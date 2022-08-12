@@ -95,7 +95,7 @@ print(
                 ]
             }],
             "tags":
-            {
+            {   "tag": Tags,
                 "lang": Langs,
                 "publish": [
                 ],
