@@ -49,7 +49,7 @@ def LinkParser(lks: list,steamCode: str):
             "icon": "twitter",
             "uri": "twitter:"+lks[i][lks[i].rfind('/')+1:]
         })
-  elif lks[i].find("youtube"):
+  elif lks[i].find("youtube")!=-1:
      ret.append(    {
             "name": ".youtube",
             "uri": lks[i]
