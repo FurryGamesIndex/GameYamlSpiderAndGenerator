@@ -100,7 +100,7 @@ def GetSteamData(url: str):
     Desc = pss(
         html2text.html2text(
             str(soup.body.find("div", attrs={
-                "class": "game_area_description"}))
+                'id': 'game_area_description',"class": "game_area_description"}))
         )
     )
 
@@ -181,13 +181,13 @@ def TagParser(tag: list):
         "lang": [],
         "publish": [],
         "platform": [],
-        "sys": ['automatically-generated'],
     }
     for i in range(len(tag)):
         for ii in range(len(db['type'])):
             if tag[i].find(db['type'][ii][0]) != -1:
                 ret['type'].append(db['type'][ii][1])
-    return list(set(ret))
+    ret['type']=list(set(ret['type']))
+    return ret
 
 
 if __name__ == '__main__':
