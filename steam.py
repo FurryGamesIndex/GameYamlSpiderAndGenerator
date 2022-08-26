@@ -27,8 +27,10 @@ def ScParser(videomp4: list, videowebm: list, sc: list, IsNSFW: bool):
             {
                 "type": "video",
                 "src": [
-                    {"mime": "video/webm", "sensitive": IsNSFW, "uri": videowebm[i]},
-                    {"mime": "video/mp4", "sensitive": IsNSFW, "uri": videomp4[i]},
+                    {"mime": "video/webm", "sensitive": IsNSFW,
+                        "uri": videowebm[i]},
+                    {"mime": "video/mp4", "sensitive": IsNSFW,
+                        "uri": videomp4[i]},
                 ],
             }
         )
@@ -36,27 +38,29 @@ def ScParser(videomp4: list, videowebm: list, sc: list, IsNSFW: bool):
         ret.append(sc[i])
     return ret
 
-def LinkParser(lks: list,steamCode: str):
- ret=[]
- ret.append({
-            "name": ".steam",
-            "uri": "steam:"+steamCode
-        })
- for i in range(len(lks)):
-  if lks[i].find("twitter")!=-1:
-   ret.append({
-            "name": "Twitter",
-            "icon": "twitter",
-            "uri": "twitter:"+lks[i][lks[i].rfind('/')+1:]
-        })
-  elif lks[i].find("youtube")!=-1:
-     ret.append(    {
-            "name": ".youtube",
-            "uri": lks[i]
-        })
-  else:
-     ret.append(lks[i])
-  return ret
+
+def LinkParser(lks: list, steamCode: str):
+    ret = []
+    ret.append({
+               "name": ".steam",
+               "uri": "steam:"+steamCode
+               })
+    for i in range(len(lks)):
+        if lks[i].find("twitter") != -1:
+            ret.append({
+                "name": "Twitter",
+                "icon": "twitter",
+                "uri": "twitter:"+lks[i][lks[i].rfind('/')+1:]
+            })
+        elif lks[i].find("youtube") != -1:
+            ret.append({
+                "name": ".youtube",
+                "uri": lks[i]
+            })
+        else:
+            ret.append(lks[i])
+        return ret
+
 
 def GetSteamData(url: str):
 
@@ -95,11 +99,13 @@ def GetSteamData(url: str):
 
     Desc = pss(
         html2text.html2text(
-            str(soup.body.find("div", attrs={"class": "game_area_description"}))
+            str(soup.body.find("div", attrs={
+                "class": "game_area_description"}))
         )
     )
 
-    b5 = soup.body.find_all("div", {"class": "highlight_player_item highlight_movie"})
+    b5 = soup.body.find_all(
+        "div", {"class": "highlight_player_item highlight_movie"})
     Video_mp4 = [
         b5[i].attrs["data-mp4-source"].split("?", 1)[0] for i in range(len(b5))
     ]
@@ -107,7 +113,8 @@ def GetSteamData(url: str):
         b5[i].attrs["data-webm-source"].split("?", 1)[0] for i in range(len(b5))
     ]
 
-    IsNSFW = soup.body.find_all("div", {"id": "game_area_content_descriptors"}) != []
+    IsNSFW = soup.body.find_all(
+        "div", {"id": "game_area_content_descriptors"}) != []
 
     b6 = soup.body.find_all("a", {"class": "app_tag"})
     Tags = [re.sub(r"[\n\t\r]*", "", b6[i].text) for i in range(len(b6))]
@@ -126,28 +133,63 @@ def GetSteamData(url: str):
     )
     yaml.default_flow_style = False
     yaml.sort_keys = False
-    ret = ""
-    return [yaml.dump_to_string(
+    parsedTag = TagParser(Tags)
+    parsedTag['lang'] = Langs
+    ret = [
         {
             "name": Name,
             "brief-description": bDesc,
             "description": Desc,
             "authors": Author,
-            "tags": {
-                "type": [],
-                "species": [],
-                "fetish": [],
-                "misc": [],
-                "Automatically-Generated_Tag": Tags,
-                "lang": Langs,
-                "publish": [],
-                "platform": [],
-                "sys": ['automatically-generated'],
-            },
-            "links": LinkParser(Linkz,url.split('/')[4]),
+            "tags": parsedTag,
+            "links": LinkParser(Linkz, url.split('/')[4]),
             "thumbnail": "thumbnail"+Thumbnail[Thumbnail.rfind('.'):],
             "screenshots": ScParser(Video_mp4, Video_webm, Sc, IsNSFW),
-        }
-    ),Thumbnail]
+        }, Thumbnail]
+    import imghandle
+    imghandle.ParserImg(ret[1], ret[0]['thumbnail'])
+    return ret
 
-print(GetSteamData(sys.argv[1])[0])
+
+def TagParser(tag: list):
+    db = {
+        "type": [
+            ["Adventure", "adventure"],
+            ["Action", "action"],
+            ["Visual Novel", "visual-novel"],
+            ["Strategy", "strategy"],
+            ["RTS", "real-time-strategy"],
+            ['Casual', 'casual'],
+            ['Management', 'business-sim'],
+            ['Card Game', 'board'],
+            ['Fighting', 'fighting'],
+            ['Music', 'music'],
+            ['Shooter', 'shooter'],
+            ['Puzzle', 'puzzle'],
+            ['RPG', 'role-playing'],
+            ['MMORPG', 'mmorpg'],
+            ['Dating Sim', 'dating-sim'],
+            ['Roguel', 'roguelike'],
+            ['Sports', 'sports']
+        ]
+    }
+    ret = {
+        "type": [],
+        "species": [],
+        "fetish": [],
+        "misc": [],
+        "lang": [],
+        "publish": [],
+        "platform": [],
+        "sys": ['automatically-generated'],
+    }
+    for i in range(len(tag)):
+        for ii in range(len(db['type'])):
+            if tag[i].find(db['type'][ii][0]) != -1:
+                ret['type'].append(db['type'][ii][1])
+    return list(set(ret))
+
+
+if __name__ == '__main__':
+    print(ruamel.yaml.YAML(typ=['rt', 'string']).dump_to_string(
+        (GetSteamData(sys.argv[1])[0])))
