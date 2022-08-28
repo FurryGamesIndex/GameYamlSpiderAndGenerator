@@ -26,19 +26,19 @@ if stm != None:
 
 # push files
 
-    str_arr = stmData[1][stmData[1].rfind('.'):]
-    with open(f'thumbnail{str_arr}',"rb") as fd:                   # 打开二进制文件
+    data,str_arr = stmData
+    with open(str_arr,"rb") as fd:                   # 打开二进制文件
      img_data=fd.read() 
-    repo.create_file(f'assets/{stmName}/thumbnail{str_arr}',
+    repo.create_file(f'assets/{stmName}/{str_arr}',
                      f'assets: games/{stmName}: add thumbnail file',
                      img_data, branch=md5(stmName))
-    print(repo.create_file('games/{}.yaml'.format(stmName), 'games/{}: new game'.format(stmName), ruamel.yaml.YAML(typ=['rt', 'string']).dump_to_string(stmData[0]),branch=md5(stmName)))
+    print(repo.create_file('games/{}.yaml'.format(stmName), 'games/{}: new game'.format(stmName),data,branch=md5(stmName)))
     time.sleep(3)
 
 # create PR
 
     fgi = g1.get_organization('FurryGamesIndex').get_repo('games')
-    pr = fgi.create_pull('[DO NOT MERGE]games/{}: new game'.format(stmName), 'Created by my bot'
+    pr = fgi.create_pull('[DO NOT MERGE]games/{}: new game'.format(stmName), 'Created by my [bot](https://github.com/kaixinol/GameYamlSpiderAndGenerator)'
                          , 'master',
                          'kaixinol:{}'.format(md5(stmName)), True)
 

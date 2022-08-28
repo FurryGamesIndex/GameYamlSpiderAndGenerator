@@ -40,6 +40,7 @@ def ScParser(videomp4: list, videowebm: list, sc: list, IsNSFW: bool):
 
 
 def LinkParser(lks: list, steamCode: str):
+    print(lks)
     ret = []
     ret.append({
                "name": ".steam",
@@ -48,8 +49,7 @@ def LinkParser(lks: list, steamCode: str):
     for i in range(len(lks)):
         if lks[i].find("twitter") != -1:
             ret.append({
-                "name": "Twitter",
-                "icon": "twitter",
+                "name": ".twitter",
                 "uri": "twitter:"+lks[i][lks[i].rfind('/')+1:]
             })
         elif lks[i].find("youtube") != -1:
@@ -59,16 +59,16 @@ def LinkParser(lks: list, steamCode: str):
             })
         else:
             ret.append(lks[i])
-        return ret
+    return ret
 
 
 def GetSteamData(url: str):
-
-    yaml = ruamel.yaml.YAML(typ=["rt", "string"])
+    from ruamel.yaml import YAML
+    yaml = YAML(typ=['rt', 'string'])
+    yaml.indent(sequence=4, offset=2)
     r = requests.get(url)
     demo = r.text
     soup = BeautifulSoup(demo, "html.parser")
-
     bDesc = soup.find("meta", {"name": "Description"})["content"]
 
     b1 = soup.body.find("div", attrs={"class": "blockbg"})
@@ -100,7 +100,7 @@ def GetSteamData(url: str):
     Desc = pss(
         html2text.html2text(
             str(soup.body.find("div", attrs={
-                'id': 'game_area_description',"class": "game_area_description"}))
+                'id': 'game_area_description', "class": "game_area_description"}))
         )
     )
 
@@ -131,24 +131,22 @@ def GetSteamData(url: str):
         .attrs["src"]
         .split("?", 1)[0]
     )
-    yaml.default_flow_style = False
-    yaml.sort_keys = False
     parsedTag = TagParser(Tags)
     parsedTag['lang'] = Langs
-    ret = [
-        {
-            "name": Name,
-            "brief-description": bDesc,
-            "description": Desc,
-            "authors": Author,
-            "tags": parsedTag,
-            "links": LinkParser(Linkz, url.split('/')[4]),
-            "thumbnail": "thumbnail"+Thumbnail[Thumbnail.rfind('.'):],
-            "screenshots": ScParser(Video_mp4, Video_webm, Sc, IsNSFW),
-        }, Thumbnail]
+    ret = {
+        "name": Name,
+        "brief-description": bDesc,
+        "description": Desc,
+        "authors": Author,
+        "tags": parsedTag,
+        "links": LinkParser(Linkz, url.split('/')[4]),
+        "thumbnail": "thumbnail"+Thumbnail[Thumbnail.rfind('.'):],
+        "screenshots": ScParser(Video_mp4, Video_webm, Sc, IsNSFW),
+    }
     import imghandle
-    imghandle.ParserImg(ret[1], ret[0]['thumbnail'])
-    return ret
+    imghandle.ParserImg(Thumbnail, ret['thumbnail'])
+    print(ret['thumbnail'])
+    return (yaml.dump_to_string(ret), ret['thumbnail'])
 
 
 def TagParser(tag: list):
@@ -186,10 +184,9 @@ def TagParser(tag: list):
         for ii in range(len(db['type'])):
             if tag[i].find(db['type'][ii][0]) != -1:
                 ret['type'].append(db['type'][ii][1])
-    ret['type']=list(set(ret['type']))
+    ret['type'] = list(set(ret['type']))
     return ret
 
 
 if __name__ == '__main__':
-    print(ruamel.yaml.YAML(typ=['rt', 'string']).dump_to_string(
-        (GetSteamData(sys.argv[1])[0])))
+    print(GetSteamData(sys.argv[1])[0])
