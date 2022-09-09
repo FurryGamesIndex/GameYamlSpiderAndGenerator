@@ -5,7 +5,8 @@ import langcodes
 import html2text
 import ruamel
 from ruamel.yaml import YAML
-from ruamel.yaml.scalarstring import PreservedScalarString as pss
+from ruamel.yaml.scalarstring import PreservedScalarString
+import textwrap
 import sys
 
 
@@ -31,7 +32,12 @@ def ScParser(videomp4: list, videowebm: list, sc: list, IsNSFW: bool):
                         "uri": videowebm[i]},
                     {"mime": "video/mp4", "sensitive": IsNSFW,
                         "uri": videomp4[i]},
-                ],
+                ] if IsNSFW else [
+                    {"mime": "video/webm",
+                        "uri": videowebm[i]},
+                    {"mime": "video/mp4",
+                        "uri": videomp4[i]},
+                ]
             }
         )
     for i in range(len(sc)):
@@ -66,10 +72,14 @@ def GetSteamData(url: str):
     from ruamel.yaml import YAML
     yaml = YAML(typ=['rt', 'string'])
     yaml.indent(sequence=4, offset=2)
+    yaml.width = 4096
+    def LS(x): return PreservedScalarString(
+        textwrap.dedent(x))  # avoid soft line
+
     r = requests.get(url)
     demo = r.text
     soup = BeautifulSoup(demo, "html.parser")
-    bDesc = soup.find("meta", {"name": "Description"})["content"]
+    bDesc = LS(soup.find("meta", {"name": "Description"})["content"])
 
     b1 = soup.body.find("div", attrs={"class": "blockbg"})
     Name = b1.find("span", {"itemprop": "name"}).text
@@ -97,12 +107,9 @@ def GetSteamData(url: str):
     b4 = soup.body.find_all("a", attrs={"class": "highlight_screenshot_link"})
     Sc = [b4[i].attrs["href"].split("?", 1)[0] for i in range(len(b4))]
 
-    Desc = pss(
-        html2text.html2text(
-            str(soup.body.find("div", attrs={
-                'id': 'game_area_description', "class": "game_area_description"}))
-        )
-    )
+    Desc = LS(html2text.html2text(
+        str(soup.body.find("div", attrs={
+            'id': 'game_area_description', "class": "game_area_description"})), bodywidth=0))  # avoid soft line
 
     b5 = soup.body.find_all(
         "div", {"class": "highlight_player_item highlight_movie"})
@@ -121,9 +128,8 @@ def GetSteamData(url: str):
 
     b7 = soup.body.find_all("div", {"class": "dev_row"})
     if b7[0].a.text != b7[1].a.text:
-        Author = [{"name": b7[0].a.text, "role": ["publisher"]}]
-        Author.append({"name": b7[1].a.text, "role": ["producer"]})
-
+        Author = [{"name": b7[1].a.text, "role": ["publisher"]}]
+        Author.append({"name": b7[0].a.text, "role": ["producer"]})
     else:
         Author = [{"name": b7[0].a.text, "role": ["publisher", "producer"]}]
     Thumbnail = (
@@ -137,6 +143,7 @@ def GetSteamData(url: str):
         "name": Name,
         "brief-description": bDesc,
         "description": Desc,
+        "description-format": 'markdown',
         "authors": Author,
         "tags": parsedTag,
         "links": LinkParser(Linkz, url.split('/')[4]),
@@ -145,8 +152,11 @@ def GetSteamData(url: str):
     }
     import imghandle
     imghandle.ParserImg(Thumbnail, ret['thumbnail'])
-    print(ret['thumbnail'])
-    return (yaml.dump_to_string(ret), ret['thumbnail'])
+    bRet = yaml.dump_to_string(ret)
+    # add top-level key line
+    for key in ['\ndescription: |', 'brief-description: |-']+[i+':' for i in list(ret.keys())[3:]]:
+        bRet = bRet.replace(key, '\n'+key)
+    return (bRet, ret['thumbnail'])
 
 
 def TagParser(tag: list):
