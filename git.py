@@ -40,7 +40,7 @@ if stm != None:
     fgi = g1.get_organization('FurryGamesIndex').get_repo('games')
     pr = fgi.create_pull('games/{}: new game'.format(stmName), 'Created by my [bot](https://github.com/kaixinol/GameYamlSpiderAndGenerator)'
                          , 'master',
-                         'kaixinol:{}'.format(md5(stmName)),draft=True, True)
+                         'kaixinol:{}'.format(md5(stmName)), True,draft=True)
 
  # comment
 
