@@ -156,7 +156,10 @@ def GetSteamData(url: str):
     # add top-level key line
     for key in ['\ndescription: |', 'brief-description: |-']+[i+':' for i in list(ret.keys())[3:]]:
         bRet = bRet.replace(key, '\n'+key)
-    return (bRet.replace("![]","![img]"), ret['thumbnail'])
+    return (RemoveQuery(bRet.replace("![]","![img]")), ret['thumbnail'])
+def RemoveQuery(s: str):
+    s = re.sub(r"\?t=\d{6,12}", "", s)
+    return s
 
 
 def TagParser(tag: list):
