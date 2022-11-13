@@ -1,6 +1,6 @@
 plugin:
-- test1
-- test2
+- steam
+#- test2
 # if you don't want to set proxy, please fill in null
 #proxy: null
 proxy:

@@ -7,7 +7,7 @@ from util.spider import get_text
 from util.spider import get_status
 from loguru import logger
 from typing import Dict, AnyStr, SupportsInt, NoReturn
-
+logger.info('Loading plugin steam')
 class search:
     @staticmethod
     def is_id_exist(url: AnyStr,id: SupportsInt):
