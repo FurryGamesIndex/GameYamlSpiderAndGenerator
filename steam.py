@@ -76,7 +76,7 @@ def GetSteamData(url: str):
     def LS(x): return PreservedScalarString(
         textwrap.dedent(x))  # avoid soft line
 
-    r = requests.get(url)
+    r = requests.get(url,proxies={'http': 'http://127.0.0.1:7890','https': 'socks5://127.0.0.1:7891'})
     demo = r.text
     soup = BeautifulSoup(demo, "html.parser")
     bDesc = LS(soup.find("meta", {"name": "Description"})["content"])
