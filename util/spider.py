@@ -46,8 +46,7 @@ def download_file(url: AnyStr, save: AnyStr) -> SupportsInt:
     try:
         response = requests.get(url, allow_redirects=True)
         if response.status_code == 200:
-            open(save, 'wb').write(requests.get(
-                url, allow_redirects=True).content)
+            open(save, 'wb').write(response.content)
             return 0
         else:
             return response.status_code

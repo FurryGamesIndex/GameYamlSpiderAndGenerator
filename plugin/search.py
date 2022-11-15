@@ -1,0 +1,50 @@
+if __name__ == '__main__':
+    import sys
+    import os
+    sys.path.append(os.path.dirname(
+        os.path.dirname(os.path.realpath(__file__))))
+from util.spider import get_json
+from util.spider import get_text
+from urllib.parse import quote_plus
+from re import sub
+from typing import AnyStr
+from bs4 import BeautifulSoup
+
+
+class search:
+    @staticmethod
+    def name_filter(s: AnyStr):
+        return sub('[^A-z]', '', s.lower())
+
+    def __init__(self, name: str) -> None:
+        self.pure = self.name_filter(name)
+        self.encode = quote_plus(name.lower())
+
+    def search_steam(self):
+        data = get_json(
+            f'https://store.steampowered.com/api/storesearch/?term={self.encode}&l=english&cc=US')['items']
+        for i in data:
+            if self.name_filter(i['name']) == self.pure:
+                return True
+        return False
+
+    def search_epic(self):
+        data = get_text(f'https://en.softonic.com/s/{self.encode}')
+        soup = BeautifulSoup(data, "html.parser")
+        bf = soup.body.find_all("a", {"class": "track-search-results"})
+        for i in range(len(bf)):
+            if self.name_filter(bf[i].div['data-meta-data']) == self.pure:
+                return True
+        return False
+
+    def search_all(self):
+        func_list = [self.__getattribute__(i) for i in (
+            list(filter(lambda x:x[-2:] != x[:2], self.__dir__())))]
+        func_list = filter(lambda x: callable(x) and x.__name__.startswith(
+            'search') and x.__name__ != 'search_all', func_list)
+        for ii in func_list:
+            print(ii())
+
+
+if __name__ == '__main__':
+    s = search('dead-space').search_all()
