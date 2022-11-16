@@ -20,7 +20,6 @@ def LS(x: AnyStr): return PS(dedent(x))
 
 class search:
     def __init__(self, link: AnyStr) -> None:
-        self.config = read_config('./plugin/config/steam.yaml')
         self.id = self.get_steam_id(link)
         self.data = get_json(
             f'https://store.steampowered.com/api/appdetails?appids={self.id}&cc=us&l=english')

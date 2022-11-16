@@ -9,16 +9,19 @@ from urllib.parse import quote_plus
 from re import sub
 from typing import AnyStr
 from bs4 import BeautifulSoup
+from util.setting import setting
+from loguru import logger
 
 
 class search:
     @staticmethod
-    def name_filter(s: AnyStr):
-        return sub('[^A-z]', '', s.lower())
+    def name_filter(s: AnyStr, rep: AnyStr = ''):
+        return sub('[^A-z]', rep, s.lower())
 
     def __init__(self, name: str) -> None:
+        logger.info(f'init {name}')
         self.pure = self.name_filter(name)
-        self.encode = quote_plus(name.lower())
+        self.encode = quote_plus(self.name_filter(name,' '))
 
     def search_steam(self):
         data = get_json(
@@ -37,13 +40,29 @@ class search:
                 return True
         return False
 
+    def search_play(self):
+        data = get_json(
+            f'https://serpapi.com/search?engine=google_play&apikey={setting["api"]["google-play"]}&store=apps&q={self.encode}')
+        for i in data["organic_results"][0]["items"]:
+            if self.name_filter(i['title']) == self.pure:
+                return True
+        return False
+
+    def search_apple(self):
+        data = get_json(
+            f'https://serpapi.com/search.json?engine=apple_app_store&term={self.encode}&apikey={setting["api"]["apple"]}')
+        for i in data["organic_results"]:
+            if self.name_filter(i['title']) == self.pure:
+                return True
+        return False
+
     def search_all(self):
         func_list = [self.__getattribute__(i) for i in (
-            list(filter(lambda x:x[-2:] != x[:2], self.__dir__())))]
+            list(filter(lambda x:'__' not in x, self.__dir__())))]
         func_list = filter(lambda x: callable(x) and x.__name__.startswith(
             'search') and x.__name__ != 'search_all', func_list)
         for ii in func_list:
-            print(ii())
+            print(ii.__name__, ii())
 
 
 if __name__ == '__main__':

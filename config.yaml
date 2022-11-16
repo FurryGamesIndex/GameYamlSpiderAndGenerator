@@ -13,3 +13,6 @@ lang: zh
 #updateRepo: 'url'
 updateRepo: null
 version: '0.1'
+api:
+  google-play: a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90
+  apple: a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90

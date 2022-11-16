@@ -12,9 +12,9 @@ def init() -> Dict | SupportsInt:
     try:
         logger.info('Reading config.yaml...')
         with open('config.yaml', 'r') as f:
-            return yaml.load(f.read())
+            return yaml.safe_load(f.read())
     except Exception as e:
-        logger.error(e)
+        logger.critical(e)
         return -1
 
 
