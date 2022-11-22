@@ -16,9 +16,15 @@ from ruamel.yaml.scalarstring import PreservedScalarString as PS
 from textwrap import dedent
 import re
 def LS(x: AnyStr): return PS(dedent(x))
+'''
+^https://www\.youtube\.com/(@[A-z]{3,})
+^https://www\.youtube\.com/channel/(.{3,})
 
+^https://twitter\.com/(.{1,})
+'''
 
 class search:
+
     def __init__(self, link: AnyStr) -> None:
         self.id = self.get_steam_id(link)
         self.data = get_json(
