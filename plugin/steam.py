@@ -10,20 +10,30 @@ from loguru import logger
 from typing import Dict, AnyStr, SupportsInt, NoReturn, List
 from bs4 import BeautifulSoup
 from langcodes import find
-from urllib.parse import urlparse,parse_qs
+from urllib.parse import urlparse, parse_qs
 from html2text import html2text
 from ruamel.yaml.scalarstring import PreservedScalarString as PS
+from ruamel.yaml import YAML
 from textwrap import dedent
 import re
 def LS(x: AnyStr): return PS(dedent(x))
-'''
-^https://www\.youtube\.com/(@[A-z]{3,})
-^https://www\.youtube\.com/channel/(.{3,})
-
-^https://twitter\.com/(.{1,})
-'''
+yaml = YAML(typ=['rt', 'string'])
+yaml.indent(sequence=4, offset=2)
+yaml.width = 4096
 
 class search:
+    @staticmethod
+    def get_steam_id(link: AnyStr) -> SupportsInt:
+        return int(urlparse(link).path.split('/')[2])
+
+    def get_steam_name(self):
+        name = self.data[str(self.id)]["data"]["name"]
+        return name
+
+    @staticmethod
+    def remove_query(s: str):
+        s = re.sub(r"\?t=\d{6,12}", "", s)
+        return s.replace('![]', '![img]')
 
     def __init__(self, link: AnyStr) -> None:
         self.id = self.get_steam_id(link)
@@ -31,16 +41,31 @@ class search:
             f'https://store.steampowered.com/api/appdetails?appids={self.id}&cc=us&l=english')
         self.data_html = get_text(link)
         self.soup = BeautifulSoup(self.data_html, "html.parser")
-        self.name = self.get_steam_name(link)
+        self.name = self.get_steam_name()
 
-    def make_yaml(self, id: SupportsInt) -> Dict | SupportsInt:
+    def make_yaml(self) -> AnyStr | SupportsInt:
         if type(self.data) == int:
             return self.data
+        ret = {
+            "name": self.get_steam_name(),
+            "brief-description": self.get_brief_desc(),
+            "description": self.get_brief_desc(),
+            "description-format": 'markdown',
+            "authors": self.get_authors(),
+            "tags": {'type': self.get_tag(),'lang': self.get_lang(),'platform': self.get_platforms()},
+            "links": self.get_link(),
+            "thumbnail": 'thumbnail.png',
+            "screenshots": self.get_screenshots()+self.get_video(),
+        }
+        bRet = yaml.dump_to_string(ret)
+        for i in list(ret.keys())[1:]:
+            bRet=bRet.replace('\n'+i,'\n\n'+i)
+        return bRet
 
     def get_lang(self) -> List[str]:
         temp = self.data[str(
             self.id)]['data']['supported_languages'].split(',')
-        return [find(i).language for i in temp]
+        return list(set([find(i).language for i in temp]))
 
     def get_desc(self):
         return LS(self.remove_query((html2text(self.data[str(self.id)]['data']['detailed_description'], bodywidth=0))))
@@ -98,7 +123,30 @@ class search:
         return [self.remove_query(i['path_full']) for i in self.data[str(self.id)]['data']['screenshots']]
 
     def get_video(self):
-        return [[self.remove_query(i['webm']['max']), self.remove_query(i['mp4']['max'])] for i in self.data[str(self.id)]['data']['movies']]
+        ret = list()
+        IsNSFW = self.get_if_nsfw()
+        videowebm = [self.remove_query(i['webm']['max'])
+                     for i in self.data[str(self.id)]['data']['movies']]
+        videomp4 = [self.remove_query(i['mp4']['max'])
+                    for i in self.data[str(self.id)]['data']['movies']]
+        for i in range(len(videowebm)):
+            ret.append(
+                {
+                    "type": "video",
+                    "src": [
+                        {"mime": "video/webm", "sensitive": IsNSFW,
+                         "uri": videowebm[i]},
+                        {"mime": "video/mp4", "sensitive": IsNSFW,
+                         "uri": videomp4[i]},
+                    ] if IsNSFW else [
+                        {"mime": "video/webm",
+                         "uri": videowebm[i]},
+                        {"mime": "video/mp4",
+                         "uri": videomp4[i]},
+                    ]
+                }
+            )
+        return ret
 
     def get_link(self) -> List[dict]:
         def remove_query_string(x: AnyStr):
@@ -108,40 +156,45 @@ class search:
                 return x
         temp1 = self.soup.body.find("div", attrs={
             'id': 'game_area_description', "class": "game_area_description"})
-        temp3=self.soup.body.find("div", attrs={"style": "padding-top: 14px;"})
-        temp2=temp3.find_all('a')
-        temp4=[remove_query_string(i["data-tooltip-text"]) for i in temp2 if "data-tooltip-text" in i.attrs]
+        temp3 = self.soup.body.find(
+            "div", attrs={"style": "padding-top: 14px;"})
+        temp2 = temp3.find_all('a')
+        temp4 = [remove_query_string(i["data-tooltip-text"])
+                 for i in temp2 if "data-tooltip-text" in i.attrs]
         temp = temp1.select("a[href]")
         ret = []
         for i in temp:
             ret.append(remove_query_string(i.attrs['href']))
-        return list(set(ret+temp4))
+        fgi_dict = [
+            {'match': '^https://www\.youtube\.com/(@?[A-z]{3,})',
+             'prefix': '.youtube', 'replace': "youtube:\\g<1>"},
+            {'match': '^https://www\.youtube\.com/channel/(.{3,})',
+             'prefix': '.youtube', 'replace': "youtube:\\g<1>"},
+            {'match': '^https://twitter\.com/(.{1,})',
+             'prefix': '.twitter', 'replace': "twitter:\\g<1>"},
+            {'match': '^https://www\.patreon\.com/(.+)',
+             'prefix': '.patreon', 'replace': "patreon:\\g<1>"},
+            {'match': '^https://discord\.gg/(.+)', 'prefix': '.discord',
+             'replace': "discord:\\g<1>"}
+        ]
+        data = [{'url': i, 'processed': False} for i in list(set(ret+temp4))]
+        processed_data = list()
+        for i in data:
+            for p in fgi_dict:
+                if re.match(p['match'], i['url']) != None:
+                    processed_data.append(
+                        {'name': p['prefix'], 'uri':  re.sub(p['match'], p['replace'], i['url'])})
+                    i['processed'] = True
+        for i in data:
+            if not i['processed']:
+                processed_data.append({'name': '.website', 'uri': i['url']})
+        return processed_data
 
-    @staticmethod
-    def get_steam_id(link: AnyStr) -> SupportsInt:
-        return int(urlparse(link).path.split('/')[2])
-
-    @staticmethod
-    def get_steam_name(link: AnyStr) -> SupportsInt:
-        name = urlparse(link).path.split('/')[3]
-        return name if name != '_' else '[NAME NEED TRANSLATE]'
-
-    @staticmethod
-    def remove_query(s: str):
-        s = re.sub(r"\?t=\d{6,12}", "", s)
-        return s.replace('![]', '![img]')
+    def get_thumbnail(self):
+        return self.remove_query(self.soup.body.find("img", {"class": "game_header_image_full"}).attrs["src"])
 
 
 if __name__ == '__main__':
     obj = search('https://store.steampowered.com/app/1313140/_/')
-    print(obj.get_lang())
-    print(obj.get_brief_desc())
-    print(obj.get_desc())
-    print(obj.get_authors())
-    print(obj.get_platforms())
-    print(obj.get_tag())
-    print(obj.get_if_nsfw())
-    print(obj.get_screenshots())
-    print(obj.get_video())
-    print(obj.get_link())
-    print(obj.name)
+    print(obj.make_yaml())
+
