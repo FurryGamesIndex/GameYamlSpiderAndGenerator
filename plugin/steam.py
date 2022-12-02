@@ -52,7 +52,7 @@ class search:
             "description": self.get_brief_desc(),
             "description-format": 'markdown',
             "authors": self.get_authors(),
-            "tags": {'type': self.get_tag(),'lang': self.get_lang(),'platform': self.get_platforms()},
+            "tags": {'type': self.get_type_tag(),'lang': self.get_lang(),'platform': self.get_platforms(),'misc': self.get_misc_tag},
             "links": self.get_link(),
             "thumbnail": 'thumbnail.png',
             "screenshots": self.get_screenshots()+self.get_video(),
@@ -86,7 +86,7 @@ class search:
         repl = {'windows': 'windows', 'mac': 'macos', 'linux': 'linux'}
         return [repl[i] for i in temp if i]
 
-    def get_tag(self) -> List[str]:
+    def get_type_tag(self) -> List[str]:
         repl = {
             "Adventure": "adventure",
             "Action": "action",
