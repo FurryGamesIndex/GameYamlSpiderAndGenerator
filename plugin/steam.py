@@ -1,6 +1,7 @@
 if __name__ == '__main__':
     import sys
     import os
+
     sys.path.append(os.path.dirname(
         os.path.dirname(os.path.realpath(__file__))))
 from util.spider import get_json
@@ -16,12 +17,17 @@ from ruamel.yaml.scalarstring import PreservedScalarString as PS
 from ruamel.yaml import YAML
 from textwrap import dedent
 import re
-def LS(x: AnyStr): return PS(dedent(x))
+
+
+def ls(x: AnyStr): return PS(dedent(x))
+
+
 yaml = YAML(typ=['rt', 'string'])
 yaml.indent(sequence=4, offset=2)
 yaml.width = 4096
 
-class search:
+
+class Search:
     @staticmethod
     def get_steam_id(link: AnyStr) -> SupportsInt:
         return int(urlparse(link).path.split('/')[2])
@@ -42,24 +48,29 @@ class search:
         self.data_html = get_text(link)
         self.soup = BeautifulSoup(self.data_html, "html.parser")
         self.name = self.get_steam_name()
+        temp1 = self.soup.body.find_all("a", {"class": "app_tag"})
+        self.tag = [re.sub(r"[\n\t\r]*", "", temp1[i].text)
+                for i in range(len(temp1))]
+
 
     def make_yaml(self) -> AnyStr | SupportsInt:
         if type(self.data) == int:
             return self.data
         ret = {
             "name": self.get_steam_name(),
-            "brief-description": self.get_brief_desc(),
+            "brief-description": self.get_desc(),
             "description": self.get_brief_desc(),
             "description-format": 'markdown',
             "authors": self.get_authors(),
-            "tags": {'type': self.get_type_tag(),'lang': self.get_lang(),'platform': self.get_platforms(),'misc': self.get_misc_tag},
+            "tags": {'type': self.get_type_tag(), 'lang': self.get_lang(), 'platform': self.get_platforms(),
+                     'misc': self.get_misc_tag()},
             "links": self.get_link(),
             "thumbnail": 'thumbnail.png',
-            "screenshots": self.get_screenshots()+self.get_video(),
+            "screenshots": self.get_screenshots() + self.get_video(),
         }
         bRet = yaml.dump_to_string(ret)
         for i in list(ret.keys())[1:]:
-            bRet=bRet.replace('\n'+i,'\n\n'+i)
+            bRet = bRet.replace('\n' + i, '\n\n' + i)
         return bRet
 
     def get_lang(self) -> List[str]:
@@ -68,10 +79,10 @@ class search:
         return list(set([find(i).language for i in temp]))
 
     def get_desc(self):
-        return LS(self.remove_query((html2text(self.data[str(self.id)]['data']['detailed_description'], bodywidth=0))))
+        return ls(self.remove_query((html2text(self.data[str(self.id)]['data']['detailed_description'], bodywidth=0))))
 
     def get_brief_desc(self):
-        return LS(html2text(self.data[str(self.id)]['data']['short_description'], bodywidth=0))
+        return ls(html2text(self.data[str(self.id)]['data']['short_description'], bodywidth=0))
 
     def get_authors(self) -> List[dict]:
         temp = self.data[str(self.id)]['data']
@@ -79,7 +90,7 @@ class search:
                       for i in temp['developers']]
         publishers = [{'name': i, 'role': 'publisher'}
                       for i in temp['publishers']]
-        return developers+publishers
+        return developers + publishers
 
     def get_platforms(self):
         temp = self.data[str(self.id)]['data']['platforms']
@@ -104,14 +115,34 @@ class search:
             'MMORPG': 'mmorpg',
             'Dating Sim': 'dating-sim',
             'Roguel': 'roguelike',
-            'Sports': 'sports'
+            'Sports': 'sports',
+            'Comedy': 'comedy',
+            'Horror': 'horror'
         }
-        temp1 = self.soup.body.find_all("a", {"class": "app_tag"})
-        temp = [re.sub(r"[\n\t\r]*", "", temp1[i].text)
-                for i in range(len(temp1))]
+
         ret = []
         for i in repl:
-            for ii in temp:
+            for ii in self.tag:
+                if i in ii:
+                    ret.append(repl[i])
+        return list(set(ret))
+
+    def get_misc_tag(self):
+        repl = {'3D': '3d',
+                'Pixel': 'pixel-art',
+                'Multiplayer': 'multiplayer',
+                'PvP': 'pvp',
+                'Sexual': 'uncensored',
+                'Nudity': 'uncensored',
+                'Free to Play': 'freeware',
+                'Story Rich': 'multiple-endings',
+                'JRPG': 'multiple-endings',
+                'Co-Op': 'co-op',
+                'Online': 'online'
+                }
+        ret = []
+        for i in repl:
+            for ii in self.tag:
                 if i in ii:
                     ret.append(repl[i])
         return list(set(ret))
@@ -154,6 +185,7 @@ class search:
                 return parse_qs(urlparse(x).query)['url'][0]
             else:
                 return x
+
         temp1 = self.soup.body.find("div", attrs={
             'id': 'game_area_description', "class": "game_area_description"})
         temp3 = self.soup.body.find(
@@ -166,24 +198,26 @@ class search:
         for i in temp:
             ret.append(remove_query_string(i.attrs['href']))
         fgi_dict = [
-            {'match': '^https://www\.youtube\.com/(@?[A-z]{3,})',
-             'prefix': '.youtube', 'replace': "youtube:\\g<1>"},
-            {'match': '^https://www\.youtube\.com/channel/(.{3,})',
+            {'match': '^https://www\.youtube\.com/@?([^/]+)/?',
+             'prefix': '.youtube', 'replace': "youtube:@\\g<1>"},
+            {'match': '^https://www\.youtube\.com/channel/(.+[^/])',
              'prefix': '.youtube', 'replace': "youtube:\\g<1>"},
             {'match': '^https://twitter\.com/(.{1,})',
              'prefix': '.twitter', 'replace': "twitter:\\g<1>"},
             {'match': '^https://www\.patreon\.com/(.+)',
              'prefix': '.patreon', 'replace': "patreon:\\g<1>"},
             {'match': '^https://discord\.gg/(.+)', 'prefix': '.discord',
-             'replace': "discord:\\g<1>"}
+             'replace': "discord:\\g<1>"},
+            {'match': 'https://www\.facebook\.com/(.+)/', 'prefix': '.facebook',
+             'replace': "facebook:\\g<1>"}
         ]
-        data = [{'url': i, 'processed': False} for i in list(set(ret+temp4))]
+        data = [{'url': i, 'processed': False} for i in list(set(ret + temp4))]
         processed_data = list()
         for i in data:
             for p in fgi_dict:
-                if re.match(p['match'], i['url']) != None:
+                if re.match(p['match'], i['url']) is not None:
                     processed_data.append(
-                        {'name': p['prefix'], 'uri':  re.sub(p['match'], p['replace'], i['url'])})
+                        {'name': p['prefix'], 'uri': re.sub(p['match'], p['replace'], i['url'])})
                     i['processed'] = True
         for i in data:
             if not i['processed']:
@@ -195,6 +229,5 @@ class search:
 
 
 if __name__ == '__main__':
-    obj = search('https://store.steampowered.com/app/1313140/_/')
+    obj = Search('https://store.steampowered.com/app/381210/Dead_by_Daylight/')
     print(obj.make_yaml())
-

@@ -14,7 +14,7 @@ from html2text import html2text
 from langcodes import find
 
 
-class search:
+class Search:
     def __init__(self, link: AnyStr) -> None:
         self.data_html = get_text(link)
         self.soup = BeautifulSoup(self.data_html, "html.parser")
@@ -64,16 +64,18 @@ class search:
     def get_link(self) -> List[dict]:
         link = [i.attrs['href'] for i in self.soup.select('a[href]')]
         fgi_dict = [
-            {'match': '^https://www\.youtube\.com/(@?[A-z]{3,})',
-             'prefix': '.youtube', 'replace': "youtube:\\g<1>"},
-            {'match': '^https://www\.youtube\.com/channel/(.{3,})',
+            {'match': '^https://www\.youtube\.com/@?([^/]+)/?',
+             'prefix': '.youtube', 'replace': "youtube:@\\g<1>"},
+            {'match': '^https://www\.youtube\.com/channel/(.+[^/])',
              'prefix': '.youtube', 'replace': "youtube:\\g<1>"},
             {'match': '^https://twitter\.com/(.{1,})',
              'prefix': '.twitter', 'replace': "twitter:\\g<1>"},
             {'match': '^https://www\.patreon\.com/(.+)',
              'prefix': '.patreon', 'replace': "patreon:\\g<1>"},
             {'match': '^https://discord\.gg/(.+)', 'prefix': '.discord',
-             'replace': "discord:\\g<1>"}
+             'replace': "discord:\\g<1>"},
+            {'match': 'https://www\.facebook\.com/(.+)/', 'prefix': '.facebook',
+             'replace': "facebook:\\g<1>"}
         ]
         data = [i for i in list(set(link))]
         processed_data = list()
@@ -86,7 +88,7 @@ class search:
 
 
 if __name__ == '__main__':
-    obj = search(link='https://horrorbuns.itch.io/clawstar-wrestling')
+    obj = Search(link='https://horrorbuns.itch.io/clawstar-wrestling')
     print(obj.get_thumbnail())
     print(obj.get_desc())
     print(obj.get_name())
