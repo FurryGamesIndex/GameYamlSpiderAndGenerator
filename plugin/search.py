@@ -21,7 +21,7 @@ class search:
     def __init__(self, name: str) -> None:
         logger.info(f'init {name}')
         self.pure = self.name_filter(name)
-        self.encode = quote_plus(self.name_filter(name,' '))
+        self.encode = quote_plus(self.name_filter(name, ' '))
 
     def search_steam(self):
         data = get_json(

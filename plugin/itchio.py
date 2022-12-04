@@ -20,6 +20,7 @@ class Search:
         self.soup = BeautifulSoup(self.data_html, "html.parser")
         self.data = [ii for ii in [loads(i.text) for i in self.soup.find_all(
             'script', attrs={'type': "application/ld+json"})] if 'name' in ii][0]
+        self.more_info=self.get_more_info()
 
     def get_thumbnail(self):
         return self.soup.select_one('#header > img').attrs['src']
@@ -38,27 +39,26 @@ class Search:
 
     def get_platforms(self):
         repl = {'Windows': 'windows', 'macOS': 'macos',
-                'Linux': 'linux', 'Android': 'android'}
-        return [repl[i.strip()] for i in self.soup.select_one('div.info_panel_wrapper > div > table > tbody > tr:nth-child(4) > td:nth-child(2)').text.split(',')]
+                'Linux': 'linux', 'Android': 'android', 
+                'HTML5': 'web', 'iOS': 'ios'}
+        platforms=self.more_info['Platforms'][0].split(',')
+        return [repl[i.strip()] for i in platforms]
 
     def get_authors(self) -> List[dict]:
-        temp = self.soup.select_one(
-            'div.info_panel_wrapper > div > table > tbody > tr:nth-child(6) > td:nth-child(2)').text.split(',')
+        temp = self.more_info['Author']
         author = [{'name': i, 'role': 'developer'}
                   for i in temp]
         return author
 
     def get_tag(self) -> List[str]:
-        temp = self.soup.select_one(
-            'div.info_panel_wrapper > div > table > tbody > tr:nth-child(7) > td:nth-child(2)').text.split(',')
-        temp1 = self.soup.select_one(
-            'div.info_panel_wrapper > div > table > tbody > tr:nth-child(9) > td:nth-child(2)').text.split(',')
-        temp2 = [i.strip() for i in (temp1+temp)]
-        return temp2
+        temp = self.more_info['Genre']
+        temp1 = self.more_info['Made with']if 'Made with' in self.more_info else ''
+        temp2 = self.more_info['Tags']
+        temp3 = [i.strip() for i in (temp2+temp1+temp)]
+        return temp3
 
     def get_lang(self) -> List[str]:
-        temp = self.soup.select_one(
-            'div.info_panel_wrapper > div > table > tbody > tr:nth-child(11) > td:nth-child(2)').text.split(',')
+        temp = self.more_info['Languages']
         return list(set([find(i).language for i in temp]))
 
     def get_link(self) -> List[dict]:
@@ -85,15 +85,23 @@ class Search:
                     processed_data.append(
                         {'name': p['prefix'], 'uri':  sub(p['match'], p['replace'], i)})
         return processed_data
-
-
+    def get_more_info(self):
+        d={}
+        for i in range(1,18):
+            try:
+                cache=self.soup.select_one(f'div.info_panel_wrapper > div > table > tbody > tr:nth-child({str(i)})')
+                temp=[i.get_text() for i in list(cache.children)]
+                d[temp[0]]=temp[1:][0].split(',')
+            except:
+                continue
+        return d
 if __name__ == '__main__':
-    obj = Search(link='https://horrorbuns.itch.io/clawstar-wrestling')
+    obj = Search(link='https://fymm-game.itch.io/ddp')
     print(obj.get_thumbnail())
     print(obj.get_desc())
     print(obj.get_name())
     print(obj.get_screenshots())
-    print(obj.get_desc())
+    print(obj.get_brief_desc())
     print(obj.get_platforms())
     print(obj.get_authors())
     print(obj.get_tag())
