@@ -50,8 +50,7 @@ class Search:
         self.name = self.get_steam_name()
         temp1 = self.soup.body.find_all("a", {"class": "app_tag"})
         self.tag = [re.sub(r"[\n\t\r]*", "", temp1[i].text)
-                for i in range(len(temp1))]
-
+                    for i in range(len(temp1))]
 
     def make_yaml(self) -> AnyStr | SupportsInt:
         if type(self.data) == int:
