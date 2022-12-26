@@ -8,7 +8,7 @@ from util.spider import get_json
 from util.spider import get_text
 from urllib.parse import quote_plus
 from re import sub, match
-from typing import AnyStr, Dict, List
+from typing import AnyStr, Dict, List, Set, Any
 from bs4 import BeautifulSoup
 from json import loads
 from html2text import html2text
@@ -58,6 +58,33 @@ class Search:
         temp2 = self.more_info['Tags']
         temp3 = [i.strip() for i in (temp2 + temp1 + temp)]
         return temp3
+
+    def get_misc_tag(self):
+        repl = {
+            "3D": "3d",
+            "Pixel Art": "pixel-art",
+            "free": "freeware",
+            "Multiplayer": "multiplayer",
+            "Co-op": "co-op",
+            "PvP": "pvp",
+            "Ren'Py": "engine-renpy",
+            "Unity": "engine-unity",
+            "RPG Maker": "engine-rpg-maker",
+            "Godot": "engine-godot",
+            "ue4": "engine-ue4",
+            "unreal - engine - 4": "engine-ue4",
+            "TyranoBuilder": "engine-tyranobuilder",
+            "Flash": "adobe-flash",
+            "t-series": "multiple-series",
+            "Multiple Endings": "multiple-endings"
+        }
+
+        ret = []
+        for i in repl:
+            for ii in self.tag:
+                if i in ii:
+                    ret.append(repl[i])
+        return list(set(ret))
 
     def get_lang(self) -> List[str]:
         temp = self.more_info['Languages']
@@ -111,3 +138,4 @@ if __name__ == '__main__':
     print(obj.get_authors())
     print(obj.get_lang())
     print(obj.get_link())
+    print(obj.get_misc_tag())

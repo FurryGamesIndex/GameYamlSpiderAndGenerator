@@ -8,7 +8,7 @@ from util.spider import get_json
 from util.spider import get_text
 from util.yaml_parse import read_config
 from loguru import logger
-from typing import Dict, AnyStr, SupportsInt, NoReturn, List
+from typing import Dict, AnyStr, SupportsInt, NoReturn, List, Set, Any
 from bs4 import BeautifulSoup
 from langcodes import find
 from urllib.parse import urlparse, parse_qs
@@ -96,7 +96,7 @@ class Search:
         repl = {'windows': 'windows', 'mac': 'macos', 'linux': 'linux'}
         return [repl[i] for i in temp if i]
 
-    def get_type_tag(self) -> List[str]:
+    def get_type_tag(self):
         repl = {
             "Adventure": "adventure",
             "Action": "action",
@@ -197,17 +197,17 @@ class Search:
         for i in temp:
             ret.append(remove_query_string(i.attrs['href']))
         fgi_dict = [
-            {'match': '^https://www\.youtube\.com/@?([^/]+)/?',
+            {'match': '^https://www.youtube.com/@?([^/]+)/?',
              'prefix': '.youtube', 'replace': "youtube:@\\g<1>"},
-            {'match': '^https://www\.youtube\.com/channel/(.+[^/])',
+            {'match': '^https://www.youtube.com/channel/(.+[^/])',
              'prefix': '.youtube', 'replace': "youtube:\\g<1>"},
-            {'match': '^https://twitter\.com/(.{1,})',
+            {'match': '^https://twitter.com/(.{1,})',
              'prefix': '.twitter', 'replace': "twitter:\\g<1>"},
-            {'match': '^https://www\.patreon\.com/(.+)',
+            {'match': '^https://www.patreon.com/(.+)',
              'prefix': '.patreon', 'replace': "patreon:\\g<1>"},
-            {'match': '^https://discord\.gg/(.+)', 'prefix': '.discord',
+            {'match': '^https://discord.gg/(.+)', 'prefix': '.discord',
              'replace': "discord:\\g<1>"},
-            {'match': 'https://www\.facebook\.com/(.+)/', 'prefix': '.facebook',
+            {'match': 'https://www.facebook.com/(.+)/', 'prefix': '.facebook',
              'replace': "facebook:\\g<1>"}
         ]
         data = [{'url': i, 'processed': False} for i in list(set(ret + temp4))]
