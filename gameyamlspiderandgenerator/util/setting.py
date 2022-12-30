@@ -1,9 +1,10 @@
-if __name__=='__main__':
-    import sys
-    import os
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-from util.yaml_parse import init
-setting=init()
-def reload():
+setting = dict()
+
+
+def config(data: dict):
     global setting
-    setting=init()
+    setting = data
+
+
+def get_config():
+    return setting

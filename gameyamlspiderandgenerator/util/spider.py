@@ -1,16 +1,20 @@
-if __name__ == '__main__':
+if __name__ != '__main__':
     import sys
     import os
+
     sys.path.append(os.path.dirname(
         os.path.dirname(os.path.realpath(__file__))))
 
 from loguru import logger
 from typing import Dict, AnyStr, SupportsInt, NoReturn
 import requests
-from util.setting import setting
+from gameyamlspiderandgenerator.util.setting import get_config
+
+setting = get_config()
 
 
 def get_json(url: AnyStr) -> SupportsInt | Dict:
+    logger.info(setting)
     try:
         response = requests.get(url, proxies=setting['proxy'])
         if response.status_code == 200:
@@ -56,7 +60,6 @@ def download_file(url: AnyStr, save: AnyStr) -> SupportsInt:
 
 
 if __name__ == '__main__':
-
     logger.info(get_json(
         'https://raw.githubusercontent.com/FurryGamesIndex/GameYamlSpiderAndGenerator/master/version.json'))
     logger.info(get_text('https://www.so.com/'))

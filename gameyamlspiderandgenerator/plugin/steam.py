@@ -4,9 +4,7 @@ if __name__ == '__main__':
 
     sys.path.append(os.path.dirname(
         os.path.dirname(os.path.realpath(__file__))))
-from util.spider import get_json
-from util.spider import get_text
-from util.yaml_parse import read_config
+from gameyamlspiderandgenerator.util.spider import get_json, get_text
 from loguru import logger
 from typing import Dict, AnyStr, SupportsInt, NoReturn, List, Set, Any
 from bs4 import BeautifulSoup

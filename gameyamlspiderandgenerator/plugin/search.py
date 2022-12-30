@@ -3,17 +3,17 @@ if __name__ == '__main__':
     import os
     sys.path.append(os.path.dirname(
         os.path.dirname(os.path.realpath(__file__))))
-from util.spider import get_json
-from util.spider import get_text
+from gameyamlspiderandgenerator.util.spider import get_json
+from gameyamlspiderandgenerator.util.spider import get_text
 from urllib.parse import quote_plus
 from re import sub
 from typing import AnyStr
 from bs4 import BeautifulSoup
-from util.setting import setting
+from gameyamlspiderandgenerator.util.setting import setting
 from loguru import logger
 
 
-class search:
+class Search:
     @staticmethod
     def name_filter(s: AnyStr, rep: AnyStr = ''):
         return sub('[^A-z]', rep, s.lower())
@@ -66,4 +66,4 @@ class search:
 
 
 if __name__ == '__main__':
-    s = search('dead-space').search_all()
+    s = Search('dead-space').search_all()
