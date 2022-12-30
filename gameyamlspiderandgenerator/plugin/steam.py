@@ -27,6 +27,11 @@ yaml.width = 4096
 
 class Search:
     @staticmethod
+    def verify(url: str):
+        return re.match(r'https://store\.steampowered\.com/app/\d*/.+/',
+                        url) is not None
+
+    @staticmethod
     def get_steam_id(link: AnyStr) -> SupportsInt:
         return int(urlparse(link).path.split('/')[2])
 

@@ -1,12 +1,13 @@
 if __name__ == '__main__':
     import sys
     import os
+
     sys.path.append(os.path.dirname(
         os.path.dirname(os.path.realpath(__file__))))
 from gameyamlspiderandgenerator.util.spider import get_json
 from gameyamlspiderandgenerator.util.spider import get_text
 from urllib.parse import quote_plus
-from re import sub
+from re import sub, match
 from typing import AnyStr
 from bs4 import BeautifulSoup
 from gameyamlspiderandgenerator.util.setting import setting
@@ -58,7 +59,7 @@ class Search:
 
     def search_all(self):
         func_list = [self.__getattribute__(i) for i in (
-            list(filter(lambda x:'__' not in x, self.__dir__())))]
+            list(filter(lambda x: '__' not in x, self.__dir__())))]
         func_list = filter(lambda x: callable(x) and x.__name__.startswith(
             'search') and x.__name__ != 'search_all', func_list)
         for ii in func_list:
@@ -66,4 +67,4 @@ class Search:
 
 
 if __name__ == '__main__':
-    s = Search('dead-space').search_all()
+    Search('dead-space').search_all()

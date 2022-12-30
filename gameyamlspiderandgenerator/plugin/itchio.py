@@ -4,8 +4,8 @@ if __name__ == '__main__':
 
     sys.path.append(os.path.dirname(
         os.path.dirname(os.path.realpath(__file__))))
-from util.spider import get_json
-from util.spider import get_text
+from gameyamlspiderandgenerator.util.spider import get_json
+from gameyamlspiderandgenerator.util.spider import get_text
 from urllib.parse import quote_plus
 from re import sub, match
 from typing import AnyStr, Dict, List, Set, Any
@@ -16,6 +16,10 @@ from langcodes import find
 
 
 class Search:
+    @staticmethod
+    def verify(url: str):
+        return match(r'https://.+\.itch\.io/.+', url) is not None
+
     def __init__(self, link: AnyStr) -> None:
         self.data_html = get_text(link)
         self.soup = BeautifulSoup(self.data_html, "html.parser")

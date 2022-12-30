@@ -8,3 +8,7 @@ def config(data: dict):
 
 def get_config():
     return setting
+
+
+def set_config(name: str, data: dict):
+    setting[name] = data
