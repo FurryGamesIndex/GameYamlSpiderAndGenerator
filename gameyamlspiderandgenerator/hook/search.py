@@ -65,6 +65,9 @@ class Search:
         for ii in func_list:
             print(ii.__name__, ii())
 
+    def setup(self, data: dict):
+        pass
+
 
 if __name__ == '__main__':
     Search('dead-space').search_all()

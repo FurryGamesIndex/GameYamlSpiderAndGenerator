@@ -1,7 +1,8 @@
 plugin:
 - steam
 - itchio
-#- test2
+hook:
+- search
 # if you don't want to set proxy, please fill in null
 #proxy: null
 proxy:

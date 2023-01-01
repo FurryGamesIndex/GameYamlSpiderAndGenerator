@@ -6,6 +6,8 @@ if __name__ == '__main__':
         os.path.dirname(os.path.realpath(__file__))))
 from gameyamlspiderandgenerator.util.spider import get_json
 from gameyamlspiderandgenerator.util.spider import get_text
+from gameyamlspiderandgenerator.util.setting import get_config
+from gameyamlspiderandgenerator.util.plugin_manager import load_plugins
 from urllib.parse import quote_plus
 from re import sub, match
 from typing import AnyStr, Dict, List, Set, Any
@@ -13,6 +15,9 @@ from bs4 import BeautifulSoup
 from json import loads
 from html2text import html2text
 from langcodes import find
+from loguru import logger
+
+setting = get_config()
 
 
 class Search:
@@ -129,6 +134,13 @@ class Search:
             except:
                 continue
         return d
+
+    def __load_hook(self, data: dict):
+        self.pkg = load_plugins()
+        temp = data
+        for i in self.pkg['hook']:
+            temp = self.pkg['hook'].Search(self.get_name()).setup(temp)
+        return temp
 
 
 if __name__ == '__main__':
