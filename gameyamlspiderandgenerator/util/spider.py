@@ -59,7 +59,3 @@ def download_file(url: AnyStr, save: AnyStr) -> SupportsInt:
         return -3
 
 
-if __name__ == '__main__':
-    logger.info(get_json(
-        'https://raw.githubusercontent.com/FurryGamesIndex/GameYamlSpiderAndGenerator/master/version.json'))
-    logger.info(get_text('https://www.so.com/'))

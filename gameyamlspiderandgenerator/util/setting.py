@@ -10,5 +10,5 @@ def get_config():
     return setting
 
 
-def set_config(name: str, data: dict):
+def set_config(name: str, data: dict | list[str]):
     setting[name] = data
