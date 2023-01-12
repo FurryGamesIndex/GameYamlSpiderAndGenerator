@@ -1,21 +1,21 @@
-if __name__ == '__main__':
-    import sys
-    import os
+from contextlib import suppress
 
-    sys.path.append(os.path.dirname(
-        os.path.dirname(os.path.realpath(__file__))))
-from gameyamlspiderandgenerator.util.spider import get_json
-from gameyamlspiderandgenerator.util.spider import get_text
-from gameyamlspiderandgenerator.util.setting import get_config
-from gameyamlspiderandgenerator.util.plugin_manager import load_plugins
-from urllib.parse import quote_plus
-from re import sub, match
-from typing import AnyStr, Dict, List, Set, Any
-from bs4 import BeautifulSoup
+if __name__ == "__main__":
+    import os
+    import sys
+
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from json import loads
+from re import match, sub
+from typing import AnyStr, List
+
+from bs4 import BeautifulSoup
 from html2text import html2text
 from langcodes import find
-from loguru import logger
+
+from gameyamlspiderandgenerator.util.plugin_manager import load_plugins
+from gameyamlspiderandgenerator.util.setting import get_config
+from gameyamlspiderandgenerator.util.spider import get_text
 
 setting = get_config()
 
@@ -23,48 +23,70 @@ setting = get_config()
 class Search:
     @staticmethod
     def verify(url: str):
-        return match(r'https://.+\.itch\.io/.+', url) is not None
+        return match(r"https://.+\.itch\.io/.+", url) is not None
 
     def __init__(self, link: AnyStr) -> None:
         self.data_html = get_text(link)
         self.soup = BeautifulSoup(self.data_html, "html.parser")
-        self.data = [ii for ii in [loads(i.text) for i in self.soup.find_all(
-            'script', attrs={'type': "application/ld+json"})] if 'name' in ii][0]
+        self.data = [
+            ii
+            for ii in [
+                loads(i.text)
+                for i in self.soup.find_all(
+                    "script", attrs={"type": "application/ld+json"}
+                )
+            ]
+            if "name" in ii
+        ][0]
         self.more_info = self.get_more_info()
         self.tag = self.get_tag()
 
     def get_thumbnail(self):
-        return self.soup.select_one('#header > img').attrs['src']
+        return self.soup.select_one("#header > img").attrs["src"]
 
     def get_brief_desc(self):
-        return self.data['aggregateRating']['description'] if 'description' in self.data['aggregateRating'] else None
+        return (
+            self.data["aggregateRating"]["description"]
+            if "description" in self.data["aggregateRating"]
+            else None
+        )
 
     def get_name(self):
-        return self.data['name']
+        return self.data["name"]
 
     def get_screenshots(self):
-        return [i.attrs['src'] for i in self.soup.find_all('img', attrs={'class': "screenshot"})]
+        return [
+            i.attrs["src"]
+            for i in self.soup.find_all("img", attrs={"class": "screenshot"})
+        ]
 
     def get_desc(self):
-        return html2text(str(self.soup.select_one('div.formatted_description.user_formatted')), bodywidth=0).strip()
+        return html2text(
+            str(self.soup.select_one("div.formatted_description.user_formatted")),
+            bodywidth=0,
+        ).strip()
 
     def get_platforms(self):
-        repl = {'Windows': 'windows', 'macOS': 'macos',
-                'Linux': 'linux', 'Android': 'android',
-                'HTML5': 'web', 'iOS': 'ios'}
-        platforms = self.more_info['Platforms'][0].split(',')
+        repl = {
+            "Windows": "windows",
+            "macOS": "macos",
+            "Linux": "linux",
+            "Android": "android",
+            "HTML5": "web",
+            "iOS": "ios",
+        }
+        platforms = self.more_info["Platforms"][0].split(",")
         return [repl[i.strip()] for i in platforms]
 
     def get_authors(self) -> List[dict]:
-        temp = self.more_info['Author']
-        author = [{'name': i, 'role': 'developer'}
-                  for i in temp]
+        temp = self.more_info["Author"]
+        author = [{"name": i, "role": "developer"} for i in temp]
         return author
 
     def get_tag(self) -> List[str]:
-        temp = self.more_info['Genre'] if 'Genre' in self.more_info else ''
-        temp1 = self.more_info['Made with'] if 'Made with' in self.more_info else ''
-        temp2 = self.more_info['Tags']
+        temp = self.more_info["Genre"] if "Genre" in self.more_info else ""
+        temp1 = self.more_info["Made with"] if "Made with" in self.more_info else ""
+        temp2 = self.more_info["Tags"]
         temp3 = [i.strip() for i in (temp2 + temp1 + temp)]
         return temp3
 
@@ -85,7 +107,7 @@ class Search:
             "TyranoBuilder": "engine-tyranobuilder",
             "Flash": "adobe-flash",
             "t-series": "multiple-series",
-            "Multiple Endings": "multiple-endings"
+            "Multiple Endings": "multiple-endings",
         }
 
         ret = []
@@ -96,55 +118,74 @@ class Search:
         return list(set(ret))
 
     def get_lang(self) -> List[str]:
-        temp = self.more_info['Languages']
+        temp = self.more_info["Languages"]
         return list(set([find(i).language for i in temp]))
 
     def get_link(self) -> List[dict]:
-        link = [i.attrs['href'] for i in self.soup.select('a[href]')]
+        link = [i.attrs["href"] for i in self.soup.select("a[href]")]
         fgi_dict = [
-            {'match': '^https://www.youtube.com/@?([^/]+)/?',
-             'prefix': '.youtube', 'replace': "youtube:@\\g<1>"},
-            {'match': '^https://www.youtube.com/channel/(.+[^/])',
-             'prefix': '.youtube', 'replace': "youtube:\\g<1>"},
-            {'match': '^https://twitter.com/(.{1,})',
-             'prefix': '.twitter', 'replace': "twitter:\\g<1>"},
-            {'match': '^https://www.patreon.com/(.+)',
-             'prefix': '.patreon', 'replace': "patreon:\\g<1>"},
-            {'match': '^https://discord.gg/(.+)', 'prefix': '.discord',
-             'replace': "discord:\\g<1>"},
-            {'match': 'https://www.facebook.com/(.+)/', 'prefix': '.facebook',
-             'replace': "facebook:\\g<1>"}
+            {
+                "match": "^https://www.youtube.com/@?([^/]+)/?",
+                "prefix": ".youtube",
+                "replace": "youtube:@\\g<1>",
+            },
+            {
+                "match": "^https://www.youtube.com/channel/(.+[^/])",
+                "prefix": ".youtube",
+                "replace": "youtube:\\g<1>",
+            },
+            {
+                "match": "^https://twitter.com/(.{1,})",
+                "prefix": ".twitter",
+                "replace": "twitter:\\g<1>",
+            },
+            {
+                "match": "^https://www.patreon.com/(.+)",
+                "prefix": ".patreon",
+                "replace": "patreon:\\g<1>",
+            },
+            {
+                "match": "^https://discord.gg/(.+)",
+                "prefix": ".discord",
+                "replace": "discord:\\g<1>",
+            },
+            {
+                "match": "https://www.facebook.com/(.+)/",
+                "prefix": ".facebook",
+                "replace": "facebook:\\g<1>",
+            },
         ]
         data = [i for i in list(set(link))]
         processed_data = list()
         for i in data:
             for p in fgi_dict:
-                if match(p['match'], i) is not None:
+                if match(p["match"], i) is not None:
                     processed_data.append(
-                        {'name': p['prefix'], 'uri': sub(p['match'], p['replace'], i)})
+                        {"name": p["prefix"], "uri": sub(p["match"], p["replace"], i)}
+                    )
         return processed_data
 
     def get_more_info(self):
         d = {}
         for i in range(1, 18):
-            try:
-                cache = self.soup.select_one(f'div.info_panel_wrapper > div > table > tbody > tr:nth-child({str(i)})')
+            with suppress(Exception):
+                cache = self.soup.select_one(
+                    f"div.info_panel_wrapper > div > table > tbody > tr:nth-child({str(i)})"
+                )
                 temp = [i.get_text() for i in list(cache.children)]
-                d[temp[0]] = temp[1:][0].split(',')
-            except:
-                continue
+                d[temp[0]] = temp[1:][0].split(",")
         return d
 
     def __load_hook(self, data: dict):
         self.pkg = load_plugins()
         temp = data
-        for i in self.pkg['hook']:
-            temp = self.pkg['hook'].Search(self.get_name()).setup(temp)
+        for i in self.pkg["hook"]:
+            temp = self.pkg["hook"].Search(self.get_name()).setup(temp)
         return temp
 
 
-if __name__ == '__main__':
-    obj = Search(link='https://fymm-game.itch.io/ddp')
+if __name__ == "__main__":
+    obj = Search(link="https://fymm-game.itch.io/ddp")
     print(obj.get_thumbnail())
     print(obj.get_desc())
     print(obj.get_name())
