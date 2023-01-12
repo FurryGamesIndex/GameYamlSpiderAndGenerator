@@ -9,18 +9,14 @@ global pkg
 
 
 def verify(url: str):
-    verify_list = []
-    for n in pkg["plugin"]:
-        verify_list.append(
-            [
-                pkg["plugin"][n].__getattribute__("Search").verify,
-                pkg["plugin"][n].__getattribute__("Search"),
-            ]
-        )
-    for i, cls in verify_list:
-        if i(url):
-            return cls
-    return None
+    verify_list = [
+        [
+            pkg["plugin"][n].__getattribute__("Search").verify,
+            pkg["plugin"][n].__getattribute__("Search"),
+        ]
+        for n in pkg["plugin"]
+    ]
+    return next((cls for i, cls in verify_list if i(url)), None)
 
 
 parser = argparse.ArgumentParser()

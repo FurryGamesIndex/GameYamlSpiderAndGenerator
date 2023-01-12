@@ -18,10 +18,7 @@ def get_json(url: AnyStr) -> SupportsInt | Dict:
     logger.info(setting)
     try:
         response = requests.get(url, proxies=setting["proxy"])
-        if response.status_code == 200:
-            return response.json()
-        else:
-            return response.status_code
+        return response.json() if response.status_code == 200 else response.status_code
     except Exception as e:
         logger.error(e)
         return -3
@@ -30,10 +27,7 @@ def get_json(url: AnyStr) -> SupportsInt | Dict:
 def get_text(url: AnyStr) -> SupportsInt | AnyStr:
     try:
         response = requests.get(url, proxies=setting["proxy"])
-        if response.status_code == 200:
-            return response.text
-        else:
-            return response.status_code
+        return response.text if response.status_code == 200 else response.status_code
     except Exception as e:
         logger.error(e)
         return -3
@@ -50,11 +44,10 @@ def get_status(url: AnyStr) -> SupportsInt:
 def download_file(url: AnyStr, save: AnyStr) -> SupportsInt:
     try:
         response = requests.get(url, allow_redirects=True)
-        if response.status_code == 200:
-            open(save, "wb").write(response.content)
-            return 0
-        else:
+        if response.status_code != 200:
             return response.status_code
+        open(save, "wb").write(response.content)
+        return 0
     except Exception as e:
         logger.error(e)
         return -3

@@ -10,4 +10,6 @@ explain = {
 
 
 def get_code_explain(code: SupportsInt):
-    return explain[str(code)] if str(code) in explain else http.client.responses[code]
+    return (
+        explain[str(code)] if str(code) in explain else http.client.responses[int(code)]
+    )

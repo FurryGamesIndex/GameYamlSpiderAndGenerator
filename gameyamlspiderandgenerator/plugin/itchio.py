@@ -1,10 +1,11 @@
-from contextlib import suppress
-
 if __name__ == "__main__":
     import os
     import sys
 
     sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+
+import itertools
+from contextlib import suppress
 from json import loads
 from re import match, sub
 from typing import AnyStr, List
@@ -80,15 +81,13 @@ class Search:
 
     def get_authors(self) -> List[dict]:
         temp = self.more_info["Author"]
-        author = [{"name": i, "role": "developer"} for i in temp]
-        return author
+        return [{"name": i, "role": "developer"} for i in temp]
 
     def get_tag(self) -> List[str]:
         temp = self.more_info["Genre"] if "Genre" in self.more_info else ""
         temp1 = self.more_info["Made with"] if "Made with" in self.more_info else ""
         temp2 = self.more_info["Tags"]
-        temp3 = [i.strip() for i in (temp2 + temp1 + temp)]
-        return temp3
+        return [i.strip() for i in (temp2 + temp1 + temp)]
 
     def get_misc_tag(self):
         repl = {
@@ -111,15 +110,13 @@ class Search:
         }
 
         ret = []
-        for i in repl:
-            for ii in self.tag:
-                if i in ii:
-                    ret.append(repl[i])
+        for i, value in repl.items():
+            ret.extend(value for ii in self.tag if i in ii)
         return list(set(ret))
 
     def get_lang(self) -> List[str]:
         temp = self.more_info["Languages"]
-        return list(set([find(i).language for i in temp]))
+        return list({find(i).language for i in temp})
 
     def get_link(self) -> List[dict]:
         link = [i.attrs["href"] for i in self.soup.select("a[href]")]
@@ -155,15 +152,12 @@ class Search:
                 "replace": "facebook:\\g<1>",
             },
         ]
-        data = [i for i in list(set(link))]
-        processed_data = list()
-        for i in data:
-            for p in fgi_dict:
-                if match(p["match"], i) is not None:
-                    processed_data.append(
-                        {"name": p["prefix"], "uri": sub(p["match"], p["replace"], i)}
-                    )
-        return processed_data
+        data = list(list(set(link)))
+        return [
+            {"name": p["prefix"], "uri": sub(p["match"], p["replace"], i)}
+            for i, p in itertools.product(data, fgi_dict)
+            if match(p["match"], i) is not None
+        ]
 
     def get_more_info(self):
         d = {}
@@ -179,7 +173,7 @@ class Search:
     def __load_hook(self, data: dict):
         self.pkg = load_plugins()
         temp = data
-        for i in self.pkg["hook"]:
+        for _ in self.pkg["hook"]:
             temp = self.pkg["hook"].Search(self.get_name()).setup(temp)
         return temp
 

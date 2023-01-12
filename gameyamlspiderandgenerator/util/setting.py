@@ -1,4 +1,4 @@
-setting = dict()
+setting = {}
 
 
 def config(data: dict):

@@ -3,6 +3,7 @@ if __name__ == "__main__":
     import sys
 
     sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+
 from re import sub
 from typing import AnyStr
 from urllib.parse import quote_plus
@@ -28,39 +29,35 @@ class Search:
         data = get_json(
             f"https://store.steampowered.com/api/storesearch/?term={self.encode}&l=english&cc=US"
         )["items"]
-        for i in data:
-            if self.name_filter(i["name"]) == self.pure:
-                return True
-        return False
+        return any(self.name_filter(i["name"]) == self.pure for i in data)
 
     def search_epic(self):
         data = get_text(f"https://en.softonic.com/s/{self.encode}")
         soup = BeautifulSoup(data, "html.parser")
         bf = soup.body.find_all("a", {"class": "track-search-results"})
-        for i in range(len(bf)):
-            if self.name_filter(bf[i].div["data-meta-data"]) == self.pure:
-                return True
-        return False
+        return any(
+            self.name_filter(bf[i].div["data-meta-data"]) == self.pure
+            for i in range(len(bf))
+        )
 
     def search_play(self):
         data = get_json(
             "https://serpapi.com/search?engine=google_play&apikey="
             f'{setting["api"]["google-play"]}&store=apps&q={self.encode}'
         )
-        for i in data["organic_results"][0]["items"]:
-            if self.name_filter(i["title"]) == self.pure:
-                return True
-        return False
+        return any(
+            self.name_filter(i["title"]) == self.pure
+            for i in data["organic_results"][0]["items"]
+        )
 
     def search_apple(self):
         data = get_json(
             "https://serpapi.com/search.json?engine=apple_app_store&term="
             f'{self.encode}&apikey={setting["api"]["apple"]}'
         )
-        for i in data["organic_results"]:
-            if self.name_filter(i["title"]) == self.pure:
-                return True
-        return False
+        return any(
+            self.name_filter(i["title"]) == self.pure for i in data["organic_results"]
+        )
 
     def search_all(self):
         func_list = [

@@ -3,6 +3,7 @@ if __name__ == "__main__":
     import sys
 
     sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+
 import re
 from textwrap import dedent
 from typing import AnyStr, List, SupportsInt
@@ -38,8 +39,7 @@ class Search:
         return int(urlparse(link).path.split("/")[2])
 
     def get_steam_name(self):
-        name = self.data[str(self.id)]["data"]["name"]
-        return name
+        return self.data[str(self.id)]["data"]["name"]
 
     @staticmethod
     def remove_query(s: str):
@@ -83,7 +83,7 @@ class Search:
 
     def get_lang(self) -> List[str]:
         temp = self.data[str(self.id)]["data"]["supported_languages"].split(",")
-        return list(set([find(i).language for i in temp]))
+        return list({find(i).language for i in temp})
 
     def get_desc(self):
         return ls(
@@ -137,10 +137,8 @@ class Search:
         }
 
         ret = []
-        for i in repl:
-            for ii in self.tag:
-                if i in ii:
-                    ret.append(repl[i])
+        for i, value in repl.items():
+            ret.extend(value for ii in self.tag if i in ii)
         return list(set(ret))
 
     def get_misc_tag(self):
@@ -158,10 +156,8 @@ class Search:
             "Online": "online",
         }
         ret = []
-        for i in repl:
-            for ii in self.tag:
-                if i in ii:
-                    ret.append(repl[i])
+        for i, value in repl.items():
+            ret.extend(value for ii in self.tag if i in ii)
         return list(set(ret))
 
     def get_if_nsfw(self):
@@ -177,7 +173,6 @@ class Search:
         ]
 
     def get_video(self):
-        ret = list()
         IsNSFW = self.get_if_nsfw()
         videowebm = [
             self.remove_query(i["webm"]["max"])
@@ -187,33 +182,29 @@ class Search:
             self.remove_query(i["mp4"]["max"])
             for i in self.data[str(self.id)]["data"]["movies"]
         ]
-        for i in range(len(videowebm)):
-            ret.append(
-                {
-                    "type": "video",
-                    "src": [
-                        {
-                            "mime": "video/webm",
-                            "sensitive": IsNSFW,
-                            "uri": videowebm[i],
-                        },
-                        {"mime": "video/mp4", "sensitive": IsNSFW, "uri": videomp4[i]},
-                    ]
-                    if IsNSFW
-                    else [
-                        {"mime": "video/webm", "uri": videowebm[i]},
-                        {"mime": "video/mp4", "uri": videomp4[i]},
-                    ],
-                }
-            )
-        return ret
+        return [
+            {
+                "type": "video",
+                "src": [
+                    {
+                        "mime": "video/webm",
+                        "sensitive": IsNSFW,
+                        "uri": videowebm[i],
+                    },
+                    {"mime": "video/mp4", "sensitive": IsNSFW, "uri": videomp4[i]},
+                ]
+                if IsNSFW
+                else [
+                    {"mime": "video/webm", "uri": videowebm[i]},
+                    {"mime": "video/mp4", "uri": videomp4[i]},
+                ],
+            }
+            for i in range(len(videowebm))
+        ]
 
     def get_link(self) -> List[dict]:
         def remove_query_string(x: AnyStr):
-            if "linkfilter" in x:
-                return parse_qs(urlparse(x).query)["url"][0]
-            else:
-                return x
+            return parse_qs(urlparse(x).query)["url"][0] if "linkfilter" in x else x
 
         temp1 = self.soup.body.find(
             "div",
@@ -263,7 +254,7 @@ class Search:
             },
         ]
         data = [{"url": i, "processed": False} for i in list(set(ret + temp4))]
-        processed_data = list()
+        processed_data = []
         for i in data:
             for p in fgi_dict:
                 if re.match(p["match"], i["url"]) is not None:
