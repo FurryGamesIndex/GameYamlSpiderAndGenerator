@@ -10,10 +10,11 @@ from ruamel.yaml import YAML
 from ruamel.yaml.scalarstring import PreservedScalarString
 
 from gameyamlspiderandgenerator.plugin._base import BasePlugin
+from gameyamlspiderandgenerator.util.fgi import fgi_dict
 from gameyamlspiderandgenerator.util.spider import get_json, get_text
 
 
-def indent(x: AnyStr):
+def pss_dedent(x: AnyStr) -> PreservedScalarString:
     return PreservedScalarString(dedent(x))
 
 
@@ -22,13 +23,8 @@ yaml.indent(sequence=4, offset=2)
 yaml.width = 4096
 
 
-# TODO Rewrite to use ABC
-class Search(BasePlugin):
-    @staticmethod
-    def verify(url: str):
-        return (
-            re.match(r"https://store\.steampowered\.com/app/\d*/.+/", url) is not None
-        )
+class Steam(BasePlugin):
+    _VERIFY_PATTERN = re.compile(r"https?://store\.steampowered\.com/app/\d+/.+/")
 
     @staticmethod
     def get_steam_id(link: AnyStr) -> SupportsInt:
@@ -70,19 +66,19 @@ class Search(BasePlugin):
             },
             "links": self.get_links(),
             "thumbnail": "thumbnail.png",
-            "screenshots": self.get_screenshots() + self.get_video(),
+            "screenshots": self.get_screenshots() + self.get_video(),  # type: ignore
         }
-        bRet = yaml.dump_to_string(ret)
+        b_ret = yaml.dump_to_string(ret)
         for i in list(ret.keys())[1:]:
-            bRet = bRet.replace("\n" + i, "\n\n" + i)
-        return bRet
+            b_ret = b_ret.replace("\n" + i, "\n\n" + i)
+        return b_ret
 
     def get_langs(self) -> List[str]:
         temp = self.data[str(self.id)]["data"]["supported_languages"].split(",")
         return list({find(i).language for i in temp})
 
     def get_desc(self):
-        return indent(
+        return pss_dedent(
             self.remove_query(
                 (
                     html2text(
@@ -94,7 +90,7 @@ class Search(BasePlugin):
         )
 
     def get_brief_desc(self):
-        return indent(
+        return pss_dedent(
             html2text(self.data[str(self.id)]["data"]["short_description"], bodywidth=0)
         )
 
@@ -172,12 +168,12 @@ class Search(BasePlugin):
         ]
 
     def get_video(self):
-        IsNSFW = self.get_if_nsfw()
-        videowebm = [
+        is_nsfw = self.get_if_nsfw()
+        video_webm = [
             self.remove_query(i["webm"]["max"])
             for i in self.data[str(self.id)]["data"]["movies"]
         ]
-        videomp4 = [
+        video_mp4 = [
             self.remove_query(i["mp4"]["max"])
             for i in self.data[str(self.id)]["data"]["movies"]
         ]
@@ -187,23 +183,23 @@ class Search(BasePlugin):
                 "src": [
                     {
                         "mime": "video/webm",
-                        "sensitive": IsNSFW,
-                        "uri": videowebm[i],
+                        "sensitive": is_nsfw,
+                        "uri": video_webm[i],
                     },
-                    {"mime": "video/mp4", "sensitive": IsNSFW, "uri": videomp4[i]},
+                    {"mime": "video/mp4", "sensitive": is_nsfw, "uri": video_mp4[i]},
                 ]
-                if IsNSFW
+                if is_nsfw
                 else [
-                    {"mime": "video/webm", "uri": videowebm[i]},
-                    {"mime": "video/mp4", "uri": videomp4[i]},
+                    {"mime": "video/webm", "uri": video_webm[i]},
+                    {"mime": "video/mp4", "uri": video_mp4[i]},
                 ],
             }
-            for i in range(len(videowebm))
+            for i in range(len(video_webm))
         ]
 
     def get_links(self) -> List[dict]:
         def remove_query_string(x: AnyStr):
-            return parse_qs(urlparse(x).query)["url"][0] if "linkfilter" in x else x
+            return parse_qs(urlparse(x).query)["url"][0] if "linkfilter" in x else x  # type: ignore
 
         temp1 = self.soup.body.find(
             "div",
@@ -220,43 +216,11 @@ class Search(BasePlugin):
         ret = []
         for i in temp:
             ret.append(remove_query_string(i.attrs["href"]))
-        fgi_dict = [
-            {
-                "match": "^https://www.youtube.com/@?([^/]+)/?",
-                "prefix": ".youtube",
-                "replace": "youtube:@\\g<1>",
-            },
-            {
-                "match": "^https://www.youtube.com/channel/(.+[^/])",
-                "prefix": ".youtube",
-                "replace": "youtube:\\g<1>",
-            },
-            {
-                "match": "^https://twitter.com/(.{1,})",
-                "prefix": ".twitter",
-                "replace": "twitter:\\g<1>",
-            },
-            {
-                "match": "^https://www.patreon.com/(.+)",
-                "prefix": ".patreon",
-                "replace": "patreon:\\g<1>",
-            },
-            {
-                "match": "^https://discord.gg/(.+)",
-                "prefix": ".discord",
-                "replace": "discord:\\g<1>",
-            },
-            {
-                "match": "https://www.facebook.com/(.+)/",
-                "prefix": ".facebook",
-                "replace": "facebook:\\g<1>",
-            },
-        ]
         data = [{"url": i, "processed": False} for i in list(set(ret + temp4))]
         processed_data = []
         for i in data:
             for p in fgi_dict:
-                if re.match(p["match"], i["url"]) is not None:
+                if re.match(p["match"], i["url"]):
                     processed_data.append(
                         {
                             "name": p["prefix"],
@@ -273,8 +237,3 @@ class Search(BasePlugin):
         return self.remove_query(
             self.soup.body.find("img", {"class": "game_header_image_full"}).attrs["src"]
         )
-
-
-if __name__ == "__main__":
-    obj = Search("https://store.steampowered.com/app/381210/Dead_by_Daylight/")
-    print(obj.to_yaml())

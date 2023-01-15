@@ -5,12 +5,16 @@ from loguru import logger
 
 from gameyamlspiderandgenerator.hook import BaseHook
 from gameyamlspiderandgenerator.plugin import BasePlugin
-from gameyamlspiderandgenerator.util.setting import get_config, setting
+from gameyamlspiderandgenerator.util.config import config
 
 
 class Package:
     plugin: dict[str, BasePlugin] = {}
     hook: dict[str, BaseHook] = {}
+
+    def __init__(self):
+        self.load_plugins()
+        self.load_hooks()
 
     def __getitem__(self, item):
         # Compatibility with the old version
@@ -20,27 +24,32 @@ class Package:
         # Compatibility with the old version
         self.__setattr__(key, value)
 
-    @staticmethod
-    def _run_hook(cls: BasePlugin | BaseHook, data: dict):
-        cls.__load_hook__(data)
-
     def _load(
         self, _dir: Literal["plugin", "hook"], _type: type[BasePlugin] | type[BaseHook]
     ):
         base = __package__.split(".")[0] + "." + _dir
-        for plugin in getattr(setting, _dir, []):
+        for plugin in getattr(config, _dir, []):
+            if plugin.startswith("_"):
+                logger.warning(f"Skip loading protected {_dir} {plugin}")
+                continue
             try:
+                package = f"{base}.{plugin}"
                 logger.info(f"Loading {_dir}: {plugin}")
-                module = importlib.import_module(f"{base}.{plugin}")
-                target = [o for o in module.__dict__.values() if isinstance(o, _type)][
-                    0
-                ]
+                module = importlib.import_module(package)
+                target = [
+                    o
+                    for o in module.__dict__.values()
+                    if isinstance(o, type) and issubclass(o, _type) and o is not _type
+                ][-1]
+                if target in self[_dir].values():
+                    logger.warning(f"Skip loading duplicate {_dir} {plugin}")
+                    continue
                 self[_dir][plugin] = target
             except ImportError as e:
                 logger.trace(e)
                 logger.error(f"Failed to import {_dir}: {plugin}")
             except IndexError:
-                logger.error(f"Import {_dir} but no {_type} found: {plugin}")
+                logger.error(f"Imported {_dir} but no {_type.__name__} found: {plugin}")
 
     def load_plugins(self):
         self._load("plugin", BasePlugin)
@@ -50,22 +59,3 @@ class Package:
 
 
 pkg = Package()
-
-
-def load_plugins():
-    if not pkg.plugin:
-        try:
-            logger.info("Loading plugins...")
-            for i in get_config()["plugin"]:
-                logger.info(f"Loading plugin {i}")
-                pkg.plugin[i] = importlib.import_module(  # type: ignore
-                    f"gameyamlspiderandgenerator.plugin.{i}"
-                )
-            for i in get_config()["hook"]:
-                logger.info(f"Loading hook {i}")
-                pkg.hook[i] = importlib.import_module(  # type: ignore
-                    f"gameyamlspiderandgenerator.hook.{i}"
-                )
-        except Exception as e:
-            logger.trace(e)
-    return pkg

@@ -1,9 +1,3 @@
-if __name__ == "__main__":
-    import os
-    import sys
-
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-
 from re import sub
 from typing import AnyStr
 from urllib.parse import quote_plus
@@ -11,11 +5,12 @@ from urllib.parse import quote_plus
 from bs4 import BeautifulSoup
 from loguru import logger
 
-from gameyamlspiderandgenerator.util.setting import setting
+from gameyamlspiderandgenerator.hook import BaseHook
+from gameyamlspiderandgenerator.util.config import config
 from gameyamlspiderandgenerator.util.spider import get_json, get_text
 
 
-class Search:
+class Search(BaseHook):
     @staticmethod
     def name_filter(s: AnyStr, rep: AnyStr = ""):
         return sub("[^A-z]", rep, s.lower())
@@ -44,7 +39,7 @@ class Search:
     def search_play(self):
         data = get_json(
             "https://serpapi.com/search?engine=google_play&apikey="
-            f'{setting["api"]["google-play"]}&store=apps&q={self.encode}'
+            f'{config["api"]["google-play"]}&store=apps&q={self.encode}'
         )
         return any(
             self.name_filter(i["title"]) == self.pure
@@ -54,13 +49,13 @@ class Search:
     def search_apple(self):
         data = get_json(
             "https://serpapi.com/search.json?engine=apple_app_store&term="
-            f'{self.encode}&apikey={setting["api"]["apple"]}'
+            f'{self.encode}&apikey={config["api"]["apple"]}'
         )
         return any(
             self.name_filter(i["title"]) == self.pure for i in data["organic_results"]
         )
 
-    def search_all(self):
+    def search_all(self) -> list:
         func_list = [
             self.__getattribute__(i)
             for i in (list(filter(lambda x: "__" not in x, self.__dir__())))
@@ -72,11 +67,8 @@ class Search:
             func_list,
         )
         for ii in func_list:
-            print(ii.__name__, ii())
+            logger.info(ii.__name__, ii())
+        return [ii.__name__ for ii in func_list if ii()]
 
     def setup(self, data: dict):
         pass
-
-
-if __name__ == "__main__":
-    Search("dead-space").search_all()

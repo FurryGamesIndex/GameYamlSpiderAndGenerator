@@ -1,12 +1,14 @@
 import abc
+import re
 
 
 class BasePlugin(abc.ABC):
     """插件基类"""
 
-    @staticmethod
-    @abc.abstractmethod
-    def verify(url: str) -> bool:
+    _VERIFY_PATTERN: re.Pattern
+
+    @classmethod
+    def verify(cls, url: str) -> bool:
         """
         验证 URL 是否符合插件的要求
 
@@ -16,7 +18,7 @@ class BasePlugin(abc.ABC):
         Returns:
             是否符合要求
         """
-        pass
+        return bool(cls._VERIFY_PATTERN.match(url))
 
     def __load_hook__(self, data: dict):
         """

@@ -1,4 +1,5 @@
 import itertools
+import re
 from contextlib import suppress
 from json import loads
 from re import match, sub
@@ -9,15 +10,12 @@ from html2text import html2text
 from langcodes import find
 
 from gameyamlspiderandgenerator.plugin._base import BasePlugin
-from gameyamlspiderandgenerator.util.plugin_manager import load_plugins
+from gameyamlspiderandgenerator.util.fgi import fgi_dict
 from gameyamlspiderandgenerator.util.spider import get_text
 
 
-# TODO Rewrite to use ABC
-class Search(BasePlugin):
-    @staticmethod
-    def verify(url: str):
-        return match(r"https://.+\.itch\.io/.+", url) is not None
+class ItchIO(BasePlugin):
+    _VERIFY_PATTERN = re.compile(r"https?://.+\.itch\.io/.+")
 
     def __init__(self, link: AnyStr) -> None:
         self.data_html = get_text(link)
@@ -113,43 +111,11 @@ class Search(BasePlugin):
 
     def get_links(self) -> List[dict]:
         link = [i.attrs["href"] for i in self.soup.select("a[href]")]
-        fgi_dict = [
-            {
-                "match": "^https://www.youtube.com/@?([^/]+)/?",
-                "prefix": ".youtube",
-                "replace": "youtube:@\\g<1>",
-            },
-            {
-                "match": "^https://www.youtube.com/channel/(.+[^/])",
-                "prefix": ".youtube",
-                "replace": "youtube:\\g<1>",
-            },
-            {
-                "match": "^https://twitter.com/(.{1,})",
-                "prefix": ".twitter",
-                "replace": "twitter:\\g<1>",
-            },
-            {
-                "match": "^https://www.patreon.com/(.+)",
-                "prefix": ".patreon",
-                "replace": "patreon:\\g<1>",
-            },
-            {
-                "match": "^https://discord.gg/(.+)",
-                "prefix": ".discord",
-                "replace": "discord:\\g<1>",
-            },
-            {
-                "match": "https://www.facebook.com/(.+)/",
-                "prefix": ".facebook",
-                "replace": "facebook:\\g<1>",
-            },
-        ]
         data = list(list(set(link)))
         return [
             {"name": p["prefix"], "uri": sub(p["match"], p["replace"], i)}
             for i, p in itertools.product(data, fgi_dict)
-            if match(p["match"], i) is not None
+            if match(p["match"], i)
         ]
 
     def get_more_info(self):
@@ -164,26 +130,13 @@ class Search(BasePlugin):
         return d
 
     def __load_hook__(self, data: dict):
-        self.pkg = load_plugins()
-        temp = data
-        for _ in self.pkg["hook"]:
-            temp = self.pkg["hook"].Search(self.get_name()).setup(temp)
+        from gameyamlspiderandgenerator.util.plugin_manager import pkg
+
+        temp = data.copy()
+        for _ in pkg["hook"].values():
+            temp = pkg["hook"].Search(self.get_name()).setup(temp)
         return temp
 
     def to_yaml(self) -> str:
         # TODO Implement this
         pass
-
-
-if __name__ == "__main__":
-    obj = Search(link="https://fymm-game.itch.io/ddp")
-    print(obj.get_thumbnail())
-    print(obj.get_desc())
-    print(obj.get_name())
-    print(obj.get_screenshots())
-    print(obj.get_brief_desc())
-    print(obj.get_platforms())
-    print(obj.get_authors())
-    print(obj.get_langs())
-    print(obj.get_links())
-    print(obj.get_misc_tags())

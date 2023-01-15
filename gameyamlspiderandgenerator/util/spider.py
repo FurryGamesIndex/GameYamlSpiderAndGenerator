@@ -1,30 +1,26 @@
 from pathlib import Path
+from typing import Dict
 
+import requests
 from requests import JSONDecodeError
 
 from gameyamlspiderandgenerator.exception import (
     CommunicateWithServerFailed,
     InvalidResponse,
 )
-
-if __name__ != "__main__":
-    import os
-    import sys
-
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-
-from typing import AnyStr, Dict, SupportsInt
-
-import requests
-from loguru import logger
-
-from gameyamlspiderandgenerator.util.setting import get_config
-
-setting = get_config()
+from gameyamlspiderandgenerator.util.config import config
 
 
 class GetResponse:
-    """对 requests.get 的简单封装"""
+    """
+    对 requests.get 的简单封装，使用上下文以保证资源被正确释放
+
+    使用方法：
+
+    with GetResponse("https://www.example.com/") as resp:
+        print(resp.response)  # 响应内容
+        response.to_disk("example.html")  # 将响应内容写入磁盘
+    """
 
     def __init__(self, url: str, allow_redirects: bool = True, /, **kwargs):
         """
@@ -37,7 +33,7 @@ class GetResponse:
         """
         self.url = url
         self.args = {
-            "proxies": setting["proxy"],
+            "proxies": config["proxy"],
             "allow_redirects": allow_redirects,
             **kwargs,
         }
@@ -52,7 +48,7 @@ class GetResponse:
         self.response.close()
 
     @property
-    def json(self) -> Dict:
+    def json(self):
         """
         将响应内容解析为 JSON
 
@@ -110,46 +106,21 @@ class GetResponse:
         path.write_bytes(self.response.content)
 
 
-def get_json(url: AnyStr) -> SupportsInt | Dict:
-    logger.info(setting)
-    try:
-        response = requests.get(url, proxies=setting["proxy"])
-        if response.status_code == 200:
-            return response.json()
-        raise CommunicateWithServerFailed(response.status_code)
-    except Exception as e:
-        logger.trace(e)
-        raise CommunicateWithServerFailed() from e
+def get_json(url: str) -> Dict:
+    with GetResponse(url) as resp:
+        return resp.json
 
 
-def get_text(url: AnyStr) -> SupportsInt | AnyStr:
-    try:
-        response = requests.get(url, proxies=setting["proxy"])
-        if response.status_code == 200:
-            return response.text
-        else:
-            raise CommunicateWithServerFailed(response.status_code)
-    except Exception as e:
-        logger.trace(e)
-        raise CommunicateWithServerFailed() from e
+def get_text(url: str) -> str:
+    with GetResponse(url) as resp:
+        return resp.text
 
 
-def get_status(url: AnyStr) -> SupportsInt:
-    try:
-        return requests.get(url, proxies=setting["proxy"]).status_code
-    except Exception as e:
-        logger.error(e)
-        return -3
+def get_status(url: str) -> int:
+    with GetResponse(url) as resp:
+        return resp.status
 
 
-def download_file(url: AnyStr, save: AnyStr) -> SupportsInt:
-    try:
-        response = requests.get(url, allow_redirects=True)
-        if response.status_code != 200:
-            return response.status_code
-        open(save, "wb").write(response.content)
-        # NEVER USE `open` THIS WAY, YOU WILL LEAK FDs
-        return 0
-    except Exception as e:
-        logger.error(e)
-        return -3
+def download_file(url: str, save: str | Path):
+    with GetResponse(url) as resp:
+        resp.to_disk(save)
