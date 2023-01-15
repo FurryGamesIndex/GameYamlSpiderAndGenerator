@@ -1,6 +1,7 @@
 import http.client
 from typing import SupportsInt
 
+# TODO Deprecate this
 explain = {
     "0": "Task executed successfully.",
     "-1": "Error during initialization.",

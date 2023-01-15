@@ -1,3 +1,5 @@
+# TODO Make callable (cli.py -> __main__.py)
+
 import argparse
 
 from yaml import safe_load
@@ -8,13 +10,14 @@ from gameyamlspiderandgenerator.util.setting import config
 global pkg
 
 
+# TODO Rewrite this using __dict__
 def verify(url: str):
     verify_list = [
         [
-            pkg["plugin"][n].__getattribute__("Search").verify,
-            pkg["plugin"][n].__getattribute__("Search"),
+            pkg.plugin[n].__getattribute__("Search").verify,
+            pkg.plugin[n].__getattribute__("Search"),
         ]
-        for n in pkg["plugin"]
+        for n in pkg.plugin
     ]
     return next((cls for i, cls in verify_list if i(url)), None)
 

@@ -27,7 +27,8 @@ class Search:
 
     def search_steam(self):
         data = get_json(
-            f"https://store.steampowered.com/api/storesearch/?term={self.encode}&l=english&cc=US"
+            f"https://store.steampowered.com/api/storesearch/"
+            f"?term={self.encode}&l=english&cc=US"
         )["items"]
         return any(self.name_filter(i["name"]) == self.pure for i in data)
 
