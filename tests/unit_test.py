@@ -1,4 +1,4 @@
-import os
+import subprocess
 import sys
 import unittest
 
@@ -28,11 +28,11 @@ class CliUnitTest(unittest.TestCase):
     """Rewritten from test_cli.py"""
 
     def test_cli(self):
-        status_code = os.system(
-            f"{sys.executable} -m gameyamlspiderandgenerator.cli url"
+
+        result = subprocess.run(
+            [sys.executable, "-m", "gameyamlspiderandgenerator.cli", "url"]
         )
-        status_code = os.waitstatus_to_exitcode(status_code)
-        self.assertEqual(status_code, 0)
+        self.assertEqual(result.returncode, 0)
 
 
 class InitUnitTest(unittest.TestCase):
@@ -57,6 +57,30 @@ class SpiderUnitTest(unittest.TestCase):
         update_config()
         self.assertGreaterEqual(get_status("https://store.steampowered.com/"), 0)
         self.assertIsInstance(get_text("https://www.so.com/"), str)
+
+
+class SettingUnitTest(unittest.TestCase):
+    def test_load_setting(self):
+        from gameyamlspiderandgenerator.util.setting import setting
+
+        update_config()
+        self.assertEqual(
+            setting.proxy,
+            {
+                "http": "http://127.0.0.1:10809",
+                "https": "http://127.0.0.1:10809",
+            },
+        )
+
+    def test_update_setting(self):
+        from gameyamlspiderandgenerator.util.setting import set_config, setting
+
+        update_config()
+        set_config("foo", ["bar"])
+        self.assertEqual(
+            getattr(setting, "foo"),
+            ["bar"],
+        )
 
 
 if __name__ == "__main__":
