@@ -25,6 +25,8 @@ def update_config():
 
 
 class CliUnitTest(unittest.TestCase):
+    """Rewritten from test_cli.py"""
+
     def test_cli(self):
         status_code = os.system(
             f"{sys.executable} -m gameyamlspiderandgenerator.cli url"
@@ -34,6 +36,8 @@ class CliUnitTest(unittest.TestCase):
 
 
 class InitUnitTest(unittest.TestCase):
+    """Rewritten from test_init.py"""
+
     def test_init(self):
         from gameyamlspiderandgenerator.plugin.steam import Search as Steam
 
@@ -41,12 +45,14 @@ class InitUnitTest(unittest.TestCase):
         self.assertIsInstance(
             Steam(
                 "https://store.steampowered.com/app/381210/Dead_by_Daylight/"
-            ).make_yaml(),
+            ).to_yaml(),
             str,
         )
 
 
 class SpiderUnitTest(unittest.TestCase):
+    """Rewritten from test_spider.py"""
+
     def test_spider(self):
         update_config()
         self.assertGreaterEqual(get_status("https://store.steampowered.com/"), 0)

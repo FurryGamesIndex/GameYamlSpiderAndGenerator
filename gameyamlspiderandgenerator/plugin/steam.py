@@ -1,9 +1,3 @@
-if __name__ == "__main__":
-    import os
-    import sys
-
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-
 import re
 from textwrap import dedent
 from typing import AnyStr, List, SupportsInt
@@ -13,13 +7,14 @@ from bs4 import BeautifulSoup
 from html2text import html2text
 from langcodes import find
 from ruamel.yaml import YAML
-from ruamel.yaml.scalarstring import PreservedScalarString as PS
+from ruamel.yaml.scalarstring import PreservedScalarString
 
+from gameyamlspiderandgenerator.plugin._base import BasePlugin
 from gameyamlspiderandgenerator.util.spider import get_json, get_text
 
 
-def ls(x: AnyStr):
-    return PS(dedent(x))
+def indent(x: AnyStr):
+    return PreservedScalarString(dedent(x))
 
 
 yaml = YAML(typ=["rt", "string"])
@@ -27,7 +22,8 @@ yaml.indent(sequence=4, offset=2)
 yaml.width = 4096
 
 
-class Search:
+# TODO Rewrite to use ABC
+class Search(BasePlugin):
     @staticmethod
     def verify(url: str):
         return (
@@ -38,7 +34,7 @@ class Search:
     def get_steam_id(link: AnyStr) -> SupportsInt:
         return int(urlparse(link).path.split("/")[2])
 
-    def get_steam_name(self):
+    def get_name(self):
         return self.data[str(self.id)]["data"]["name"]
 
     @staticmethod
@@ -53,26 +49,26 @@ class Search:
         )
         self.data_html = get_text(link)
         self.soup = BeautifulSoup(self.data_html, "html.parser")
-        self.name = self.get_steam_name()
+        self.name = self.get_name()
         temp1 = self.soup.body.find_all("a", {"class": "app_tag"})
         self.tag = [re.sub(r"[\n\t\r]*", "", temp1[i].text) for i in range(len(temp1))]
 
-    def make_yaml(self) -> AnyStr | SupportsInt:
+    def to_yaml(self) -> AnyStr | SupportsInt:
         if type(self.data) == int:
             return self.data
         ret = {
-            "name": self.get_steam_name(),
+            "name": self.get_name(),
             "brief-description": self.get_desc(),
             "description": self.get_brief_desc(),
             "description-format": "markdown",
             "authors": self.get_authors(),
             "tags": {
                 "type": self.get_type_tag(),
-                "lang": self.get_lang(),
+                "lang": self.get_langs(),
                 "platform": self.get_platforms(),
-                "misc": self.get_misc_tag(),
+                "misc": self.get_misc_tags(),
             },
-            "links": self.get_link(),
+            "links": self.get_links(),
             "thumbnail": "thumbnail.png",
             "screenshots": self.get_screenshots() + self.get_video(),
         }
@@ -81,12 +77,12 @@ class Search:
             bRet = bRet.replace("\n" + i, "\n\n" + i)
         return bRet
 
-    def get_lang(self) -> List[str]:
+    def get_langs(self) -> List[str]:
         temp = self.data[str(self.id)]["data"]["supported_languages"].split(",")
         return list({find(i).language for i in temp})
 
     def get_desc(self):
-        return ls(
+        return indent(
             self.remove_query(
                 (
                     html2text(
@@ -98,7 +94,7 @@ class Search:
         )
 
     def get_brief_desc(self):
-        return ls(
+        return indent(
             html2text(self.data[str(self.id)]["data"]["short_description"], bodywidth=0)
         )
 
@@ -141,7 +137,10 @@ class Search:
             ret.extend(value for ii in self.tag if i in ii)
         return list(set(ret))
 
-    def get_misc_tag(self):
+    def get_tags(self) -> list[dict]:
+        pass
+
+    def get_misc_tags(self):
         repl = {
             "3D": "3d",
             "Pixel": "pixel-art",
@@ -202,7 +201,7 @@ class Search:
             for i in range(len(videowebm))
         ]
 
-    def get_link(self) -> List[dict]:
+    def get_links(self) -> List[dict]:
         def remove_query_string(x: AnyStr):
             return parse_qs(urlparse(x).query)["url"][0] if "linkfilter" in x else x
 
@@ -278,4 +277,4 @@ class Search:
 
 if __name__ == "__main__":
     obj = Search("https://store.steampowered.com/app/381210/Dead_by_Daylight/")
-    print(obj.make_yaml())
+    print(obj.to_yaml())

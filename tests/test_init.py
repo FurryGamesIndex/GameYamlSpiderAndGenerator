@@ -19,4 +19,4 @@ set_config("plugin", ["steam", "itchio"])
 sys.path.append("../gameyamlspiderandgenerator")
 sys.path.append("../gameyamlspiderandgenerator/util")
 
-print(Steam("https://store.steampowered.com/app/381210/Dead_by_Daylight/").make_yaml())
+print(Steam("https://store.steampowered.com/app/381210/Dead_by_Daylight/").to_yaml())

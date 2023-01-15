@@ -1,9 +1,3 @@
-if __name__ == "__main__":
-    import os
-    import sys
-
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-
 import itertools
 from contextlib import suppress
 from json import loads
@@ -14,14 +8,13 @@ from bs4 import BeautifulSoup
 from html2text import html2text
 from langcodes import find
 
+from gameyamlspiderandgenerator.plugin._base import BasePlugin
 from gameyamlspiderandgenerator.util.plugin_manager import load_plugins
-from gameyamlspiderandgenerator.util.setting import get_config
 from gameyamlspiderandgenerator.util.spider import get_text
 
-setting = get_config()
 
-
-class Search:
+# TODO Rewrite to use ABC
+class Search(BasePlugin):
     @staticmethod
     def verify(url: str):
         return match(r"https://.+\.itch\.io/.+", url) is not None
@@ -40,7 +33,7 @@ class Search:
             if "name" in ii
         ][0]
         self.more_info = self.get_more_info()
-        self.tag = self.get_tag()
+        self.tag = self.get_tags()
 
     def get_thumbnail(self):
         return self.soup.select_one("#header > img").attrs["src"]
@@ -83,13 +76,13 @@ class Search:
         temp = self.more_info["Author"]
         return [{"name": i, "role": "developer"} for i in temp]
 
-    def get_tag(self) -> List[str]:
+    def get_tags(self) -> List[str]:
         temp = self.more_info["Genre"] if "Genre" in self.more_info else ""
         temp1 = self.more_info["Made with"] if "Made with" in self.more_info else ""
         temp2 = self.more_info["Tags"]
         return [i.strip() for i in (temp2 + temp1 + temp)]
 
-    def get_misc_tag(self):
+    def get_misc_tags(self):
         repl = {
             "3D": "3d",
             "Pixel Art": "pixel-art",
@@ -114,11 +107,11 @@ class Search:
             ret.extend(value for ii in self.tag if i in ii)
         return list(set(ret))
 
-    def get_lang(self) -> List[str]:
+    def get_langs(self) -> List[str]:
         temp = self.more_info["Languages"]
         return list({find(i).language for i in temp})
 
-    def get_link(self) -> List[dict]:
+    def get_links(self) -> List[dict]:
         link = [i.attrs["href"] for i in self.soup.select("a[href]")]
         fgi_dict = [
             {
@@ -170,12 +163,16 @@ class Search:
                 d[temp[0]] = temp[1:][0].split(",")
         return d
 
-    def __load_hook(self, data: dict):
+    def __load_hook__(self, data: dict):
         self.pkg = load_plugins()
         temp = data
         for _ in self.pkg["hook"]:
             temp = self.pkg["hook"].Search(self.get_name()).setup(temp)
         return temp
+
+    def to_yaml(self) -> str:
+        # TODO Implement this
+        pass
 
 
 if __name__ == "__main__":
@@ -187,6 +184,6 @@ if __name__ == "__main__":
     print(obj.get_brief_desc())
     print(obj.get_platforms())
     print(obj.get_authors())
-    print(obj.get_lang())
-    print(obj.get_link())
-    print(obj.get_misc_tag())
+    print(obj.get_langs())
+    print(obj.get_links())
+    print(obj.get_misc_tags())
