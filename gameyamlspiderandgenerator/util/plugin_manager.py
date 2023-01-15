@@ -1,5 +1,5 @@
 import importlib
-from typing import Literal
+from typing import Dict, Literal, Type, Union
 
 from loguru import logger
 
@@ -9,8 +9,8 @@ from gameyamlspiderandgenerator.util.config import config
 
 
 class Package:
-    plugin: dict[str, BasePlugin] = {}
-    hook: dict[str, BaseHook] = {}
+    plugin: Dict[str, BasePlugin] = {}
+    hook: Dict[str, BaseHook] = {}
 
     def __init__(self):
         self.load_plugins()
@@ -25,7 +25,9 @@ class Package:
         self.__setattr__(key, value)
 
     def _load(
-        self, _dir: Literal["plugin", "hook"], _type: type[BasePlugin] | type[BaseHook]
+        self,
+        _dir: Literal["plugin", "hook"],
+        _type: Union[Type[BasePlugin], Type[BaseHook]],
     ):
         base = __package__.split(".")[0] + "." + _dir
         for plugin in getattr(config, _dir, []):

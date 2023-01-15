@@ -1,4 +1,5 @@
 import argparse
+from typing import Optional
 
 from yaml import safe_load
 
@@ -34,7 +35,7 @@ else:
 config.update(setting)
 
 
-def verify(url: str) -> BasePlugin | None:
+def verify(url: str) -> Optional[BasePlugin]:
     verify_list = [
         [
             pkg.plugin[n].verify,

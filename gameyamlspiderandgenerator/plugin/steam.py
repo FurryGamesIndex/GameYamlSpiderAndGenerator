@@ -1,6 +1,6 @@
 import re
 from textwrap import dedent
-from typing import AnyStr, List, SupportsInt
+from typing import AnyStr, List, SupportsInt, Union
 from urllib.parse import parse_qs, urlparse
 
 from bs4 import BeautifulSoup
@@ -49,7 +49,7 @@ class Steam(BasePlugin):
         temp1 = self.soup.body.find_all("a", {"class": "app_tag"})
         self.tag = [re.sub(r"[\n\t\r]*", "", temp1[i].text) for i in range(len(temp1))]
 
-    def to_yaml(self) -> AnyStr | SupportsInt:
+    def to_yaml(self) -> Union[AnyStr, SupportsInt]:
         if type(self.data) == int:
             return self.data
         ret = {
@@ -133,7 +133,7 @@ class Steam(BasePlugin):
             ret.extend(value for ii in self.tag if i in ii)
         return list(set(ret))
 
-    def get_tags(self) -> list[dict]:
+    def get_tags(self) -> List[dict]:
         pass
 
     def get_misc_tags(self):

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Union
 
 import requests
 from requests import JSONDecodeError
@@ -86,7 +86,7 @@ class GetResponse:
         """
         return self.response.status_code
 
-    def to_disk(self, path: str | Path, allow_exist: bool = False, /):
+    def to_disk(self, path: Union[str, Path], allow_exist: bool = False, /):
         """
         将响应内容写入磁盘
 
@@ -121,6 +121,6 @@ def get_status(url: str) -> int:
         return resp.status
 
 
-def download_file(url: str, save: str | Path):
+def download_file(url: str, save: Union[str, Path]):
     with GetResponse(url) as resp:
         resp.to_disk(save)

@@ -1,3 +1,6 @@
+from typing import List, Union
+
+
 class Config:
     proxy = {}
     api = {}
@@ -12,7 +15,7 @@ class Config:
         # Compatibility with the old version
         self.__setattr__(key, value)
 
-    def set(self, name: str, data: dict | list[str]):
+    def set(self, name: str, data: Union[dict, List[str]]):
         self.__setattr__(name, data)
 
     def update(self, data: dict):
