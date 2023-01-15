@@ -1,9 +1,9 @@
 from loguru import logger
 
-from gameyamlspiderandgenerator.util.setting import config, set_config
+from gameyamlspiderandgenerator.util.config import config
 from gameyamlspiderandgenerator.util.spider import get_status, get_text
 
-config(
+config.update(
     {
         "proxy": {
             "http": r"http://127.0.0.1:7890",
@@ -15,8 +15,8 @@ config(
         },
     }
 )
-set_config("hook", ["search"])
-set_config("plugin", ["steam", "itchio"])
+config.set("hook", ["search"])
+config.set("plugin", ["steam", "itchio"])
 
 logger.info(get_status("https://store.steampowered.com/"))
 logger.info(get_text("https://www.so.com/"))

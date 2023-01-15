@@ -1,9 +1,9 @@
 import sys
 
-from gameyamlspiderandgenerator.plugin.steam import Search as Steam
-from gameyamlspiderandgenerator.util.setting import config, set_config
+from gameyamlspiderandgenerator.plugin.steam import Steam as Steam
+from gameyamlspiderandgenerator.util.config import config
 
-config(
+config.update(
     {
         "proxy": {"http": "http://127.0.0.1:7890", "https": "socks5://127.0.0.1:7891"},
         "api": {
@@ -12,8 +12,8 @@ config(
         },
     }
 )
-set_config("hook", ["search"])
-set_config("plugin", ["steam", "itchio"])
+config.set("hook", ["search"])
+config.set("plugin", ["steam", "itchio"])
 
 
 sys.path.append("../gameyamlspiderandgenerator")
