@@ -1,26 +1,10 @@
-# TODO Make callable (cli.py -> __main__.py)
-
 import argparse
 
 from yaml import safe_load
 
-from gameyamlspiderandgenerator.util.plugin_manager import load_plugins
-from gameyamlspiderandgenerator.util.setting import config
-
-global pkg
-
-
-# TODO Rewrite this using __dict__
-def verify(url: str):
-    verify_list = [
-        [
-            pkg.plugin[n].__getattribute__("Search").verify,
-            pkg.plugin[n].__getattribute__("Search"),
-        ]
-        for n in pkg.plugin
-    ]
-    return next((cls for i, cls in verify_list if i(url)), None)
-
+from gameyamlspiderandgenerator.plugin import BasePlugin
+from gameyamlspiderandgenerator.util.config import config
+from gameyamlspiderandgenerator.util.plugin_manager import pkg
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -32,10 +16,10 @@ parser.add_argument(
 )
 parser.add_argument("url", metavar="URL")
 parser.add_argument(
-    "-push", action="store_true", default=False, help="Whether push to github"
+    "--push", action="store_true", default=False, help="Whether push to github"
 )
 parser.add_argument(
-    "-pull",
+    "--pull",
     action="store_true",
     default=False,
     help="Whether make a pull request to github",
@@ -47,8 +31,19 @@ if isinstance(args.config, str):
         setting = safe_load(f)
 else:
     setting = args.config
-config(setting)
-pkg = load_plugins()
+config.update(setting)
+
+
+def verify(url: str) -> BasePlugin | None:
+    verify_list = [
+        [
+            pkg.plugin[n].verify,
+            pkg.plugin[n],
+        ]
+        for n in pkg.plugin
+    ]
+    return next((cls for func, cls in verify_list if func(url)), None)
+
 
 print(verify("https://store.steampowered.com/app/1470120/Atopes/"))
 print(verify("ht"))
