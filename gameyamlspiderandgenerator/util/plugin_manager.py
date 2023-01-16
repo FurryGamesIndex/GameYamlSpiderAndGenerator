@@ -1,24 +1,63 @@
-import argparse
 import importlib
-import sys
+from typing import Dict, Literal, Type, Union
 
-from gameyamlspiderandgenerator.util.setting import get_config
 from loguru import logger
-from yaml import safe_load
 
-pkg = {'plugin': {}, 'hook': {}}
+from gameyamlspiderandgenerator.hook import BaseHook
+from gameyamlspiderandgenerator.plugin import BasePlugin
+from gameyamlspiderandgenerator.util.config import config
 
 
-def load_plugins():
-    global pkg
-    if not pkg['plugin']:
-        try:
-            for i in get_config()['plugin']:
-                logger.info(f'Loading plugin {i}')
-                pkg['plugin'][i] = importlib.import_module(f'.{i}', 'gameyamlspiderandgenerator.plugin')
-            for i in get_config()['hook']:
-                logger.info(f'Loading hook {i}')
-                pkg['hook'][i] = importlib.import_module(f'.{i}', 'gameyamlspiderandgenerator.hook')
-        except Exception as e:
-            logger.error(e)
-    return pkg
+class Package:
+    plugin: Dict[str, BasePlugin] = {}
+    hook: Dict[str, BaseHook] = {}
+
+    def __init__(self):
+        self.load_plugins()
+        self.load_hooks()
+
+    def __getitem__(self, item):
+        # Compatibility with the old version
+        return self.__getattribute__(item)
+
+    def __setitem__(self, key, value):
+        # Compatibility with the old version
+        self.__setattr__(key, value)
+
+    def _load(
+        self,
+        _dir: Literal["plugin", "hook"],
+        _type: Union[Type[BasePlugin], Type[BaseHook]],
+    ):
+        base = __package__.split(".")[0] + "." + _dir
+        for plugin in getattr(config, _dir, []):
+            if plugin.startswith("_"):
+                logger.warning(f"Skip loading protected {_dir} {plugin}")
+                continue
+            try:
+                package = f"{base}.{plugin}"
+                logger.info(f"Loading {_dir}: {plugin}")
+                module = importlib.import_module(package)
+                target = [
+                    o
+                    for o in module.__dict__.values()
+                    if isinstance(o, type) and issubclass(o, _type) and o is not _type
+                ][-1]
+                if target in self[_dir].values():
+                    logger.warning(f"Skip loading duplicate {_dir} {plugin}")
+                    continue
+                self[_dir][plugin] = target
+            except ImportError as e:
+                logger.trace(e)
+                logger.error(f"Failed to import {_dir}: {plugin}")
+            except IndexError:
+                logger.error(f"Imported {_dir} but no {_type.__name__} found: {plugin}")
+
+    def load_plugins(self):
+        self._load("plugin", BasePlugin)
+
+    def load_hooks(self):
+        self._load("hook", BaseHook)
+
+
+pkg = Package()
