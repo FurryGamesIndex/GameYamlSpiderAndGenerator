@@ -19,10 +19,7 @@ class Config:
         self.__setattr__(name, data)
 
     def update(self, data: dict):
-        from gameyamlspiderandgenerator.util.plugin_manager import pkg
-
         self.__dict__.update(data)
-        pkg.__init__()
 
     def flush(self):
         self.__dict__.clear()

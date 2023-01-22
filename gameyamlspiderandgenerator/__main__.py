@@ -33,7 +33,7 @@ if isinstance(args.config, str):
 else:
     setting = args.config
 config.update(setting)
-
+pkg.__init__()
 
 def verify(url: str) -> Optional[BasePlugin]:
     verify_list = [

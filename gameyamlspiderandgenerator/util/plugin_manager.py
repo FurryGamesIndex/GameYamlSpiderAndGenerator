@@ -1,5 +1,5 @@
 import importlib
-from typing import Dict, Literal, Type, Union
+from typing import Dict, Literal, Type, Union, List
 
 from loguru import logger
 
@@ -11,6 +11,7 @@ from gameyamlspiderandgenerator.util.config import config
 class Package:
     plugin: Dict[str, BasePlugin] = {}
     hook: Dict[str, BaseHook] = {}
+    log: List[str] = []
 
     def __init__(self):
         self.load_plugins()
@@ -25,9 +26,9 @@ class Package:
         self.__setattr__(key, value)
 
     def _load(
-        self,
-        _dir: Literal["plugin", "hook"],
-        _type: Union[Type[BasePlugin], Type[BaseHook]],
+            self,
+            _dir: Literal["plugin", "hook"],
+            _type: Union[Type[BasePlugin], Type[BaseHook]],
     ):
         base = __package__.split(".")[0] + "." + _dir
         for plugin in getattr(config, _dir, []):
@@ -36,17 +37,16 @@ class Package:
                 continue
             try:
                 package = f"{base}.{plugin}"
+                if plugin in self["log"]:
+                    continue
                 logger.info(f"Loading {_dir}: {plugin}")
-                module = importlib.import_module(package)
-                target = [
+                temp = importlib.import_module(package)
+                self[_dir][plugin] = [
                     o
-                    for o in module.__dict__.values()
+                    for o in temp.__dict__.values()
                     if isinstance(o, type) and issubclass(o, _type) and o is not _type
                 ][-1]
-                if target in self[_dir].values():
-                    logger.warning(f"Skip loading duplicate {_dir} {plugin}")
-                    continue
-                self[_dir][plugin] = target
+                self["log"].append(temp.__name__.split(".")[-1])
             except ImportError as e:
                 logger.trace(e)
                 logger.error(f"Failed to import {_dir}: {plugin}")

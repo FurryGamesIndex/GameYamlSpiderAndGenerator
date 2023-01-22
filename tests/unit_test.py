@@ -12,8 +12,8 @@ def update_config():
     config.update(
         {
             "proxy": {
-                "http": "http://127.0.0.1:10809",
-                "https": "http://127.0.0.1:10809",
+                "http": "socks5://127.0.0.1:7891",
+                "https": "socks5://127.0.0.1:7891",
             },
             "api": {
                 "google-play": "a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90",
@@ -48,7 +48,7 @@ class InitUnitTest(unittest.TestCase):
     """Rewritten from test_init.py"""
 
     def test_init(self):
-        from gameyamlspiderandgenerator.plugin.steam import Steam as Steam
+        from gameyamlspiderandgenerator.plugin.steam import Steam
 
         update_config()
         self.assertIsInstance(
@@ -78,8 +78,8 @@ class ConfigUnitTest(unittest.TestCase):
         self.assertEqual(
             config.proxy,
             {
-                "http": "http://127.0.0.1:10809",
-                "https": "http://127.0.0.1:10809",
+                "http": "socks5://127.0.0.1:7891",
+                "https": "socks5://127.0.0.1:7891",
             },
         )
 
