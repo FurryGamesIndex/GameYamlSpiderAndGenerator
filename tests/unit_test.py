@@ -51,22 +51,6 @@ class SpiderUnitTest(unittest.TestCase):
         self.assertIsInstance(get_text("https://www.so.com/"), str)
 
 
-class ConfigUnitTest(unittest.TestCase):
-
-    def test_flush(self):
-        from gameyamlspiderandgenerator.util.config import config
-        config.flush()
-        self.assertFalse(bool(config.__dict__))
-
-    def test_set(self):
-        from gameyamlspiderandgenerator.util.config import config
-        config.set("foo", ["bar"])
-        self.assertEqual(
-            getattr(config, "foo"),
-            ["bar"],
-        )
-
-
 class SteamUnitTest(unittest.TestCase):
     """Rewritten from plugin/steam.py"""
 

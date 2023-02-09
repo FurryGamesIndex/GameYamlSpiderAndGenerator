@@ -1,6 +1,4 @@
-from typing import List, Union
-
-from ruamel.yaml import round_trip_load, round_trip_dump
+from ruamel.yaml import YAML
 
 from gameyamlspiderandgenerator.exception import ReadOrWriteConfigFailed
 
@@ -22,21 +20,20 @@ class Config:
     def load(self, file_name: str):
         try:
             with open(file_name, "r+") as fp:
-                self.update(round_trip_load(fp, preserve_quotes=True))
+                yaml = YAML()
+                yaml.preserve_quotes = True
+                self.__dict__.update(yaml.load(fp))
         except Exception:
             raise ReadOrWriteConfigFailed from None
-
-    def set(self, name: str, data: Union[dict, List[str]]):
-        self.__setattr__(name, data)
 
     def update(self, data: dict):
         self.__dict__.update(data)
 
-    def flush(self):
-        self.__dict__.clear()
-
     def __str__(self):
-        return round_trip_dump(self.__dict__, indent=1, explicit_start=True)
+        yaml = YAML()
+        yaml.explicit_start = True
+        yaml.indent = 1
+        return yaml.dump(self.__dict__)
 
 
 config = Config()
