@@ -30,10 +30,10 @@ class Config:
         self.__dict__.update(data)
 
     def __str__(self):
-        yaml = YAML()
+        yaml = YAML(typ=["rt", "string"])
         yaml.explicit_start = True
         yaml.indent = 1
-        return yaml.dump(self.__dict__)
+        return yaml.dump_to_string(self.__dict__)
 
 
 config = Config()
