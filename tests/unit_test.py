@@ -4,25 +4,9 @@ import sys
 import unittest
 
 from gameyamlspiderandgenerator.hook.search import Search
+from gameyamlspiderandgenerator.util.config import config
 
-
-def update_config():
-    from gameyamlspiderandgenerator.util.config import config
-
-    config.update(
-        {
-            "proxy": {
-                "http": "socks5://127.0.0.1:7891",
-                "https": "socks5://127.0.0.1:7891",
-            },
-            "api": {
-                "google-play": "a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90",
-                "apple": "a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90",
-            },
-        }
-    )
-    config.set("hook", ["search"])
-    config.set("plugin", ["steam", "itchio"])
+config.load("config.yaml")
 
 
 class CliUnitTest(unittest.TestCase):
@@ -49,8 +33,6 @@ class InitUnitTest(unittest.TestCase):
 
     def test_init(self):
         from gameyamlspiderandgenerator.plugin.steam import Steam
-
-        update_config()
         self.assertIsInstance(
             Steam(
                 "https://store.steampowered.com/app/381210/Dead_by_Daylight/"
@@ -64,42 +46,24 @@ class SpiderUnitTest(unittest.TestCase):
 
     def test_spider(self):
         from gameyamlspiderandgenerator.util.spider import get_status, get_text
-
-        update_config()
-        self.assertGreaterEqual(get_status("https://store.steampowered.com/"), 0)
+        self.assertGreaterEqual(get_status("https://store.steampowered.com/"), 200)
         self.assertIsInstance(get_text("https://www.so.com/"), str)
 
 
 class ConfigUnitTest(unittest.TestCase):
-    def test_update(self):
-        from gameyamlspiderandgenerator.util.config import config
-
-        update_config()
-        self.assertEqual(
-            config.proxy,
-            {
-                "http": "socks5://127.0.0.1:7891",
-                "https": "socks5://127.0.0.1:7891",
-            },
-        )
 
     def test_flush(self):
         from gameyamlspiderandgenerator.util.config import config
-
-        update_config()
         config.flush()
         self.assertFalse(bool(config.__dict__))
 
     def test_set(self):
         from gameyamlspiderandgenerator.util.config import config
-
-        update_config()
         config.set("foo", ["bar"])
         self.assertEqual(
             getattr(config, "foo"),
             ["bar"],
         )
-        update_config()
 
 
 class SteamUnitTest(unittest.TestCase):
@@ -107,8 +71,6 @@ class SteamUnitTest(unittest.TestCase):
 
     def test_steam(self):
         from gameyamlspiderandgenerator.plugin.steam import Steam as Steam
-
-        update_config()
         steam = Steam("https://store.steampowered.com/app/381210/Dead_by_Daylight/")
         self.assertIsInstance(
             steam.to_yaml(),
@@ -119,8 +81,6 @@ class SteamUnitTest(unittest.TestCase):
 class ItchIOUnitTest(unittest.TestCase):
     def test_itchio(self):
         from gameyamlspiderandgenerator.plugin.itchio import ItchIO
-
-        update_config()
         obj = ItchIO(link="https://fymm-game.itch.io/ddp")
         with self.assertLogs("itchio") as _:
             self._extract_log(obj)

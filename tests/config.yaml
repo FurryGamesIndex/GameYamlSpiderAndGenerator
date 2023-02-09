@@ -6,14 +6,13 @@ hook:
 # if you don't want to set proxy, please fill in null
 #proxy: null
 proxy:
-  http: http://127.0.0.1:7890
+  http: socks5://127.0.0.1:7891
   https: socks5://127.0.0.1:7891
 autoupdateDatabase: false
 gitToken: 'your token'
 lang: zh
 # if you cannot directly connect to the github server, please fill in other urls here
 #updateRepo: 'url'
-updateRepo: null
 version: '0.1'
 api:
   google-play: a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90

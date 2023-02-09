@@ -1,5 +1,9 @@
 from typing import List, Union
 
+from yaml import safe_load
+
+from gameyamlspiderandgenerator.exception import ReadOrWriteConfigFailed
+
 
 class Config:
     proxy = {}
@@ -14,6 +18,13 @@ class Config:
     def __setitem__(self, key, value):
         # Compatibility with the old version
         self.__setattr__(key, value)
+
+    def load(self, file_name: str):
+        try:
+            with open(file_name, "r+") as fp:
+                self.update(safe_load(fp))
+        except Exception:
+            raise ReadOrWriteConfigFailed from None
 
     def set(self, name: str, data: Union[dict, List[str]]):
         self.__setattr__(name, data)

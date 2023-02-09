@@ -35,14 +35,18 @@ class GetResponse:
         self.args = {
             "proxies": config["proxy"],
             "allow_redirects": allow_redirects,
+            "headers": {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0'},
             **kwargs,
         }
 
     def __enter__(self):
-        self.response = requests.get(self.url, **self.args)
-        if self.response.status_code != 200:
-            raise CommunicateWithServerFailed(self.response.status_code)
-        return self
+        try:
+            self.response = requests.get(self.url, **self.args)
+            if self.response.status_code != 200:
+                raise CommunicateWithServerFailed(self.response.status_code)
+            return self
+        except Exception as e:
+            raise CommunicateWithServerFailed(str(e)[:100]) from None
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.response.close()

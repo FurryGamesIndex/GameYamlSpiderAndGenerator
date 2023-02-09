@@ -107,7 +107,7 @@ class ItchIO(BasePlugin):
 
     def get_langs(self) -> List[str]:
         temp = self.more_info["Languages"]
-        return list({find(i).language for i in temp})
+        return list(set(find(i).language for i in temp))
 
     def get_links(self) -> List[dict]:
         link = [i.attrs["href"] for i in self.soup.select("a[href]")]

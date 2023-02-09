@@ -9,10 +9,9 @@ class ReadOrWriteConfigFailed(Exception):
 
 
 class CommunicateWithServerFailed(Exception):
-    def __init__(self, status_code: int = None):
-        self.status_code = status_code
+    def __init__(self, info: int | str = ""):
         super().__init__(
-            f"Failed to communicate with server, status code: {status_code}"
+            f"Failed to communicate with server, {('status code: ' + str(info)) if isinstance(info, int) else info}"
         )
 
 
