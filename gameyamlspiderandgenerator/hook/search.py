@@ -62,8 +62,8 @@ class Search(BaseHook):
         ]
         func_list = filter(
             lambda x: callable(x)
-            and x.__name__.startswith("search")
-            and x.__name__ != "search_all",
+                      and x.__name__.startswith("search")
+                      and x.__name__ != "search_all",
             func_list,
         )
         for ii in func_list:
