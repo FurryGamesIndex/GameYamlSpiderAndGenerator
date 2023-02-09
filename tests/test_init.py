@@ -3,15 +3,7 @@ import sys
 from gameyamlspiderandgenerator.plugin.steam import Steam as Steam
 from gameyamlspiderandgenerator.util.config import config
 
-config.update(
-    {
-        "proxy": {"http": "http://127.0.0.1:7890", "https": "socks5://127.0.0.1:7891"},
-        "api": {
-            "google-play": "a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90",
-            "apple": "a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90",
-        },
-    }
-)
+config.load("config.yaml")
 config.set("hook", ["search"])
 config.set("plugin", ["steam", "itchio"])
 
