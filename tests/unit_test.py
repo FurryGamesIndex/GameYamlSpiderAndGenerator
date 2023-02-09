@@ -70,7 +70,7 @@ class SteamUnitTest(unittest.TestCase):
     """Rewritten from plugin/steam.py"""
 
     def test_steam(self):
-        from gameyamlspiderandgenerator.plugin.steam import Steam as Steam
+        from gameyamlspiderandgenerator.plugin.steam import Steam
         steam = Steam("https://store.steampowered.com/app/381210/Dead_by_Daylight/")
         self.assertIsInstance(
             steam.to_yaml(),
@@ -105,4 +105,5 @@ class SearchUnitTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    print(config)
     unittest.main()

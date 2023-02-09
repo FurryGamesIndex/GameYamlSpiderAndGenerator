@@ -1,6 +1,6 @@
 from typing import List, Union
 
-from yaml import safe_load
+from ruamel.yaml import round_trip_load, round_trip_dump
 
 from gameyamlspiderandgenerator.exception import ReadOrWriteConfigFailed
 
@@ -22,7 +22,7 @@ class Config:
     def load(self, file_name: str):
         try:
             with open(file_name, "r+") as fp:
-                self.update(safe_load(fp))
+                self.update(round_trip_load(fp, preserve_quotes=True))
         except Exception:
             raise ReadOrWriteConfigFailed from None
 
@@ -34,6 +34,9 @@ class Config:
 
     def flush(self):
         self.__dict__.clear()
+
+    def __str__(self):
+        return round_trip_dump(self.__dict__, indent=1, explicit_start=True)
 
 
 config = Config()
