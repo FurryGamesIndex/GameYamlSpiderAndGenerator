@@ -8,7 +8,6 @@ from gameyamlspiderandgenerator.util.config import config
 
 config.load("config.yaml")
 
-
 class CliUnitTest(unittest.TestCase):
     """Rewritten from test_cli.py"""
 
