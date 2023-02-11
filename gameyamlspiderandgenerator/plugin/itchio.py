@@ -11,6 +11,7 @@ from langcodes import find
 
 from gameyamlspiderandgenerator.plugin._base import BasePlugin
 from gameyamlspiderandgenerator.util.fgi import fgi_dict
+from gameyamlspiderandgenerator.util.fgi_yaml import dump_to_yaml, pss_dedent
 from gameyamlspiderandgenerator.util.spider import get_text
 
 
@@ -38,7 +39,7 @@ class ItchIO(BasePlugin):
 
     def get_brief_desc(self):
         return (
-            self.data["aggregateRating"]["description"]
+            pss_dedent(self.data["aggregateRating"]["description"])
             if "description" in self.data["aggregateRating"]
             else None
         )
@@ -53,10 +54,10 @@ class ItchIO(BasePlugin):
         ]
 
     def get_desc(self):
-        return html2text(
+        return pss_dedent(html2text(
             str(self.soup.select_one("div.formatted_description.user_formatted")),
             bodywidth=0,
-        ).strip()
+        ).strip())
 
     def get_platforms(self):
         repl = {
@@ -138,5 +139,25 @@ class ItchIO(BasePlugin):
         return temp
 
     def to_yaml(self) -> str:
-        # TODO Implement this
+        if type(self.data) == int:
+            return self.data
+        ret = {
+            "name": self.get_name(),
+            "brief-description": self.get_desc(),
+            "description": self.get_brief_desc(),
+            "description-format": "markdown",
+            "authors": self.get_authors(),
+            "tags": {
+                "type": self.get_type_tag(),
+                "lang": self.get_langs(),
+                "platform": self.get_platforms(),
+                "misc": self.get_misc_tags(),
+            },
+            "links": self.get_links(),
+            "thumbnail": "thumbnail.png",
+            "screenshots": self.get_screenshots() + self.get_video(),  # type: ignore
+        }
+        return dump_to_yaml(ret)
+
+    def get_type_tag(self):
         pass

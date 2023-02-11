@@ -1,6 +1,5 @@
-from ruamel.yaml import YAML
-
 from gameyamlspiderandgenerator.exception import ReadOrWriteConfigFailed
+from gameyamlspiderandgenerator.util.fgi_yaml import fgi
 
 
 class Config:
@@ -19,10 +18,8 @@ class Config:
 
     def load(self, file_name: str):
         try:
-            with open(file_name, "r+") as fp:
-                yaml = YAML()
-                yaml.preserve_quotes = True
-                self.__dict__.update(yaml.load(fp))
+            with open(file_name, "r", encoding="utf-8") as fp:
+                self.__dict__.update(fgi.load(fp))
         except Exception:
             raise ReadOrWriteConfigFailed from None
 
@@ -30,11 +27,10 @@ class Config:
         self.__dict__.update(data)
 
     def __str__(self):
-        yaml = YAML(typ=["rt", "string"])
-
-        yaml.explicit_start = True
-        yaml.indent = 1
-        return yaml.dump_to_string(self.__dict__)
+        fgi.preserve_quotes = True
+        fgi.explicit_start = True
+        fgi.indent = 1
+        return fgi.dump_to_string(self.__dict__)
 
 
 config = Config()

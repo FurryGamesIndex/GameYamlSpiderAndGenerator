@@ -1,30 +1,19 @@
 import re
-from textwrap import dedent
-from typing import AnyStr, List, SupportsInt, Union
+from typing import AnyStr, List, SupportsInt
 from urllib.parse import parse_qs, urlparse
 
 from bs4 import BeautifulSoup
 from html2text import html2text
 from langcodes import find
-from ruamel.yaml import YAML
-from ruamel.yaml.scalarstring import PreservedScalarString
 
 from gameyamlspiderandgenerator.plugin._base import BasePlugin
 from gameyamlspiderandgenerator.util.fgi import fgi_dict
+from gameyamlspiderandgenerator.util.fgi_yaml import dump_to_yaml, pss_dedent
 from gameyamlspiderandgenerator.util.spider import get_json, get_text
 
 
-def pss_dedent(x: AnyStr) -> PreservedScalarString:
-    return PreservedScalarString(dedent(x))
-
-
-yaml = YAML(typ=["rt", "string"])
-yaml.indent(sequence=4, offset=2)
-yaml.width = 4096
-
-
 class Steam(BasePlugin):
-    _VERIFY_PATTERN = re.compile(r"https?://store\.steampowered\.com/app/\d+/.+/")
+    _VERIFY_PATTERN = re.compile(r"https?://store\.steampowered\.com/app/\d+/.+/?.+")
 
     @staticmethod
     def get_steam_id(link: AnyStr) -> SupportsInt:
@@ -49,9 +38,7 @@ class Steam(BasePlugin):
         temp1 = self.soup.body.find_all("a", {"class": "app_tag"})
         self.tag = [re.sub(r"[\n\t\r]*", "", temp1[i].text) for i in range(len(temp1))]
 
-    def to_yaml(self) -> Union[AnyStr, SupportsInt]:
-        if type(self.data) == int:
-            return self.data
+    def to_yaml(self) -> AnyStr:
         ret = {
             "name": self.get_name(),
             "brief-description": self.get_desc(),
@@ -68,10 +55,7 @@ class Steam(BasePlugin):
             "thumbnail": "thumbnail.png",
             "screenshots": self.get_screenshots() + self.get_video(),  # type: ignore
         }
-        b_ret = yaml.dump_to_string(ret)
-        for i in list(ret.keys())[1:]:
-            b_ret = b_ret.replace("\n" + i, "\n\n" + i)
-        return b_ret
+        return dump_to_yaml(ret)
 
     def get_langs(self) -> List[str]:
         temp = self.data[str(self.id)]["data"]["supported_languages"].split(",")
@@ -157,8 +141,8 @@ class Steam(BasePlugin):
 
     def get_if_nsfw(self):
         return (
-            self.soup.body.find_all("div", {"id": "game_area_content_descriptors"})
-            != []
+                self.soup.body.find_all("div", {"id": "game_area_content_descriptors"})
+                != []
         )
 
     def get_screenshots(self):
