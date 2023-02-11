@@ -14,7 +14,7 @@ config.load("/home/user/desktop/config.yaml")
 pkg.__init__()
 print(produce_yaml("https://store.steampowered.com/app/1470120/Atopes/"))
 ```
-
+config.yaml:
 ```yaml
 plugin:
   - steam
