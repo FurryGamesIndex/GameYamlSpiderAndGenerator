@@ -9,13 +9,14 @@ def pss_dedent(x: AnyStr) -> PreservedScalarString:
     return PreservedScalarString(dedent(x))
 
 
-yaml = YAML(typ=["rt", "string"])
-yaml.indent(sequence=4, offset=2)
-yaml.width = 4096
+fgi = YAML(typ=["rt", "string"])
+fgi.indent(sequence=4, offset=2)
+fgi.preserve_quotes = True
+fgi.width = 4096
 
 
 def dump_to_yaml(data: dict) -> AnyStr:
-    temp = yaml.dump_to_string(data)
+    temp = fgi.dump_to_string(data)
     for i in list(data.keys())[1:]:
-        b_ret = temp.replace("\n" + i, "\n\n" + i)
+        temp = temp.replace("\n" + i, "\n\n" + i)
     return temp

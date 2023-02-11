@@ -13,7 +13,7 @@ from gameyamlspiderandgenerator.util.spider import get_json, get_text
 
 
 class Steam(BasePlugin):
-    _VERIFY_PATTERN = re.compile(r"https?://store\.steampowered\.com/app/\d+/.+/")
+    _VERIFY_PATTERN = re.compile(r"https?://store\.steampowered\.com/app/\d+/.+/?.+")
 
     @staticmethod
     def get_steam_id(link: AnyStr) -> SupportsInt:

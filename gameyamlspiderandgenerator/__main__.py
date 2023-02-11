@@ -1,9 +1,8 @@
 import argparse
-from typing import Optional
 
 from yaml import safe_load
 
-from gameyamlspiderandgenerator.plugin import BasePlugin
+from gameyamlspiderandgenerator import verify
 from gameyamlspiderandgenerator.util.config import config
 from gameyamlspiderandgenerator.util.plugin_manager import pkg
 
@@ -34,16 +33,6 @@ else:
     setting = args.config
 config.update(setting)
 pkg.__init__()
-
-def verify(url: str) -> Optional[BasePlugin]:
-    verify_list = [
-        [
-            pkg.plugin[n].verify,
-            pkg.plugin[n],
-        ]
-        for n in pkg.plugin
-    ]
-    return next((cls for func, cls in verify_list if func(url)), None)
 
 
 print(verify("https://store.steampowered.com/app/1470120/Atopes/"))
