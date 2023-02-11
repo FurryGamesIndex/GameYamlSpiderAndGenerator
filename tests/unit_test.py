@@ -7,7 +7,8 @@ import unittest
 from gameyamlspiderandgenerator.hook.search import Search
 from gameyamlspiderandgenerator.util.config import config
 
-config.load(os.path.split(os.path.realpath(__file__))[0] + "/config.yaml")
+config.load(os.path.split(os.path.realpath(__file__))[0] + "/test_config.yaml")
+print(config)
 
 
 class CliUnitTest(unittest.TestCase):
@@ -90,5 +91,4 @@ class SearchUnitTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    print(config)
     unittest.main()

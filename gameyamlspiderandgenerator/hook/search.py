@@ -9,7 +9,6 @@ from gameyamlspiderandgenerator.hook import BaseHook
 from gameyamlspiderandgenerator.util.config import config
 from gameyamlspiderandgenerator.util.spider import get_json, get_text
 
-print(config, type(config))
 
 class Search(BaseHook):
     @staticmethod

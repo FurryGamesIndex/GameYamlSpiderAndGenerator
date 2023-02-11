@@ -31,7 +31,7 @@ class Config:
 
     def __str__(self):
         yaml = YAML(typ=["rt", "string"])
-
+        yaml.preserve_quotes = True
         yaml.explicit_start = True
         yaml.indent = 1
         return yaml.dump_to_string(self.__dict__)
