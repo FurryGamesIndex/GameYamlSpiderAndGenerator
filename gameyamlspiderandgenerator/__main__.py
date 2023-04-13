@@ -2,9 +2,9 @@ import argparse
 
 from yaml import safe_load
 
-from gameyamlspiderandgenerator import verify
-from gameyamlspiderandgenerator.util.config import config
-from gameyamlspiderandgenerator.util.plugin_manager import pkg
+from . import verify
+from .util.config import config
+from .util.plugin_manager import pkg
 
 parser = argparse.ArgumentParser()
 parser.add_argument(

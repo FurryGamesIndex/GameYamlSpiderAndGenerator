@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gameyamlspiderandgenerator"
-version = "0.4.1"
+version = "1.0.0"
 description = ""
 authors = ["kaesinol"]
 license = "MIT"
@@ -14,7 +14,7 @@ html2text = "^2020.1.16"
 "ruamel.yaml" = "^0.17.21"
 "ruamel.yaml.string" = "^0.1.0"
 urllib3 = "^1.26.14"
-beautifulsoup4 = "^4.11.2"
+beautifulsoup4 = "^4.11.1"
 pillow = "^9.4.0"
 pygithub = "^1.57"
 requests = "^2.28.2"

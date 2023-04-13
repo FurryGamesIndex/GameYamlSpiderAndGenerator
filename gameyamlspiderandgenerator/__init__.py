@@ -1,12 +1,13 @@
-from typing import Optional, AnyStr
+from typing import Optional, Callable
 
 from loguru import logger
 
-from gameyamlspiderandgenerator.plugin import BasePlugin
-from gameyamlspiderandgenerator.util.plugin_manager import pkg
+from .plugin import BasePlugin
+from .util.fgi_yaml import YamlData
+from .util.plugin_manager import pkg
 
 
-def verify(url: str) -> Optional[BasePlugin]:
+def verify(url: str) -> Optional[Callable]:
     verify_list = [
         [
             pkg.plugin[n].verify,
@@ -17,8 +18,8 @@ def verify(url: str) -> Optional[BasePlugin]:
     return next((cls for func, cls in verify_list if func(url)), None)
 
 
-def produce_yaml(url: str) -> Optional[AnyStr]:
-    ret = verify(url)
+def produce_yaml(url: str) -> Optional[YamlData]:
+    ret: Callable = verify(url)
     if ret is None:
         logger.error("URL is invalid")
         return
