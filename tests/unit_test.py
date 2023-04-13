@@ -36,9 +36,9 @@ class InitUnitTest(unittest.TestCase):
     def test_init(self):
         from gameyamlspiderandgenerator.plugin.steam import Steam
         self.assertIsInstance(
-            Steam(
+            str(Steam(
                 "https://store.steampowered.com/app/381210/Dead_by_Daylight/"
-            ).to_yaml(),
+            ).to_yaml()),
             str,
         )
 
@@ -59,7 +59,7 @@ class SteamUnitTest(unittest.TestCase):
         from gameyamlspiderandgenerator.plugin.steam import Steam
         steam = Steam("https://store.steampowered.com/app/381210/Dead_by_Daylight/")
         self.assertIsInstance(
-            steam.to_yaml(),
+            str(steam.to_yaml()),
             str,
         )
 
