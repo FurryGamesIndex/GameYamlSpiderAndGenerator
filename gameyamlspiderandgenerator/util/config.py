@@ -1,5 +1,5 @@
-from gameyamlspiderandgenerator.exception import ReadOrWriteConfigFailed
-from gameyamlspiderandgenerator.util.fgi_yaml import fgi
+from .fgi_yaml import fgi
+from ..exception import ReadOrWriteConfigFailed
 
 
 class Config:

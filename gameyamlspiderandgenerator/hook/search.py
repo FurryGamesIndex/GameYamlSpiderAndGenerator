@@ -5,11 +5,12 @@ from urllib.parse import quote_plus
 from bs4 import BeautifulSoup
 from loguru import logger
 
-from gameyamlspiderandgenerator.hook import BaseHook
-from gameyamlspiderandgenerator.util.config import config
-from gameyamlspiderandgenerator.util.spider import get_json, get_text
+from ..hook import BaseHook
+from ..util.config import config
+from ..util.spider import get_json, get_text
 
 print(config, type(config))
+
 
 class Search(BaseHook):
     @staticmethod

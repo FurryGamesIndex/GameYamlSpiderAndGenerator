@@ -9,10 +9,10 @@ from bs4 import BeautifulSoup
 from html2text import html2text
 from langcodes import find
 
-from gameyamlspiderandgenerator.plugin._base import BasePlugin
-from gameyamlspiderandgenerator.util.fgi import fgi_dict
-from gameyamlspiderandgenerator.util.fgi_yaml import dump_to_yaml, pss_dedent
-from gameyamlspiderandgenerator.util.spider import get_text
+from ._base import BasePlugin
+from ..util.fgi import fgi_dict
+from ..util.fgi_yaml import YamlData, pss_dedent
+from ..util.spider import get_text
 
 
 class ItchIO(BasePlugin):
@@ -143,13 +143,13 @@ class ItchIO(BasePlugin):
             temp = pkg["hook"].Search(self.get_name()).setup(temp)
         return temp
 
-    def to_yaml(self) -> str:
+    def to_yaml(self) -> YamlData:
         if type(self.data) == int:
             return self.data
         ret = {
             "name": self.get_name(),
-            "brief-description": self.get_desc(),
-            "description": self.get_brief_desc(),
+            "brief-description": self.get_brief_desc(),
+            "description": self.get_desc(),
             "description-format": "markdown",
             "authors": self.get_authors(),
             "tags": {
@@ -159,10 +159,10 @@ class ItchIO(BasePlugin):
                 "misc": self.get_misc_tags(),
             },
             "links": self.get_links(),
-            "thumbnail": "thumbnail.png",
-            "screenshots": self.get_screenshots()  # + self.get_video(),   type: ignore
+            "thumbnail": self.get_thumbnail(),
+            "screenshots": self.get_screenshots()  # + self.get_video(),
         }
-        return dump_to_yaml(ret)
+        return YamlData(ret)
 
     def get_type_tag(self):
         pass

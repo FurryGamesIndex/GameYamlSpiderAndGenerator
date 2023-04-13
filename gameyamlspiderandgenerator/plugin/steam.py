@@ -6,10 +6,10 @@ from bs4 import BeautifulSoup
 from html2text import html2text
 from langcodes import find
 
-from gameyamlspiderandgenerator.plugin._base import BasePlugin
-from gameyamlspiderandgenerator.util.fgi import fgi_dict
-from gameyamlspiderandgenerator.util.fgi_yaml import dump_to_yaml, pss_dedent
-from gameyamlspiderandgenerator.util.spider import get_json, get_text
+from ._base import BasePlugin
+from ..util.fgi import fgi_dict
+from ..util.fgi_yaml import YamlData, pss_dedent
+from ..util.spider import get_json, get_text
 
 
 class Steam(BasePlugin):
@@ -38,11 +38,11 @@ class Steam(BasePlugin):
         temp1 = self.soup.body.find_all("a", {"class": "app_tag"})
         self.tag = [re.sub(r"[\n\t\r]*", "", temp1[i].text) for i in range(len(temp1))]
 
-    def to_yaml(self) -> AnyStr:
+    def to_yaml(self) -> YamlData:
         ret = {
             "name": self.get_name(),
-            "brief-description": self.get_desc(),
-            "description": self.get_brief_desc(),
+            "brief-description": self.get_brief_desc(),
+            "description": self.get_desc(),
             "description-format": "markdown",
             "authors": self.get_authors(),
             "tags": {
@@ -52,10 +52,10 @@ class Steam(BasePlugin):
                 "misc": self.get_misc_tags(),
             },
             "links": self.get_links(),
-            "thumbnail": "thumbnail.png",
+            "thumbnail": self.get_thumbnail(),
             "screenshots": self.get_screenshots() + self.get_video(),  # type: ignore
         }
-        return dump_to_yaml(ret)
+        return YamlData(ret)
 
     def get_langs(self) -> List[str]:
         temp = self.data[str(self.id)]["data"]["supported_languages"].split(",")
