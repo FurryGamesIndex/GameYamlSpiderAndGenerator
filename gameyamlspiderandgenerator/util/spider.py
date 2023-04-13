@@ -1,5 +1,4 @@
-from pathlib import Path
-from typing import Dict, Union
+from typing import Dict
 
 import requests
 from requests import JSONDecodeError
@@ -89,24 +88,9 @@ class GetResponse:
         """
         return self.response.status_code
 
-    def to_disk(self, path: Union[str, Path], allow_exist: bool = False, /):
-        """
-        将响应内容写入磁盘
-
-        Args:
-            path: 路径
-            allow_exist: 是否允许覆盖已存在的文件
-        """
-        path = Path(path)
-        if path.is_file():
-            if allow_exist:
-                path.unlink()
-            else:
-                raise FileExistsError(f"File {path} already exists")
-        elif path.is_dir():
-            raise IsADirectoryError(f"{path} is a directory")
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(self.response.content)
+    @property
+    def bytes(self):
+        return self.response.content
 
 
 def get_json(url: str) -> Dict:
@@ -124,6 +108,6 @@ def get_status(url: str) -> int:
         return resp.status
 
 
-def download_file(url: str, save: Union[str, Path]):
+def get_bytes(url: str) -> bytes:
     with GetResponse(url) as resp:
-        resp.to_disk(save)
+        return resp.bytes

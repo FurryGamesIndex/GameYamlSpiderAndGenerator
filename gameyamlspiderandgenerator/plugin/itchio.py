@@ -11,12 +11,17 @@ from langcodes import find
 
 from ._base import BasePlugin
 from ..util.fgi import fgi_dict
-from ..util.fgi_yaml import dump_to_yaml, pss_dedent
+from ..util.fgi_yaml import YamlData, pss_dedent
 from ..util.spider import get_text
 
 
 class ItchIO(BasePlugin):
     _VERIFY_PATTERN = re.compile(r"https?://.+\.itch\.io/.+")
+
+    @staticmethod
+    def remove_query(s: str):
+        s = re.sub(r"\?t=\d{6,12}", "", s)
+        return s.replace("![]", "![img]")
 
     def __init__(self, link: AnyStr) -> None:
         self.data_html = get_text(link)
@@ -54,10 +59,10 @@ class ItchIO(BasePlugin):
         ]
 
     def get_desc(self):
-        return pss_dedent(html2text(
+        return pss_dedent(self.remove_query(html2text(
             str(self.soup.select_one("div.formatted_description.user_formatted")),
             bodywidth=0,
-        ).strip())
+        )).strip())
 
     def get_platforms(self):
         repl = {
@@ -76,8 +81,8 @@ class ItchIO(BasePlugin):
         return [{"name": i, "role": "developer"} for i in temp]
 
     def get_tags(self) -> List[str]:
-        temp = self.more_info["Genre"] if "Genre" in self.more_info else ""
-        temp1 = self.more_info["Made with"] if "Made with" in self.more_info else ""
+        temp = self.more_info["Genre"] if "Genre" in self.more_info else []
+        temp1 = self.more_info["Made with"] if "Made with" in self.more_info else []
         temp2 = self.more_info["Tags"]
         return [i.strip() for i in (temp2 + temp1 + temp)]
 
@@ -107,7 +112,7 @@ class ItchIO(BasePlugin):
         return list(set(ret))
 
     def get_langs(self) -> List[str]:
-        temp = self.more_info["Languages"]
+        temp = self.more_info["Languages"] if "Languages" in self.more_info else ["English"]
         return list(set(find(i).language for i in temp))
 
     def get_links(self) -> List[dict]:
@@ -138,7 +143,7 @@ class ItchIO(BasePlugin):
             temp = pkg["hook"].Search(self.get_name()).setup(temp)
         return temp
 
-    def to_yaml(self) -> str:
+    def to_yaml(self) -> YamlData:
         if type(self.data) == int:
             return self.data
         ret = {
@@ -154,10 +159,10 @@ class ItchIO(BasePlugin):
                 "misc": self.get_misc_tags(),
             },
             "links": self.get_links(),
-            "thumbnail": "thumbnail.png",
-            "screenshots": self.get_screenshots() + self.get_video(),  # type: ignore
+            "thumbnail": self.get_thumbnail(),
+            "screenshots": self.get_screenshots()  # + self.get_video(),
         }
-        return dump_to_yaml(ret)
+        return YamlData(ret)
 
     def get_type_tag(self):
         pass

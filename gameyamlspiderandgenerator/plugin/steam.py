@@ -8,7 +8,7 @@ from langcodes import find
 
 from ._base import BasePlugin
 from ..util.fgi import fgi_dict
-from ..util.fgi_yaml import dump_to_yaml, pss_dedent
+from ..util.fgi_yaml import YamlData, pss_dedent
 from ..util.spider import get_json, get_text
 
 
@@ -38,7 +38,7 @@ class Steam(BasePlugin):
         temp1 = self.soup.body.find_all("a", {"class": "app_tag"})
         self.tag = [re.sub(r"[\n\t\r]*", "", temp1[i].text) for i in range(len(temp1))]
 
-    def to_yaml(self) -> AnyStr:
+    def to_yaml(self) -> YamlData:
         ret = {
             "name": self.get_name(),
             "brief-description": self.get_brief_desc(),
@@ -52,10 +52,10 @@ class Steam(BasePlugin):
                 "misc": self.get_misc_tags(),
             },
             "links": self.get_links(),
-            "thumbnail": "thumbnail.png",
+            "thumbnail": self.get_thumbnail(),
             "screenshots": self.get_screenshots() + self.get_video(),  # type: ignore
         }
-        return dump_to_yaml(ret)
+        return YamlData(ret)
 
     def get_langs(self) -> List[str]:
         temp = self.data[str(self.id)]["data"]["supported_languages"].split(",")
