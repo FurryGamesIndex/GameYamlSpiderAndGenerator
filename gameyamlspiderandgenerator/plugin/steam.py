@@ -6,10 +6,10 @@ from bs4 import BeautifulSoup
 from html2text import html2text
 from langcodes import find
 
-from gameyamlspiderandgenerator.plugin._base import BasePlugin
-from gameyamlspiderandgenerator.util.fgi import fgi_dict
-from gameyamlspiderandgenerator.util.fgi_yaml import dump_to_yaml, pss_dedent
-from gameyamlspiderandgenerator.util.spider import get_json, get_text
+from ._base import BasePlugin
+from ..util.fgi import fgi_dict
+from ..util.fgi_yaml import dump_to_yaml, pss_dedent
+from ..util.spider import get_json, get_text
 
 
 class Steam(BasePlugin):
@@ -41,8 +41,8 @@ class Steam(BasePlugin):
     def to_yaml(self) -> AnyStr:
         ret = {
             "name": self.get_name(),
-            "brief-description": self.get_desc(),
-            "description": self.get_brief_desc(),
+            "brief-description": self.get_brief_desc(),
+            "description": self.get_desc(),
             "description-format": "markdown",
             "authors": self.get_authors(),
             "tags": {

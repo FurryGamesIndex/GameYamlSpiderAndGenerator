@@ -3,9 +3,9 @@ from typing import Dict, Literal, Type, Union, List
 
 from loguru import logger
 
-from gameyamlspiderandgenerator.hook import BaseHook
-from gameyamlspiderandgenerator.plugin import BasePlugin
-from gameyamlspiderandgenerator.util.config import config
+from ..hook import BaseHook
+from ..plugin import BasePlugin
+from ..util.config import config
 
 
 class Package:

@@ -4,11 +4,11 @@ from typing import Dict, Union
 import requests
 from requests import JSONDecodeError
 
-from gameyamlspiderandgenerator.exception import (
+from ..exception import (
     CommunicateWithServerFailed,
     InvalidResponse,
 )
-from gameyamlspiderandgenerator.util.config import config
+from ..util.config import config
 
 
 class GetResponse:

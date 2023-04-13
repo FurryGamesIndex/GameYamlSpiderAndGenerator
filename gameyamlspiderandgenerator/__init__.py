@@ -2,8 +2,8 @@ from typing import Optional, AnyStr
 
 from loguru import logger
 
-from gameyamlspiderandgenerator.plugin import BasePlugin
-from gameyamlspiderandgenerator.util.plugin_manager import pkg
+from .plugin import BasePlugin
+from .util.plugin_manager import pkg
 
 
 def verify(url: str) -> Optional[BasePlugin]:

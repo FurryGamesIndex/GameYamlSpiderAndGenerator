@@ -20,3 +20,14 @@ def dump_to_yaml(data: dict) -> AnyStr:
     for i in list(data.keys())[1:]:
         temp = temp.replace("\n" + i, "\n\n" + i)
     return temp
+
+
+class YamlData:
+    raw_data: dict
+    zip_file: bytes
+
+    def __init__(self, raw_data: dict):
+        pass
+
+    def __str__(self):
+        pass
