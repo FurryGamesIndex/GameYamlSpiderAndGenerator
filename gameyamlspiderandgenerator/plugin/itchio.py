@@ -51,10 +51,8 @@ class ItchIO(BasePlugin):
         return self.data["name"]
 
     def get_screenshots(self):
-        return [
-            i.attrs["src"]
-            for i in self.soup.find_all("img", attrs={"class": "screenshot"})
-        ]
+        temp = self.soup.select_one("div.columns > div.right_col.column > div.screenshot_list").select('a')
+        return [i.attrs['href'] for i in temp]
 
     def get_desc(self):
         return pss_dedent(self.remove_query(html2text(
