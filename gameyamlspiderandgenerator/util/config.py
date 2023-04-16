@@ -17,12 +17,15 @@ class Config:
         # Compatibility with the old version
         self.__setattr__(key, value)
 
-    def load(self, file_name: str | None):
-        if file_name is None:
+    def load(self, file_data: str | dict | None):
+        if type(file_data) is dict:
+            self.__dict__.update(file_data)
+            return
+        if file_data is None:
             self.__dict__.update(default_config)
             return
         try:
-            with open(file_name, "r", encoding="utf-8") as fp:
+            with open(file_data, "r", encoding="utf-8") as fp:
                 self.__dict__.update(fgi.load(fp))
         except Exception:
             raise ReadOrWriteConfigFailed from None
