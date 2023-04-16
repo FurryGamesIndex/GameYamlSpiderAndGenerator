@@ -44,7 +44,7 @@ class YamlData:
         self.raw_dict = raw_data
 
     def __str__(self):
-        return dump_to_yaml(self.raw_dict)
+        return dump_to_yaml({**self.raw_dict["thumbnail"], "thumbnail": 'thumbnail.png'})
 
     def __bytes__(self):
         from ..util.spider import get_bytes
@@ -52,6 +52,8 @@ class YamlData:
         img = get_bytes(self.raw_dict["thumbnail"])
         zip_data = zipfile.ZipFile(_io, 'w', zipfile.ZIP_STORED)
         zip_data.writestr('thumbnail.png', process_thumbnail(img))
-        zip_data.writestr(self.raw_dict['name'] + ".yaml", dump_to_yaml(self.raw_dict))
+
+        zip_data.writestr(self.raw_dict['name'] + ".yaml",
+                          dump_to_yaml({**self.raw_dict["thumbnail"], "thumbnail": 'thumbnail.png'}))
         zip_data.close()
         return _io.getvalue()

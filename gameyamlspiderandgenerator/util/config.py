@@ -1,4 +1,5 @@
 from .fgi_yaml import fgi
+from .fgi import default_config
 from ..exception import ReadOrWriteConfigFailed
 
 
@@ -16,7 +17,10 @@ class Config:
         # Compatibility with the old version
         self.__setattr__(key, value)
 
-    def load(self, file_name: str):
+    def load(self, file_name: str | None):
+        if file_name is None:
+            self.__dict__.update(default_config)
+            return
         try:
             with open(file_name, "r", encoding="utf-8") as fp:
                 self.__dict__.update(fgi.load(fp))
