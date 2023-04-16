@@ -1,4 +1,3 @@
-from typing import Dict
 
 import requests
 from requests import JSONDecodeError
@@ -93,7 +92,7 @@ class GetResponse:
         return self.response.content
 
 
-def get_json(url: str) -> Dict:
+def get_json(url: str) -> dict:
     with GetResponse(url) as resp:
         return resp.json
 

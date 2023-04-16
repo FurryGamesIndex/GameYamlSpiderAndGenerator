@@ -1,5 +1,5 @@
 import importlib
-from typing import Dict, Literal, Type, Union, List
+from typing import Literal, Type, Union
 
 from loguru import logger
 
@@ -9,9 +9,9 @@ from ..util.config import config
 
 
 class Package:
-    plugin: Dict[str, BasePlugin] = {}
-    hook: Dict[str, BaseHook] = {}
-    log: List[str] = []
+    plugin: dict[str, BasePlugin] = {}
+    hook: dict[str, BaseHook] = {}
+    log: list[str] = []
 
     def __init__(self):
         self.load_plugins()
