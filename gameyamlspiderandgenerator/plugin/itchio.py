@@ -3,8 +3,6 @@ import re
 from contextlib import suppress
 from json import loads
 from re import match, sub
-from typing import AnyStr, List
-
 from bs4 import BeautifulSoup
 from html2text import html2text
 from langcodes import find
@@ -23,7 +21,7 @@ class ItchIO(BasePlugin):
         s = re.sub(r"\?t=\d{6,12}", "", s)
         return s.replace("![]", "![img]")
 
-    def __init__(self, link: AnyStr) -> None:
+    def __init__(self, link: str) -> None:
         self.data_html = get_text(link)
         self.soup = BeautifulSoup(self.data_html, "html.parser")
         self.data = [
@@ -76,11 +74,11 @@ class ItchIO(BasePlugin):
         platforms = self.more_info["Platforms"][0].split(",")
         return [repl[i.strip()] for i in platforms]
 
-    def get_authors(self) -> List[dict]:
+    def get_authors(self) -> list[dict]:
         temp = self.more_info["Author"]
         return [{"name": i, "role": "developer"} for i in temp]
 
-    def get_tags(self) -> List[str]:
+    def get_tags(self) -> list[str]:
         temp = self.more_info["Genre"] if "Genre" in self.more_info else []
         temp1 = self.more_info["Made with"] if "Made with" in self.more_info else []
         temp2 = self.more_info["Tags"]
@@ -111,13 +109,13 @@ class ItchIO(BasePlugin):
             ret.extend(value for ii in self.tag if i in ii)
         return list(set(ret))
 
-    def get_langs(self) -> List[str]:
+    def get_langs(self) -> list[str]:
         temp = self.more_info["Languages"] if "Languages" in self.more_info else ["English"]
         return list(set(find(i).language for i in temp))
 
-    def get_links(self) -> List[dict]:
+    def get_links(self) -> list[dict]:
         link = [i.attrs["href"] for i in self.soup.select("a[href]")]
-        data = list(list(set(link)))
+        data = list(set(link))
         return [
             {"name": p["prefix"], "uri": sub(p["match"], p["replace"], i)}
             for i, p in itertools.product(data, fgi_dict)

@@ -1,5 +1,4 @@
 from re import sub
-from typing import AnyStr
 from urllib.parse import quote_plus
 
 from bs4 import BeautifulSoup
@@ -14,7 +13,7 @@ print(config, type(config))
 
 class Search(BaseHook):
     @staticmethod
-    def name_filter(s: AnyStr, rep: AnyStr = ""):
+    def name_filter(s: str, rep: str = ""):
         return sub("[^A-z]", rep, s.lower())
 
     def __init__(self, name: str) -> None:
@@ -63,9 +62,7 @@ class Search(BaseHook):
             for i in (list(filter(lambda x: "__" not in x, self.__dir__())))
         ]
         func_list = filter(
-            lambda x: callable(x)
-                      and x.__name__.startswith("search")
-                      and x.__name__ != "search_all",
+            lambda x: callable(x) and x.__name__.startswith("search") and x.__name__ != "search_all",
             func_list,
         )
         for ii in func_list:

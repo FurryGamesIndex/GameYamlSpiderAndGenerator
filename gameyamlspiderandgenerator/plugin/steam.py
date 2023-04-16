@@ -1,5 +1,4 @@
 import re
-from typing import AnyStr, List, SupportsInt
 from urllib.parse import parse_qs, urlparse
 
 from bs4 import BeautifulSoup
@@ -16,7 +15,7 @@ class Steam(BasePlugin):
     _VERIFY_PATTERN = re.compile(r"https?://store\.steampowered\.com/app/\d+/.+/?.+")
 
     @staticmethod
-    def get_steam_id(link: AnyStr) -> SupportsInt:
+    def get_steam_id(link: str) -> int:
         return int(urlparse(link).path.split("/")[2])
 
     def get_name(self):
@@ -27,7 +26,7 @@ class Steam(BasePlugin):
         s = re.sub(r"\?t=\d{6,12}", "", s)
         return s.replace("![]", "![img]")
 
-    def __init__(self, link: AnyStr) -> None:
+    def __init__(self, link: str) -> None:
         self.id = self.get_steam_id(link)
         self.data = get_json(
             f"https://store.steampowered.com/api/appdetails?appids={self.id}&cc=us&l=english"
@@ -57,7 +56,7 @@ class Steam(BasePlugin):
         }
         return YamlData(ret)
 
-    def get_langs(self) -> List[str]:
+    def get_langs(self) -> list[str]:
         temp = self.data[str(self.id)]["data"]["supported_languages"].split(",")
         return list({find(i).language for i in temp})
 
@@ -78,7 +77,7 @@ class Steam(BasePlugin):
             html2text(self.data[str(self.id)]["data"]["short_description"], bodywidth=0)
         )
 
-    def get_authors(self) -> List[dict]:
+    def get_authors(self) -> list[dict]:
         temp = self.data[str(self.id)]["data"]
         developers = [{"name": i, "role": "developer"} for i in temp["developers"]]
         publishers = [{"name": i, "role": "publisher"} for i in temp["publishers"]]
@@ -117,7 +116,7 @@ class Steam(BasePlugin):
             ret.extend(value for ii in self.tag if i in ii)
         return list(set(ret))
 
-    def get_tags(self) -> List[dict]:
+    def get_tags(self) -> list[dict]:
         pass
 
     def get_misc_tags(self):
@@ -181,8 +180,8 @@ class Steam(BasePlugin):
             for i in range(len(video_webm))
         ]
 
-    def get_links(self) -> List[dict]:
-        def remove_query_string(x: AnyStr):
+    def get_links(self) -> list[dict]:
+        def remove_query_string(x: str):
             return parse_qs(urlparse(x).query)["url"][0] if "linkfilter" in x else x  # type: ignore
 
         temp1 = self.soup.body.find(
