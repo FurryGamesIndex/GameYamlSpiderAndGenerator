@@ -163,4 +163,33 @@ class ItchIO(BasePlugin):
         return YamlData(ret)
 
     def get_type_tag(self):
-        pass
+        repl = {
+            "Visual Novel": "visual-nove",
+            "Real time strategy": "Real time strategy",
+            "Strategy": "strategy",
+            "Casual": "casual",
+            "Adventure": "adventure",
+            "Board Game": "board",
+            "Action": "action",
+            "Fantasy": "fantasy",
+            "Fighting": "fighting",
+            "Music": "music",
+            "Shooter": "shooter",
+            "Puzzle": "puzzle",
+            "RPG": "role-playing",
+            "MMORPG": "mmorpg",
+            "Dating Sim": "dating-sim",
+            "Roguelike": "roguelike",
+            "Sports": "Sports",
+            "Bara": "bara",
+            "Yuri": "yuri",
+            "Gore": "gore",
+            "Comedy": "comedy",
+            "tragedy": "tragedy",
+            "Horror": "horror"
+        }
+
+        ret = []
+        for i, value in repl.items():
+            ret.extend(value for ii in self.tag if i in ii)
+        return list(set(ret))

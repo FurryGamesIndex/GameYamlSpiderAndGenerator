@@ -4,7 +4,7 @@ from gameyamlspiderandgenerator.util.plugin_manager import pkg
 
 config.load("/home/keiplyer/桌面/config.yaml")
 pkg.__init__()
-yml = produce_yaml("https://store.steampowered.com/app/1470120/Atopes/")
+yml = produce_yaml("https://store.steampowered.com/app/531640/Eternal_Card_Game/")
 print(yml)
 with open(yml.raw_dict['name'] + ".zip", 'wb') as f:
     f.write(bytes(yml))
