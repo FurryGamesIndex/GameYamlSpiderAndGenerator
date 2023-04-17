@@ -17,6 +17,7 @@ class Config:
         # Compatibility with the old version
         self.__setattr__(key, value)
 
+
     def load(self, file_data: str | dict | None):
         if type(file_data) is dict:
             self.__dict__.update(file_data)
