@@ -38,7 +38,10 @@ class ItchIO(BasePlugin):
         self.tag = self.get_tags()
 
     def get_thumbnail(self):
-        return self.soup.select_one("#header > img").attrs["src"]
+        th = self.soup.select_one("#header > img")
+        if th is None:
+            return None
+        return th.attrs["src"]
 
     def get_brief_desc(self):
         return (
@@ -58,7 +61,7 @@ class ItchIO(BasePlugin):
         return pss_dedent(self.remove_query(html2text(
             str(self.soup.select_one("div.formatted_description.user_formatted")),
             bodywidth=0,
-        )).strip())
+        )).replace("\n"*4, "\n").strip())
 
     def get_platforms(self):
         repl = {
@@ -69,7 +72,7 @@ class ItchIO(BasePlugin):
             "HTML5": "web",
             "iOS": "ios",
         }
-        platforms = self.more_info["Platforms"][0].split(",")
+        platforms = self.more_info["Platforms"][0].split(",") if "Platforms" in self.more_info else ["Windows"]
         return [repl[i.strip()] for i in platforms]
 
     def get_authors(self) -> list[dict]:

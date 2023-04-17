@@ -69,7 +69,7 @@ class Steam(BasePlugin):
                         bodywidth=0,
                     )
                 )
-            )
+            ).replace("\n"*4, "\n").strip()
         )
 
     def get_brief_desc(self):
