@@ -4,7 +4,7 @@ from gameyamlspiderandgenerator.util.plugin_manager import pkg
 from gameyamlspiderandgenerator.util.fgi_yaml import get_valid_filename
 config.load("/home/keiplyer/桌面/config.yaml")
 pkg.__init__()
-yml = produce_yaml("https://echoproject.itch.io/adastra")
+yml = produce_yaml("https://cryptid-keep.itch.io/cryptid-crush")
 print(yml)
 with open(get_valid_filename(yml.raw_dict['name']) + ".zip", 'wb') as f:
     f.write(bytes(yml))

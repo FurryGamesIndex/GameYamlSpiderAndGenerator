@@ -115,13 +115,23 @@ class ItchIO(BasePlugin):
         return list(set(find(i).language for i in temp))
 
     def get_links(self) -> list[dict]:
-        link = [i.attrs["href"] for i in self.soup.select("a[href]")]
-        data = list(set(link))
-        return [
-            {"name": p["prefix"], "uri": sub(p["match"], p["replace"], i)}
-            for i, p in itertools.product(data, fgi_dict)
-            if match(p["match"], i)
-        ]
+        link = [i.attrs["href"] for i in self.soup.select_one("div.left_col.column > div.formatted_description.user_formatted").select("a[href]")]
+        data = [{"url": i, "processed": False} for i in list(set(link))]
+        processed_data = []
+        for i in data:
+            for p in fgi_dict:
+                if re.match(p["match"], i["url"]):
+                    processed_data.append(
+                        {
+                            "name": p["prefix"],
+                            "uri": re.sub(p["match"], p["replace"], i["url"]),
+                        }
+                    )
+                    i["processed"] = True
+        for i in data:
+            if not i["processed"]:
+                processed_data.append({"name": ".website", "uri": i["url"]})
+        return processed_data
 
     def get_more_info(self):
         d = {}
@@ -143,8 +153,6 @@ class ItchIO(BasePlugin):
         return temp
 
     def to_yaml(self) -> YamlData:
-        if type(self.data) == int:
-            return self.data
         ret = {
             "name": self.get_name(),
             "brief-description": self.get_brief_desc(),
