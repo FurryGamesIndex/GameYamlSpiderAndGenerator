@@ -116,8 +116,8 @@ class Steam(BasePlugin):
             ret.extend(value for ii in self.tag if i in ii)
         return list(set(ret))
 
-    def get_tags(self) -> list[dict]:
-        pass
+    def get_tags(self) -> list[str]:
+        return self.tag
 
     def get_misc_tags(self):
         repl = {
@@ -214,6 +214,7 @@ class Steam(BasePlugin):
         for i in data:
             if not i["processed"]:
                 processed_data.append({"name": ".website", "uri": i["url"]})
+        processed_data.append({"name": ".steam", "uri": f'steam:{self.id}'})
         return processed_data
 
     def get_thumbnail(self):
