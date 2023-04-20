@@ -17,44 +17,32 @@ class Search(BaseHook):
         return sub("[^A-z]", rep, s.lower())
 
     def __init__(self, name: str) -> None:
-        logger.info(f"init {name}")
+        logger.info(f"Hook: init {name}")
         self.pure = self.name_filter(name)
         self.encode = quote_plus(self.name_filter(name, " "))
-
-    def search_steam(self):
-        data = get_json(
-            f"https://store.steampowered.com/api/storesearch/"
-            f"?term={self.encode}&l=english&cc=US"
-        )["items"]
-        return any(self.name_filter(i["name"]) == self.pure for i in data)
-
-    def search_epic(self):
-        data = get_text(f"https://en.softonic.com/s/{self.encode}")
-        soup = BeautifulSoup(data, "html.parser")
-        bf = soup.body.find_all("a", {"class": "track-search-results"})
-        return any(
-            self.name_filter(bf[i].div["data-meta-data"]) == self.pure
-            for i in range(len(bf))
-        )
 
     def search_play(self):
         data = get_json(
             "https://serpapi.com/search?engine=google_play&apikey="
             f'{config["api"]["google-play"]}&store=apps&q={self.encode}'
         )
-        return any(
-            self.name_filter(i["title"]) == self.pure
-            for i in data["organic_results"][0]["items"]
-        )
+        if "organic_results" in data and any(
+                [self.name_filter(i["title"]) == self.pure for i in data["organic_results"][0]["items"]]):
+            logger.info("FOUND: google_play")
+            return "google-play", {'name': '.play-store',
+                                   'uri': f'google-play-store:{data["organic_results"][0]["items"][0]["product_id"]}'}
+        return [[], []]
 
     def search_apple(self):
         data = get_json(
             "https://serpapi.com/search.json?engine=apple_app_store&term="
             f'{self.encode}&apikey={config["api"]["apple"]}'
         )
-        return any(
-            self.name_filter(i["title"]) == self.pure for i in data["organic_results"]
-        )
+        if "organic_results" in data and any(
+                [self.name_filter(i["title"]) == self.pure for i in data["organic_results"]]):
+            logger.info("FOUND: apple_app_store")
+            return "apple-appstore", {'name': '.apple-appstore', 'uri': data["organic_results"][0]["link"]}
+        return [[], []]
 
     def search_all(self) -> list:
         func_list = [
@@ -65,9 +53,24 @@ class Search(BaseHook):
             lambda x: callable(x) and x.__name__.startswith("search") and x.__name__ != "search_all",
             func_list,
         )
-        for ii in func_list:
-            logger.info(ii.__name__, ii())
-        return [ii.__name__ for ii in func_list if ii()]
+        return [ii() for ii in func_list]
 
     def setup(self, data: dict):
-        pass
+        temp = data.copy()
+        try:
+            result = self.search_all()
+            publish = [i[0] for i in result] + temp["tags"]['publish']
+            link = [i[1] for i in result] + temp["links"]
+
+            def rm_empty(s: list):
+                if [] in s:
+                    s.remove([])
+                    rm_empty(s)
+
+            rm_empty(publish)
+            rm_empty(link)
+            temp["tags"]['publish'] = list(publish)
+            temp["links"] = link
+        except:
+            return data
+        return temp

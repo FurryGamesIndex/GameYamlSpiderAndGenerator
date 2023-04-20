@@ -48,13 +48,14 @@ class Steam(BasePlugin):
                 "type": self.get_type_tag(),
                 "lang": self.get_langs(),
                 "platform": self.get_platforms(),
+                "publish": ["steam"],
                 "misc": self.get_misc_tags(),
             },
             "links": self.get_links(),
             "thumbnail": self.get_thumbnail(),
             "screenshots": self.get_screenshots() + self.get_video(),  # type: ignore
         }
-        return YamlData(ret)
+        return YamlData(self.__load_hook__(ret))
 
     def get_langs(self) -> list[str]:
         temp = self.data[str(self.id)]["data"]["supported_languages"].split(",")
@@ -116,8 +117,8 @@ class Steam(BasePlugin):
             ret.extend(value for ii in self.tag if i in ii)
         return list(set(ret))
 
-    def get_tags(self) -> list[dict]:
-        pass
+    def get_tags(self) -> list[str]:
+        return self.tag
 
     def get_misc_tags(self):
         repl = {
@@ -214,6 +215,7 @@ class Steam(BasePlugin):
         for i in data:
             if not i["processed"]:
                 processed_data.append({"name": ".website", "uri": i["url"]})
+        processed_data.append({"name": ".steam", "uri": f'steam:{self.id}'})
         return processed_data
 
     def get_thumbnail(self):

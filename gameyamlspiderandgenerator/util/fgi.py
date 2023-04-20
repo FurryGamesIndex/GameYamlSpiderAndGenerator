@@ -1,6 +1,6 @@
 fgi_dict = [
     {
-        "match": "^https://www.youtube.com/@?([^/]+)/?",
+        "match": "^https://www.youtube.com/(?!watch\?v=)(@?.+)",
         "prefix": ".youtube",
         "replace": "youtube:@\\g<1>",
     },
@@ -25,17 +25,17 @@ fgi_dict = [
         "replace": "discord:\\g<1>",
     },
     {
-        "match": "https://www.facebook.com/(.+)/",
+        "match": "^https://www.facebook.com/(.+)/",
         "prefix": ".facebook",
         "replace": "facebook:\\g<1>",
     },
     {
-        "match": "https://www.furaffinity.net/user/(.+)/",
+        "match": "^https://www.furaffinity.net/user/(.+)/",
         "prefix": ".furaffinity",
         "replace": "furaffinity:\\g<1>",
     },
     {
-        "match": "(https://weibo.com/.+)",
+        "match": "(https://weibo.com/u/.+)",
         "prefix": ".weibo",
         "replace": "\\g<1>",
     },

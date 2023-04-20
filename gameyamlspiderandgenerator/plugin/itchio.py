@@ -1,8 +1,6 @@
-import itertools
 import re
 from contextlib import suppress
 from json import loads
-from re import match, sub
 from bs4 import BeautifulSoup
 from html2text import html2text
 from langcodes import find
@@ -22,6 +20,7 @@ class ItchIO(BasePlugin):
         return s.replace("![]", "![img]")
 
     def __init__(self, link: str) -> None:
+        self.link = link
         self.data_html = get_text(link)
         self.soup = BeautifulSoup(self.data_html, "html.parser")
         self.data = [
@@ -61,7 +60,7 @@ class ItchIO(BasePlugin):
         return pss_dedent(self.remove_query(html2text(
             str(self.soup.select_one("div.formatted_description.user_formatted")),
             bodywidth=0,
-        )).replace("\n"*4, "\n").strip())
+        )).replace("\n" * 4, "\n").strip())
 
     def get_platforms(self):
         repl = {
@@ -115,7 +114,9 @@ class ItchIO(BasePlugin):
         return list(set(find(i).language for i in temp))
 
     def get_links(self) -> list[dict]:
-        link = [i.attrs["href"] for i in self.soup.select_one("div.left_col.column > div.formatted_description.user_formatted").select("a[href]")]
+        link = [i.attrs["href"] for i in self.soup.select_one("div.left_col.column > "
+                                                              "div.formatted_description.user_formatted").select("a["
+                                                                                                                 "href]")]
         data = [{"url": i, "processed": False} for i in list(set(link))]
         processed_data = []
         for i in data:
@@ -131,6 +132,7 @@ class ItchIO(BasePlugin):
         for i in data:
             if not i["processed"]:
                 processed_data.append({"name": ".website", "uri": i["url"]})
+        processed_data.append({"name": ".itchio", "uri": self.link})
         return processed_data
 
     def get_more_info(self):
@@ -144,13 +146,6 @@ class ItchIO(BasePlugin):
                 d[temp[0]] = temp[1:][0].split(",")
         return d
 
-    def __load_hook__(self, data: dict):
-        from gameyamlspiderandgenerator.util.plugin_manager import pkg
-
-        temp = data.copy()
-        for _ in pkg["hook"].values():
-            temp = pkg["hook"].Search(self.get_name()).setup(temp)
-        return temp
 
     def to_yaml(self) -> YamlData:
         ret = {
@@ -163,13 +158,14 @@ class ItchIO(BasePlugin):
                 "type": self.get_type_tag(),
                 "lang": self.get_langs(),
                 "platform": self.get_platforms(),
+                "publish": [".itchio"],
                 "misc": self.get_misc_tags(),
             },
             "links": self.get_links(),
             "thumbnail": self.get_thumbnail(),
             "screenshots": self.get_screenshots()  # + self.get_video(),
         }
-        return YamlData(ret)
+        return YamlData(self.__load_hook__(ret))
 
     def get_type_tag(self):
         repl = {

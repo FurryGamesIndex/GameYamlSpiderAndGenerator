@@ -1,4 +1,4 @@
-from typing import Optional, Callable
+from typing import Optional
 
 from loguru import logger
 
@@ -7,7 +7,7 @@ from .util.fgi_yaml import YamlData
 from .util.plugin_manager import pkg
 
 
-def verify(url: str) -> Optional[Callable]:
+def verify(url: str) -> Optional[BasePlugin]:
     verify_list = [
         [
             pkg.plugin[n].verify,
@@ -19,7 +19,7 @@ def verify(url: str) -> Optional[Callable]:
 
 
 def produce_yaml(url: str) -> Optional[YamlData]:
-    ret: Callable = verify(url)
+    ret: BasePlugin = verify(url)
     if ret is None:
         logger.error("URL is invalid")
         return
