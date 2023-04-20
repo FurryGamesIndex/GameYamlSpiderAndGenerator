@@ -60,7 +60,7 @@ class ItchIO(BasePlugin):
         return pss_dedent(self.remove_query(html2text(
             str(self.soup.select_one("div.formatted_description.user_formatted")),
             bodywidth=0,
-        )).replace("\n"*4, "\n").strip())
+        )).replace("\n" * 4, "\n").strip())
 
     def get_platforms(self):
         repl = {
@@ -146,13 +146,6 @@ class ItchIO(BasePlugin):
                 d[temp[0]] = temp[1:][0].split(",")
         return d
 
-    def __load_hook__(self, data: dict):
-        from gameyamlspiderandgenerator.util.plugin_manager import pkg
-
-        temp = data.copy()
-        for _ in pkg["hook"].values():
-            temp = pkg["hook"].Search(self.get_name()).setup(temp)
-        return temp
 
     def to_yaml(self) -> YamlData:
         ret = {
@@ -165,13 +158,14 @@ class ItchIO(BasePlugin):
                 "type": self.get_type_tag(),
                 "lang": self.get_langs(),
                 "platform": self.get_platforms(),
+                "publish": [".itchio"],
                 "misc": self.get_misc_tags(),
             },
             "links": self.get_links(),
             "thumbnail": self.get_thumbnail(),
             "screenshots": self.get_screenshots()  # + self.get_video(),
         }
-        return YamlData(ret)
+        return YamlData(self.__load_hook__(ret))
 
     def get_type_tag(self):
         repl = {

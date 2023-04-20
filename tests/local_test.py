@@ -8,7 +8,7 @@ yml = produce_yaml("https://cryptid-keep.itch.io/cryptid-crush")
 print(yml)
 with open(get_valid_filename(yml.raw_dict['name']) + ".zip", 'wb') as f:
     f.write(bytes(yml))
-yml = produce_yaml("https://store.steampowered.com/app/1470120/Atopes/")
+yml = produce_yaml("https://store.steampowered.com/app/290340/Armello/")
 print(yml)
 with open(get_valid_filename(yml.raw_dict['name']) + ".zip", 'wb') as f:
     f.write(bytes(yml))

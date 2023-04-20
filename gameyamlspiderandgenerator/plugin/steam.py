@@ -48,13 +48,14 @@ class Steam(BasePlugin):
                 "type": self.get_type_tag(),
                 "lang": self.get_langs(),
                 "platform": self.get_platforms(),
+                "publish": ["steam"],
                 "misc": self.get_misc_tags(),
             },
             "links": self.get_links(),
             "thumbnail": self.get_thumbnail(),
             "screenshots": self.get_screenshots() + self.get_video(),  # type: ignore
         }
-        return YamlData(ret)
+        return YamlData(self.__load_hook__(ret))
 
     def get_langs(self) -> list[str]:
         temp = self.data[str(self.id)]["data"]["supported_languages"].split(",")
