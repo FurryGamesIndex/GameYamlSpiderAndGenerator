@@ -6,20 +6,20 @@ from loguru import logger
 
 from ..hook import BaseHook
 from ..util.config import config
-from ..util.spider import get_json, get_text
+from ..util.spider import get_json
 
 print(config, type(config))
 
 
 class Search(BaseHook):
     @staticmethod
-    def name_filter(s: str, rep: str = ""):
-        return sub("[^A-z]", rep, s.lower())
+    def name_filter(string: str, pattern: str = r"[^A-z]", repl: str = ""):
+        return sub(pattern, repl, string)
 
     def __init__(self, name: str) -> None:
         logger.info(f"Hook: init {name}")
         self.pure = self.name_filter(name)
-        self.encode = quote_plus(self.name_filter(name, " "))
+        self.encode = quote_plus(self.name_filter(name, repl=" "))
 
     def search_play(self):
         data = get_json(
@@ -54,6 +54,19 @@ class Search(BaseHook):
             func_list,
         )
         return [ii() for ii in func_list]
+
+    def search_epic(self):
+        from epicstore_api import EpicGamesStoreAPI
+
+        api = EpicGamesStoreAPI().fetch_store_games(keywords="TUNIC", sort_dir="DESC")
+        game_list = api['data']['Catalog']['searchStore']['elements']
+        reg = r"[^A-z\d]"
+        if game_list and any(
+                [self.name_filter(i["title"]) == self.pure for i in game_list]):
+            logger.info("FOUND: epic")
+            return "epic", {'name': '.epic',
+                            'uri': f'https://store.epicgames.com/p/{self.name_filter(game_list[0]["title"], pattern=reg, repl="-")}'}
+        return [[], []]
 
     def setup(self, data: dict):
         temp = data.copy()
