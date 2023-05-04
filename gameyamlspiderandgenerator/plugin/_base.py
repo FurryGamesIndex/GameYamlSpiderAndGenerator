@@ -28,10 +28,12 @@ class BasePlugin(abc.ABC):
         Args:
             data: 钩子数据
         """
+
         from gameyamlspiderandgenerator.util.plugin_manager import pkg
         pkg.__init__()
         for i in pkg.hook.values():
-            return i(self.get_name()).setup(data)
+            data = i(self.get_name()).setup(data)
+        return data
 
     @abc.abstractmethod
     def get_name(self) -> str:
