@@ -8,6 +8,7 @@ from ..hook import BaseHook
 from ..util.config import config
 from ..util.spider import get_json
 
+
 # print(config, type(config))
 
 
@@ -31,7 +32,7 @@ class Search(BaseHook):
         self.pure = self.name_filter(name)
         self.encode = quote_plus(self.name_filter(name, repl=" "))
 
-    def search_play(self)-> tuple:
+    def search_play(self) -> tuple:
         data = get_json(
             "https://serpapi.com/search?engine=google_play&apikey="
             f'{config["api"]["google-play"]}&store=apps&q={self.encode}'
@@ -43,7 +44,7 @@ class Search(BaseHook):
                                    'uri': f'google-play-store:{data["organic_results"][0]["items"][0]["product_id"]}'}
         return ([], [])
 
-    def search_apple(self)-> tuple:
+    def search_apple(self) -> tuple:
         data = get_json(
             "https://serpapi.com/search.json?engine=apple_app_store&term="
             f'{self.encode}&apikey={config["api"]["apple"]}'
@@ -53,7 +54,6 @@ class Search(BaseHook):
             logger.info("FOUND: apple_app_store")
             return "apple-appstore", {'name': '.apple-appstore', 'uri': data["organic_results"][0]["link"]}
         return ([], [])
-
 
     def search_all(self) -> list:
         func_list = [
@@ -65,6 +65,7 @@ class Search(BaseHook):
             func_list,
         )
         return [ii() for ii in func_list]
+
     def search_epic(self):
         from epicstore_api import EpicGamesStoreAPI
 

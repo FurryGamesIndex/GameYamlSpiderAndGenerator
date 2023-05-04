@@ -18,6 +18,19 @@ class Config:
         self.__setattr__(key, value)
 
     def load(self, file_data: str | dict = None):
+        """
+
+        Args:
+            file_data:
+                When the type is str, it is text in yaml format.
+
+                When the type is dict, it is the serialized dictionary data.
+
+                When it is empty, the default is the default configuration(see util.fgi.default_config)
+
+        Returns:
+
+        """
         if type(file_data) is dict:
             self.__dict__.update(file_data)
             return

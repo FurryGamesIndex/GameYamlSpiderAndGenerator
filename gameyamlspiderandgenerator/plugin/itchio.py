@@ -46,7 +46,7 @@ class ItchIO(BasePlugin):
         return (
             pss_dedent(self.data["aggregateRating"]["description"])
             if "description" in self.data["aggregateRating"]
-            else None
+            else ""
         )
 
     def get_name(self):
@@ -75,7 +75,11 @@ class ItchIO(BasePlugin):
         return [repl[i.strip()] for i in platforms]
 
     def get_authors(self) -> list[dict]:
-        temp = self.more_info["Author"]
+        temp = []
+        if "Authors" in self.more_info:
+            temp = self.more_info["Authors"]
+        elif "Author" in self.more_info:
+            temp = self.more_info["Author"]
         return [{"name": i, "role": ["producer"]} for i in temp]
 
     def get_tags(self) -> list[str]:
