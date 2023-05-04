@@ -5,8 +5,13 @@ from yaml import safe_load
 from . import verify
 from .util.config import config
 from .util.plugin_manager import pkg
+import sys
+from loguru import logger
+from gameyamlspiderandgenerator import produce_yaml
 
 parser = argparse.ArgumentParser()
+logger.remove()
+logger.add(sys.stderr, level="ERROR")
 parser.add_argument(
     "-f",
     "--config",
@@ -15,15 +20,6 @@ parser.add_argument(
     help="The location of config.yaml (default null)",
 )
 parser.add_argument("url", metavar="URL")
-parser.add_argument(
-    "--push", action="store_true", default=False, help="Whether push to github"
-)
-parser.add_argument(
-    "--pull",
-    action="store_true",
-    default=False,
-    help="Whether make a pull request to github",
-)
 args = parser.parse_args()
 
 if isinstance(args.config, str):
@@ -35,6 +31,4 @@ config.update(setting)
 pkg.__init__()
 
 
-print(verify("https://store.steampowered.com/app/1470120/Atopes/"))
-print(verify("ht"))
-print(verify("https://lunareffectdigital.itch.io/watches-you-"))
+print(produce_yaml(args.url))

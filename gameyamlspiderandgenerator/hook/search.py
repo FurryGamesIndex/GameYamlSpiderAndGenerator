@@ -8,7 +8,7 @@ from ..hook import BaseHook
 from ..util.config import config
 from ..util.spider import get_json
 
-print(config, type(config))
+# print(config, type(config))
 
 
 class Search(BaseHook):
