@@ -41,4 +41,4 @@ pkg.__init__()
 print(produce_yaml("https://store.steampowered.com/app/1470120/Atopes/"))
 ```
 
-### More: see [API Reference](https://github.com/FurryGamesIndex/GameYamlSpiderAndGenerator/wiki)
+### More: see [API Reference](https://github.com/FurryGamesIndex/GameYamlSpiderAndGenerator/wiki/Api-Reference)
