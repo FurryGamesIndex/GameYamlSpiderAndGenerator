@@ -15,7 +15,7 @@ class Search(BaseHook):
     @staticmethod
     def name_filter(string: str, pattern: str = r"[^A-z]", repl: str = ""):
         """
-
+        
         Args:
             string: The string to be replaced
             pattern: Regular expression, replace non-English letters by default
@@ -54,6 +54,7 @@ class Search(BaseHook):
             return "apple-appstore", {'name': '.apple-appstore', 'uri': data["organic_results"][0]["link"]}
         return ([], [])
 
+
     def search_all(self) -> list:
         func_list = [
             self.__getattribute__(i)
@@ -64,7 +65,6 @@ class Search(BaseHook):
             func_list,
         )
         return [ii() for ii in func_list]
-
     def search_epic(self):
         from epicstore_api import EpicGamesStoreAPI
 
