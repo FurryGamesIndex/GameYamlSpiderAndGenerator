@@ -28,7 +28,7 @@ def dump_to_yaml(data: dict) -> str:
 
 def process_thumbnail(img_byte: bytes):
     img = Image.open(BytesIO(img_byte))
-    if img.size[0] % 360 == img.size[1] % 168:
+    if img.size == (460, 215):
         img_resize = img.resize((360, 168))
         ret_byte = BytesIO()
         img_resize.save(ret_byte, format="PNG", optimize=True, quality=85)

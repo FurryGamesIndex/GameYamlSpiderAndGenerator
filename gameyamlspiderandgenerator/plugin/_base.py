@@ -33,6 +33,12 @@ class BasePlugin(abc.ABC):
         for i in pkg.hook.values():
             return i(self.get_name()).setup(data)
 
+        from gameyamlspiderandgenerator.util.plugin_manager import pkg
+        pkg.__init__()
+        for i in pkg.hook.values():
+            data = i(self.get_name()).setup(data)
+        return data
+
     @abc.abstractmethod
     def get_name(self) -> str:
         """
@@ -140,3 +146,4 @@ class BasePlugin(abc.ABC):
         Returns:
             YAML
         """
+

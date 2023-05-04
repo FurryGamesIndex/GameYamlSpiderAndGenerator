@@ -7,7 +7,7 @@ from .util.fgi_yaml import YamlData
 from .util.plugin_manager import pkg
 
 
-def verify(url: str) -> Optional[BasePlugin]:
+def verify(url: str):
     verify_list = [
         [
             pkg.plugin[n].verify,
@@ -19,7 +19,7 @@ def verify(url: str) -> Optional[BasePlugin]:
 
 
 def produce_yaml(url: str) -> Optional[YamlData]:
-    ret: BasePlugin = verify(url)
+    ret = verify(url)
     if ret is None:
         logger.error("URL is invalid")
         return

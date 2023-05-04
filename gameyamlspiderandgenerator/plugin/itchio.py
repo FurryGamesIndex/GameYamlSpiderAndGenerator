@@ -76,7 +76,7 @@ class ItchIO(BasePlugin):
 
     def get_authors(self) -> list[dict]:
         temp = self.more_info["Author"]
-        return [{"name": i, "role": "developer"} for i in temp]
+        return [{"name": i, "role": ["producer"]} for i in temp]
 
     def get_tags(self) -> list[str]:
         temp = self.more_info["Genre"] if "Genre" in self.more_info else []
@@ -145,7 +145,6 @@ class ItchIO(BasePlugin):
                 temp = [i.get_text() for i in list(cache.children)]
                 d[temp[0]] = temp[1:][0].split(",")
         return d
-
 
     def to_yaml(self) -> YamlData:
         ret = {

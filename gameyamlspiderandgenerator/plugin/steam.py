@@ -80,8 +80,8 @@ class Steam(BasePlugin):
 
     def get_authors(self) -> list[dict]:
         temp = self.data[str(self.id)]["data"]
-        developers = [{"name": i, "role": "developer"} for i in temp["developers"]]
-        publishers = [{"name": i, "role": "publisher"} for i in temp["publishers"]]
+        developers = [{"name": i, "role": ["producer"]} for i in temp["developers"]]
+        publishers = [{"name": i, "role": ["publisher"]} for i in temp["publishers"]]
         return developers + publishers
 
     def get_platforms(self):
