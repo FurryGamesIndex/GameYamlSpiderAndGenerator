@@ -30,7 +30,7 @@ api:
  python3.10 -m gameyamlspiderandgenerator https://store.steampowered.com/app/290340/Armello/
 
 ```
-*or use code in your script*
+*or use the library in your script*
 ```python
 from gameyamlspiderandgenerator import produce_yaml
 from gameyamlspiderandgenerator.util.config import config
