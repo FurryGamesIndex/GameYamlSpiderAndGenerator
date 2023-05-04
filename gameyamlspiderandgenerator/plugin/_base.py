@@ -142,3 +142,4 @@ class BasePlugin(abc.ABC):
         Returns:
             YAML
         """
+

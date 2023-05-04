@@ -14,6 +14,16 @@ from ..util.spider import get_json
 class Search(BaseHook):
     @staticmethod
     def name_filter(string: str, pattern: str = r"[^A-z]", repl: str = ""):
+        """
+
+        Args:
+            string: The string to be replaced
+            pattern: Regular expression, replace non-English letters by default
+            repl: The string to replace with
+
+        Returns:
+
+        """
         return sub(pattern, repl, string)
 
     def __init__(self, name: str) -> None:
@@ -21,7 +31,7 @@ class Search(BaseHook):
         self.pure = self.name_filter(name)
         self.encode = quote_plus(self.name_filter(name, repl=" "))
 
-    def search_play(self):
+    def search_play(self)-> tuple:
         data = get_json(
             "https://serpapi.com/search?engine=google_play&apikey="
             f'{config["api"]["google-play"]}&store=apps&q={self.encode}'
@@ -31,9 +41,9 @@ class Search(BaseHook):
             logger.info("FOUND: google_play")
             return "google-play", {'name': '.play-store',
                                    'uri': f'google-play-store:{data["organic_results"][0]["items"][0]["product_id"]}'}
-        return [[], []]
+        return ([], [])
 
-    def search_apple(self):
+    def search_apple(self)-> tuple:
         data = get_json(
             "https://serpapi.com/search.json?engine=apple_app_store&term="
             f'{self.encode}&apikey={config["api"]["apple"]}'
@@ -42,7 +52,7 @@ class Search(BaseHook):
                 [self.name_filter(i["title"]) == self.pure for i in data["organic_results"]]):
             logger.info("FOUND: apple_app_store")
             return "apple-appstore", {'name': '.apple-appstore', 'uri': data["organic_results"][0]["link"]}
-        return [[], []]
+        return ([], [])
 
     def search_all(self) -> list:
         func_list = [
@@ -69,6 +79,15 @@ class Search(BaseHook):
         return [[], []]
 
     def setup(self, data: dict):
+        """
+        hook handler
+        Args:
+            data: yaml daya
+
+        Returns:
+            The processed dict data
+
+        """
         temp = data.copy()
         try:
             result = self.search_all()

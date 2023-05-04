@@ -6,7 +6,8 @@ from loguru import logger
 
 
 class Verify(BaseHook):
-    def setup(self, data: dict):
+    @staticmethod
+    def setup(data: dict):
         try:
             validate(data, safe_load(get_text('https://raw.githubusercontent.com/FurryGamesIndex/games/master/schemas'
                                               '/game.schema.yaml')))
