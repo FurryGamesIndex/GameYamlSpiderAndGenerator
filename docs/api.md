@@ -36,7 +36,7 @@ Script to generate YAML for itchio url
 from gameyamlspiderandgenerator.plugin.itchio import ItchIO
 print(ItchIO("https://mangledmaw.itch.io/amanda-the-adventurer").to_yaml())
 ```
-### plugin.itchio.ItchIO(BasePlugin)
+### plugin.steam.Steam(BasePlugin)
 Script to generate YAML for steam url
 - Example：
 ```python
