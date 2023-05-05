@@ -80,7 +80,7 @@ class ItchIO(BasePlugin):
             temp = self.more_info["Authors"]
         elif "Author" in self.more_info:
             temp = self.more_info["Author"]
-        return [{"name": i, "role": ["producer"]} for i in temp]
+        return [{"name": i.strip(), "role": ["producer"]} for i in temp]
 
     def get_tags(self) -> list[str]:
         temp = self.more_info["Genre"] if "Genre" in self.more_info else []

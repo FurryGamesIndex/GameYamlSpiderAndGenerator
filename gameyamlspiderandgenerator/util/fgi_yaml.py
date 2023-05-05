@@ -23,6 +23,7 @@ def dump_to_yaml(data: dict) -> str:
     temp = fgi.dump_to_string(data)
     for i in list(data.keys())[1:]:
         temp = temp.replace("\n" + i, "\n\n" + i)
+    temp = temp.replace("description: |-", "description: |")
     return temp
 
 
