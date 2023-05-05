@@ -80,14 +80,14 @@ class Steam(BasePlugin):
 
     def get_authors(self) -> list[dict]:
         temp = self.data[str(self.id)]["data"]
-        developers = [{"name": i, "role": ["producer"]} for i in temp["developers"]]
-        publishers = [{"name": i, "role": ["publisher"]} for i in temp["publishers"]]
+        developers = [{"name": i.strip(), "role": ["producer"]} for i in temp["developers"]]
+        publishers = [{"name": i.strip(), "role": ["publisher"]} for i in temp["publishers"]]
         return developers + publishers
 
     def get_platforms(self):
         temp = self.data[str(self.id)]["data"]["platforms"]
         repl = {"windows": "windows", "mac": "macos", "linux": "linux"}
-        return [repl[i] for i in temp if i]
+        return [repl[i] for i in temp if temp[i]]
 
     def get_type_tag(self):
         repl = {
@@ -187,7 +187,7 @@ class Steam(BasePlugin):
 
         temp1 = self.soup.body.find(
             "div",
-            attrs={"id": "game_area_description", "class": "game_area_description"},
+            attrs={"class": "game_area_description"},
         )
         temp3 = self.soup.body.find("div", attrs={"style": "padding-top: 14px;"})
         temp2 = temp3.find_all("a")

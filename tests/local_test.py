@@ -8,7 +8,7 @@ yml = produce_yaml("https://mangledmaw.itch.io/amanda-the-adventurer")
 print(yml)
 with open(get_valid_filename(yml.raw_dict['name']) + ".zip", 'wb') as f:
     f.write(bytes(yml))
-yml = produce_yaml("https://store.steampowered.com/app/290340/Armello/")
+yml = produce_yaml("https://store.steampowered.com/app/2121450/Bangkok_Story_A_Stray_Dog/")
 print(yml)
 with open(get_valid_filename(yml.raw_dict['name']) + ".zip", 'wb') as f:
     f.write(bytes(yml))
