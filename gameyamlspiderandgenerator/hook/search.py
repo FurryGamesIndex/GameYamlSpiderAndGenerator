@@ -42,7 +42,7 @@ class Search(BaseHook):
             logger.info("FOUND: google_play")
             return "google-play", {'name': '.play-store',
                                    'uri': f'google-play-store:{data["organic_results"][0]["items"][0]["product_id"]}'}
-        return ([], [])
+        return [], []
 
     def search_apple(self) -> tuple:
         data = get_json(
@@ -53,7 +53,7 @@ class Search(BaseHook):
                 [self.name_filter(i["title"]) == self.pure for i in data["organic_results"]]):
             logger.info("FOUND: apple_app_store")
             return "apple-appstore", {'name': '.apple-appstore', 'uri': data["organic_results"][0]["link"]}
-        return ([], [])
+        return [], []
 
     def search_all(self) -> list:
         func_list = [
@@ -77,7 +77,7 @@ class Search(BaseHook):
             logger.info("FOUND: epic")
             return "epic", {'name': '.epic',
                             'uri': f'https://store.epicgames.com/p/{self.name_filter(game_list[0]["title"], pattern=reg, repl="-")}'}
-        return [[], []]
+        return [], []
 
     def setup(self, data: dict):
         """

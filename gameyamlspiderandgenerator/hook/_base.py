@@ -4,10 +4,11 @@ import abc
 class BaseHook(abc.ABC):
     """钩子基类"""
 
-    def __load_hook__(self, data: dict):
+    @abc.abstractmethod
+    def setup(self, data: dict):
         """
-        加载钩子
+        运行钩子函数
 
         Args:
-            data: 钩子数据
+            data: 数据
         """
