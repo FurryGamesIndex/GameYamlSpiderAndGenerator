@@ -173,7 +173,7 @@ class ItchIO(BasePlugin):
     def get_type_tag(self):
         repl = {
             "Visual Novel": "visual-nove",
-            "Real time strategy": "Real time strategy",
+            "Real time strategy": "real-time-strategy",
             "Strategy": "strategy",
             "Casual": "casual",
             "Adventure": "adventure",
