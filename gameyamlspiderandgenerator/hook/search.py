@@ -13,6 +13,8 @@ from ..util.spider import get_json
 
 
 class Search(BaseHook):
+    REQUIRED = "get_name"
+
     @staticmethod
     def name_filter(string: str, pattern: str = r"[^A-z]", repl: str = ""):
         """

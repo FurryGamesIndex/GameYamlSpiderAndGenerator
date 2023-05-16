@@ -85,7 +85,7 @@ class ItchIO(BasePlugin):
     def get_tags(self) -> list[str]:
         temp = self.more_info["Genre"] if "Genre" in self.more_info else []
         temp1 = self.more_info["Made with"] if "Made with" in self.more_info else []
-        temp2 = self.more_info["Tags"]
+        temp2 = self.more_info["Tags"] if "Tags" in self.more_info else []
         return [i.strip() for i in (temp2 + temp1 + temp)]
 
     def get_misc_tags(self):

@@ -31,7 +31,10 @@ class BasePlugin(abc.ABC):
         from gameyamlspiderandgenerator.util.plugin_manager import pkg
         pkg.__init__()
         for i in pkg.hook.values():
-            data = i(self.get_name()).setup(data)
+            if i.REQUIRED is None:
+                data = i().setup(data)
+            else:
+                data = i(self.__getattribute__(i.REQUIRED)()).setup(data)
         return data
 
     @abc.abstractmethod
