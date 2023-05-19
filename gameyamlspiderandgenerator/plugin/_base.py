@@ -1,5 +1,6 @@
 import abc
 import re
+import time
 from typing import List
 
 from loguru import logger
@@ -38,10 +39,7 @@ class BasePlugin(abc.ABC):
         def get_fn_address():
             fn: list = []
             for i in pkg.hook.values():
-                if i.REQUIRED is None:
                     fn.append([i().setup, i.CHANGED])
-                else:
-                    fn.append([i(self.__getattribute__(i.REQUIRED)()).setup, i.CHANGED])
             return fn
 
         fn = get_fn_address()

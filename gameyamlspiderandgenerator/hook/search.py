@@ -12,8 +12,11 @@ from ..util.thread import ThreadWithReturnValue
 # print(config, type(config))
 
 class Search(BaseHook):
-    REQUIRED = "get_name"
     CHANGED = ["tags", "links"]
+
+    def __init__(self):
+        self.pure = None
+        self.encode = None
 
     @staticmethod
     def name_filter(string: str, pattern: str = r"[^A-z]", repl: str = ""):
@@ -28,11 +31,6 @@ class Search(BaseHook):
 
         """
         return sub(pattern, repl, string)
-
-    def __init__(self, name: str) -> None:
-        self.pure = self.name_filter(name)
-        self.encode = quote_plus(self.name_filter(name, repl=" "))
-
     def search_play(self) -> tuple:
         data = get_json(
             "https://serpapi.com/search?engine=google_play&apikey="
@@ -94,6 +92,8 @@ class Search(BaseHook):
             The processed dict data
 
         """
+        self.pure = self.name_filter(data['name'])
+        self.encode = quote_plus(self.name_filter(data['name'], repl=" "))
         temp = data.copy()
         try:
             result = self.search_all()

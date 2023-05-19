@@ -4,7 +4,7 @@ from gameyamlspiderandgenerator.util.plugin_manager import pkg
 from gameyamlspiderandgenerator.util.fgi_yaml import get_valid_filename
 config.load("/home/keiplyer/桌面/config.yaml")
 pkg.__init__()
-yml = produce_yaml("https://store.steampowered.com/app/553420/TUNIC/")
+yml = produce_yaml("https://finji.itch.io/longest-night")
 print(yml)
 with open(get_valid_filename(yml.raw_dict['name']) + ".zip", 'wb') as f:
     f.write(bytes(yml))

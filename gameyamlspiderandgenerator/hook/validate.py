@@ -6,7 +6,6 @@ from loguru import logger
 
 
 class Verify(BaseHook):
-    REQUIRED = None
     CHANGED = None
 
     def setup(self, data: dict):

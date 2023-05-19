@@ -23,6 +23,7 @@ pyyaml = "^6.0"
 pysocks = "^1.7.1"
 epicstore-api = "^0.1.6"
 jsonschema = "^4.17.3"
+openai = "^0.27.6"
 
 [build-system]
 requires = ["poetry-core"]
