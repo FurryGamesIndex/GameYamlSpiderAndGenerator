@@ -1,19 +1,19 @@
 from re import sub
 from urllib.parse import quote_plus
 
-from bs4 import BeautifulSoup
 from loguru import logger
 
 from ..hook import BaseHook
 from ..util.config import config
 from ..util.spider import get_json
+from ..util.thread import ThreadWithReturnValue
 
 
 # print(config, type(config))
 
-
 class Search(BaseHook):
     REQUIRED = "get_name"
+    CHANGED = ["tags", "links"]
 
     @staticmethod
     def name_filter(string: str, pattern: str = r"[^A-z]", repl: str = ""):
@@ -30,7 +30,6 @@ class Search(BaseHook):
         return sub(pattern, repl, string)
 
     def __init__(self, name: str) -> None:
-        logger.info(f"Hook: init {name}")
         self.pure = self.name_filter(name)
         self.encode = quote_plus(self.name_filter(name, repl=" "))
 
@@ -62,11 +61,15 @@ class Search(BaseHook):
             self.__getattribute__(i)
             for i in (list(filter(lambda x: "__" not in x, self.__dir__())))
         ]
-        func_list = filter(
+        func_list = list(filter(
             lambda x: callable(x) and x.__name__.startswith("search") and x.__name__ != "search_all",
             func_list,
-        )
-        return [ii() for ii in func_list]
+        ))
+
+        fn_list = [ThreadWithReturnValue(target=i) for i in func_list]
+        for i in fn_list:
+            i.start()
+        return [ii.join() for ii in fn_list]
 
     def search_epic(self):
         from epicstore_api import EpicGamesStoreAPI

@@ -4,6 +4,7 @@ import abc
 class BaseHook(abc.ABC):
     """钩子基类"""
     REQUIRED: str | None
+    CHANGED: list | None
 
     @abc.abstractmethod
     def setup(self, data: dict):

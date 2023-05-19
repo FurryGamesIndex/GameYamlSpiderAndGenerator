@@ -2,6 +2,10 @@ import abc
 import re
 from typing import List
 
+from loguru import logger
+
+from ..util.thread import ThreadWithReturnValue
+
 
 class BasePlugin(abc.ABC):
     """插件基类"""
@@ -30,11 +34,25 @@ class BasePlugin(abc.ABC):
         """
         from gameyamlspiderandgenerator.util.plugin_manager import pkg
         pkg.__init__()
-        for i in pkg.hook.values():
-            if i.REQUIRED is None:
-                data = i().setup(data)
-            else:
-                data = i(self.__getattribute__(i.REQUIRED)()).setup(data)
+
+        def get_fn_address():
+            fn: list = []
+            for i in pkg.hook.values():
+                if i.REQUIRED is None:
+                    fn.append([i().setup, i.CHANGED])
+                else:
+                    fn.append([i(self.__getattribute__(i.REQUIRED)()).setup, i.CHANGED])
+            return fn
+
+        fn = get_fn_address()
+        fn_list = [(ThreadWithReturnValue(target=i, args=(data,)), _) for i, _ in fn]
+        for i, _ in fn_list:
+            i.start()
+        result = [(ii.join(), changed) for ii, changed in fn_list]
+        for _data, changed in result:
+            if changed is not None:
+                for i in changed:
+                    data[i] = _data[i]
         return data
 
     @abc.abstractmethod
