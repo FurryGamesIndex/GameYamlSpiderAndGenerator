@@ -2,7 +2,6 @@ import argparse
 
 from yaml import safe_load
 
-from . import verify
 from .util.config import config
 from .util.fgi_yaml import get_valid_filename
 from .util.plugin_manager import pkg

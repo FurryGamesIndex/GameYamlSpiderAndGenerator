@@ -1,10 +1,6 @@
 import abc
 import re
-import time
 from typing import List
-
-from loguru import logger
-
 from ..util.thread import ThreadWithReturnValue
 
 
@@ -26,7 +22,7 @@ class BasePlugin(abc.ABC):
         """
         return bool(cls._VERIFY_PATTERN.match(url))
 
-    def __load_hook__(self, data: dict):
+    def __load_hook__(self,data: dict):
         """
         加载钩子
 
@@ -37,10 +33,10 @@ class BasePlugin(abc.ABC):
         pkg.__init__()
 
         def get_fn_address():
-            fn: list = []
+            fn_: list = []
             for i in pkg.hook.values():
-                    fn.append([i().setup, i.CHANGED])
-            return fn
+                fn_.append([i().setup, i.CHANGED])
+            return fn_
 
         fn = get_fn_address()
         fn_list = [(ThreadWithReturnValue(target=i, args=(data,)), _) for i, _ in fn]

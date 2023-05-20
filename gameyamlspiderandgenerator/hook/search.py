@@ -31,6 +31,7 @@ class Search(BaseHook):
 
         """
         return sub(pattern, repl, string)
+
     def search_play(self) -> tuple:
         data = get_json(
             "https://serpapi.com/search?engine=google_play&apikey="
@@ -109,6 +110,6 @@ class Search(BaseHook):
             rm_empty(link)
             temp["tags"]['publish'] = list(publish)
             temp["links"] = link
-        except:
+        except Exception:
             return data
         return temp
