@@ -13,6 +13,7 @@ plugin:
 hook:
   - search
   - validate
+# - openai
 # if you don't want to set proxy, please fill in {}
 # http: socks5://127.0.0.1:7891
 # https: socks5://127.0.0.1:7891

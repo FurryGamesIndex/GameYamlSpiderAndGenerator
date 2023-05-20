@@ -46,3 +46,20 @@ default_config = {'api': {'apple': 'a714b00383f0662a61b2e382d55c685f17015617aa70
                   'hook': ['search'],
                   'plugin': ['steam', 'itchio'],
                   'proxy': {}}
+template_dict = {
+    "name": 'NAME',
+    "brief-description": 'BRIEF-DESC',
+    "description": 'DESC',
+    "description-format": "markdown",
+    "authors": [],
+    "tags": {
+        "type": [],
+        "lang": [],
+        "platform": [],
+        "publish": [],
+        "misc": [],
+    },
+    "links": [],
+    "thumbnail": 'THUMBNAIL.PNG',
+    "screenshots": [],
+}

@@ -6,7 +6,7 @@ import unittest
 
 from gameyamlspiderandgenerator.hook.search import Search
 from gameyamlspiderandgenerator.util.config import config
-
+from gameyamlspiderandgenerator.util.fgi import template_dict
 config.load(os.path.split(os.path.realpath(__file__))[0] + "/test_config.yaml")
 print(config)
 
@@ -68,26 +68,15 @@ class ItchIOUnitTest(unittest.TestCase):
     def test_itchio(self):
         from gameyamlspiderandgenerator.plugin.itchio import ItchIO
         obj = ItchIO(link="https://fymm-game.itch.io/ddp")
-        with self.assertLogs("itchio") as _:
-            self._extract_log(obj)
-
-    @staticmethod
-    def _extract_log(obj):
-        logging.getLogger("itchio").info(f"{obj.get_thumbnail() = }")
-        logging.getLogger("itchio").info(f"{obj.get_desc() = }")
-        logging.getLogger("itchio").info(f"{obj.get_name() = }")
-        logging.getLogger("itchio").info(f"{obj.get_screenshots() = }")
-        logging.getLogger("itchio").info(f"{obj.get_brief_desc() = }")
-        logging.getLogger("itchio").info(f"{obj.get_platforms() = }")
-        logging.getLogger("itchio").info(f"{obj.get_authors() = }")
-        logging.getLogger("itchio").info(f"{obj.get_langs() = }")
-        logging.getLogger("itchio").info(f"{obj.get_links() = }")
-        logging.getLogger("itchio").info(f"{obj.get_misc_tags() = }")
+        self.assertIsInstance(
+            str(obj.to_yaml()),
+            str,
+        )
 
 
 class SearchUnitTest(unittest.TestCase):
     def test_search(self):
-        self.assertIsInstance(Search("dead-space").search_all(), list)
+        self.assertIsInstance(Search().setup({**template_dict, 'name': 'dead-space'}), list)
 
 
 if __name__ == "__main__":
