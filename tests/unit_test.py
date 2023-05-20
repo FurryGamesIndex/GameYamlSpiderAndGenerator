@@ -76,7 +76,7 @@ class ItchIOUnitTest(unittest.TestCase):
 
 class SearchUnitTest(unittest.TestCase):
     def test_search(self):
-        self.assertIsInstance(Search().setup({**template_dict, 'name': 'dead-space'}), list)
+        self.assertIsInstance(Search().setup({**template_dict, 'name': 'dead-space'}), dict)
 
 
 if __name__ == "__main__":
