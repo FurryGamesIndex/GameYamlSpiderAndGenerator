@@ -9,6 +9,7 @@ from ._base import BasePlugin
 from ..util.fgi import fgi_dict
 from ..util.fgi_yaml import YamlData, pss_dedent
 from ..util.spider import get_json, get_text
+from ..util.thread import ThreadWithReturnValue
 
 
 class Steam(BasePlugin):
@@ -28,10 +29,13 @@ class Steam(BasePlugin):
 
     def __init__(self, link: str) -> None:
         self.id = self.get_steam_id(link)
-        self.data = get_json(
-            f"https://store.steampowered.com/api/appdetails?appids={self.id}&cc=us&l=english"
-        )
-        self.data_html = get_text(link)
+        fn_list = [ThreadWithReturnValue(target=get_json,
+                                         args=(f"https://store.steampowered.com/api/appdetails?appids={self.id}&cc=us"
+                                               f"&l=english",)),
+                   ThreadWithReturnValue(target=get_text, args=(link, ))]
+        for i in fn_list:
+            i.start()
+        self.data, self.data_html = (ii.join() for ii in fn_list)
         self.soup = BeautifulSoup(self.data_html, "html.parser")
         self.name = self.get_name()
         temp1 = self.soup.body.find_all("a", {"class": "app_tag"})
@@ -70,7 +74,7 @@ class Steam(BasePlugin):
                         bodywidth=0,
                     )
                 )
-            ).replace("\n"*4, "\n").strip()
+            ).replace("\n" * 4, "\n").strip()
         )
 
     def get_brief_desc(self):
