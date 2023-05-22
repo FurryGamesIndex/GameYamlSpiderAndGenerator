@@ -1,5 +1,4 @@
 import re
-import time
 from contextlib import suppress
 from json import loads
 from bs4 import BeautifulSoup
