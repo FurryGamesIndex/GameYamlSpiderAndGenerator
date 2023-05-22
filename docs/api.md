@@ -35,8 +35,10 @@ Hook plugin that uses openai to write a brief introduction to the data file for 
 **You need to fill in the config.yaml with your secret**
 - Example：
 ```python
-from gameyamlspiderandgenerator.hook.openai import OpenAI
+from gameyamlspiderandgenerator.hook.openai import OpenAi
 from gameyamlspiderandgenerator.util.fgi import template_dict
+assert type(OpenAi().setup({**template_dict,"description": "YOUR DESC"})) is dict
+
 ```
 ### hook.validate.Verify(BaseHook)
 Hook plugin to verify whether the format of the data file is correct
