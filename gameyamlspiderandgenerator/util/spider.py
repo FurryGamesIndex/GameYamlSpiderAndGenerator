@@ -73,7 +73,7 @@ class GetResponse:
         Returns:
             文本
         """
-        return self.response.text
+        return self.response.text.encode(self.response.encoding).decode(self.response.apparent_encoding)
 
     @property
     def status(self) -> int:

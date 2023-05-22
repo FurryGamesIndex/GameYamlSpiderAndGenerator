@@ -31,6 +31,12 @@ class Package:
             _type: Union[Type[BasePlugin], Type[BaseHook]],
     ):
         base = __package__.split(".")[0] + "." + _dir
+        if config[_dir] is None:
+            if None not in self["log"]:
+                logger.warning(f"All {_dir}s are disabled")
+                self["log"].append(None)
+            return
+
         for plugin in getattr(config, _dir, []):
             if plugin.startswith("_"):
                 logger.warning(f"Skip loading protected {_dir} {plugin}")

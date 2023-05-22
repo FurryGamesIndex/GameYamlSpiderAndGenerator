@@ -11,7 +11,7 @@ from gameyamlspiderandgenerator import produce_yaml
 
 parser = argparse.ArgumentParser()
 logger.remove()
-logger.add(sys.stderr, level="ERROR")
+logger.add(sys.stderr, level="INFO")
 parser.add_argument(
     "-f",
     "--config",
@@ -26,14 +26,24 @@ parser.add_argument(
     default=None,
     help="The location of the output file (zip format or yaml format)",
 )
+parser.add_argument(
+    "--fast",
+    action='store_true',
+    default=False,
+    help="Whether to disable all hooks (default: false)",
+)
 parser.add_argument("url", metavar="URL")
 args = parser.parse_args()
+
+
 
 if isinstance(args.config, str):
     with open(args.config) as f:
         setting = safe_load(f)
 else:
     setting = args.config
+if args.fast:
+     setting['hook'] = None
 config.update(setting)
 pkg.__init__()
 yml = produce_yaml(args.url)
