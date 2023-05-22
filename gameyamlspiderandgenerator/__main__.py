@@ -35,14 +35,15 @@ parser.add_argument(
 parser.add_argument("url", metavar="URL")
 args = parser.parse_args()
 
-if args.fast:
-    pkg.hook = {}
+
 
 if isinstance(args.config, str):
     with open(args.config) as f:
         setting = safe_load(f)
 else:
     setting = args.config
+if args.fast:
+     setting['hook'] = None
 config.update(setting)
 pkg.__init__()
 yml = produce_yaml(args.url)
