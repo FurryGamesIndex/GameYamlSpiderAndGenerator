@@ -1,4 +1,5 @@
 import re
+import time
 from contextlib import suppress
 from json import loads
 from bs4 import BeautifulSoup
@@ -43,11 +44,7 @@ class ItchIO(BasePlugin):
         return th.attrs["src"]
 
     def get_brief_desc(self):
-        return (
-            pss_dedent(self.data["aggregateRating"]["description"])
-            if "description" in self.data["aggregateRating"]
-            else ""
-        )
+        return self.soup.find("meta", {"name": "twitter:description"}).attrs["content"]
 
     def get_name(self):
         return self.data["name"]
@@ -60,7 +57,7 @@ class ItchIO(BasePlugin):
         return pss_dedent(self.remove_query(html2text(
             str(self.soup.select_one("div.formatted_description.user_formatted")),
             bodywidth=0,
-        )).replace("\n" * 4, "\n").strip())
+        )).replace("\n" * 3, "\n").strip())
 
     def get_platforms(self):
         repl = {
