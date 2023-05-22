@@ -12,6 +12,8 @@ options:
                         The location of config.yaml (default null)
   -o OUTPUT, --output OUTPUT
                         The location of the output file (zip format or yaml format)
+  --fast                Whether to disable all hooks (default: false)
+
 ```
 Example:
 - python3.11 -m gameyamlspiderandgenerator **url**
@@ -27,7 +29,7 @@ from gameyamlspiderandgenerator.hook.search import Search
 from gameyamlspiderandgenerator.util.fgi import template_dict
 assert type(Search().setup({**template_dict, 'name':'dead-space'})) is dict
 ```
-### hook.validate.Verify(BaseHook)
+### hook.openai.OpenAi(BaseHook)
 Hook plugin that uses openai to write a brief introduction to the data file for the introduction
 
 **You need to fill in the config.yaml with your secret**
@@ -35,9 +37,8 @@ Hook plugin that uses openai to write a brief introduction to the data file for 
 ```python
 from gameyamlspiderandgenerator.hook.openai import OpenAI
 from gameyamlspiderandgenerator.util.fgi import template_dict
-assert type(OpenAI().setup({**template_dict,"description": "YOUR DESC"})) is dict
 ```
-### hook.openai.OpenAi(BaseHook)
+### hook.validate.Verify(BaseHook)
 Hook plugin to verify whether the format of the data file is correct
 - Example：
 ```python
