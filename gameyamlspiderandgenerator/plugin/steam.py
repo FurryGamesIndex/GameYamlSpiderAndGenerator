@@ -32,7 +32,7 @@ class Steam(BasePlugin):
         fn_list = [ThreadWithReturnValue(target=get_json,
                                          args=(f"https://store.steampowered.com/api/appdetails?appids={self.id}&cc=us"
                                                f"&l=english",)),
-                   ThreadWithReturnValue(target=get_text, args=(link, ))]
+                   ThreadWithReturnValue(target=get_text, args=(link,))]
         for i in fn_list:
             i.start()
         self.data, self.data_html = (ii.join() for ii in fn_list)
@@ -158,24 +158,18 @@ class Steam(BasePlugin):
     def get_video(self):
         is_nsfw = self.get_if_nsfw()
         video_webm = [
-            self.remove_query(i["webm"]["max"])
+            self.remove_query(i["webm"]["max"]).replace("http", "https")
             for i in self.data[str(self.id)]["data"]["movies"]
         ]
         video_mp4 = [
-            self.remove_query(i["mp4"]["max"])
+            self.remove_query(i["mp4"]["max"]).replace("http", "https")
             for i in self.data[str(self.id)]["data"]["movies"]
         ]
         return [
             {
-                "type": "video",
-                "src": [
-                    {
-                        "mime": "video/webm",
-                        "sensitive": is_nsfw,
-                        "uri": video_webm[i],
-                    },
-                    {"mime": "video/mp4", "sensitive": is_nsfw, "uri": video_mp4[i]},
-                ]
+                "video": [{"mime": "video/webm", "sensitive": is_nsfw, "uri": video_webm[i], },
+                          {"mime": "video/mp4", "sensitive": is_nsfw, "uri": video_mp4[i]},
+                          ]
                 if is_nsfw
                 else [
                     {"mime": "video/webm", "uri": video_webm[i]},
