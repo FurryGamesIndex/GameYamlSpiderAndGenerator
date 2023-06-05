@@ -3,7 +3,7 @@ import requests
 from requests import JSONDecodeError
 
 from ..exception import (
-    CommunicateWithServerFailed,
+    InvalidTargetResourceError,
     InvalidResponse,
 )
 from ..util.config import config
@@ -37,13 +37,10 @@ class GetResponse:
         }
 
     def __enter__(self):
-        try:
-            self.response = requests.get(self.url, **self.args)
-            if self.response.status_code != 200:
-                raise CommunicateWithServerFailed(self.response.status_code)
-            return self
-        except Exception as e:
-            raise CommunicateWithServerFailed(str(e)[:100]) from None
+        self.response = requests.get(self.url, **self.args)
+        if self.response.status_code != 200:
+            raise InvalidTargetResourceError(self.response.status_code)
+        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.response.close()

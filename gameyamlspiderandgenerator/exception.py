@@ -8,11 +8,9 @@ class ReadOrWriteConfigFailed(Exception):
         super().__init__("Failed to read or write config")
 
 
-class CommunicateWithServerFailed(Exception):
-    def __init__(self, info: int | str = ""):
-        super().__init__(
-            f"Failed to communicate with server, {('status code: ' + str(info)) if isinstance(info, int) else info}"
-        )
+class InvalidTargetResourceError(Exception):
+    def __init__(self, code: int):
+        super().__init__(f"The target resource is no longer valid.status code: {int}")
 
 
 class ResponseNotInitialized(Exception):
