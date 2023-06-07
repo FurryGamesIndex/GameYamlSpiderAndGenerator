@@ -15,9 +15,9 @@ hook:
   - validate
 # - openai
 # if you don't want to set proxy, please fill in {}
+proxy: { }
 # http: socks5://127.0.0.1:7891
 # https: socks5://127.0.0.1:7891
-proxy: { }
 gitToken: 'your token'
 api:
   google-play: a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90
