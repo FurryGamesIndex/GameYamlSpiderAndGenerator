@@ -1,6 +1,8 @@
 import abc
 import re
 from typing import List
+
+from ..util.fgi_yaml import YamlData
 from ..util.thread import ThreadWithReturnValue
 
 
@@ -22,7 +24,8 @@ class BasePlugin(abc.ABC):
         """
         return bool(cls._VERIFY_PATTERN.match(url))
 
-    def __load_hook__(self,data: dict):
+    @staticmethod
+    def __load_hook__(data: dict):
         """
         加载钩子
 
@@ -149,7 +152,7 @@ class BasePlugin(abc.ABC):
         """
 
     @abc.abstractmethod
-    def to_yaml(self) -> str:
+    def to_yaml(self) -> YamlData:
         """
         转换为 YAML
 
