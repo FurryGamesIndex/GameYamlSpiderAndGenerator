@@ -35,21 +35,18 @@ parser.add_argument(
 )
 parser.add_argument("url", metavar="URL")
 args = parser.parse_args()
-
-
-
 if isinstance(args.config, str):
     with open(args.config) as f:
         setting = safe_load(f)
 else:
     setting = args.config
 if args.fast:
-     setting['hook'] = None
+    setting['hook'] = None
 config.update(setting)
 pkg.__init__()
 yml = produce_yaml(args.url)
 if args.output is None:
-    print(yml)
+    exit(2)
 elif "." not in args.output:
     if args.output == "zip":
         with open(get_valid_filename(yml.raw_dict['name']) + ".zip", 'wb') as f:
@@ -66,6 +63,8 @@ elif "." in args.output:
             f.write(str(yml))
     else:
         logger.error(f"unsupported file format: {args.output[args.output.rfind('.'):]}")
+        exit(3)
 
 else:
     logger.error(f"unsupported file format: {args.output[args.output.rfind('.'):]}")
+    exit(3)
