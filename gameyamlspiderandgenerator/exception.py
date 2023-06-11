@@ -10,7 +10,7 @@ class ReadOrWriteConfigFailed(Exception):
 
 class InvalidTargetResourceError(Exception):
     def __init__(self, code: int):
-        super().__init__(f"The target resource is no longer valid.status code: {int}")
+        super().__init__(f"The target resource is no longer valid.status code: {code}")
 
 
 class ResponseNotInitialized(Exception):

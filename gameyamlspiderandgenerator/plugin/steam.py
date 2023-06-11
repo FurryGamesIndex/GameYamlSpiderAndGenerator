@@ -36,7 +36,7 @@ class Steam(BasePlugin):
         for i in fn_list:
             i.start()
         self.data, self.data_html = (ii.join() for ii in fn_list)
-        self.soup = BeautifulSoup(self.data_html, "html.parser")
+        self.soup = BeautifulSoup(self.data_html, "lxml")
         self.name = self.get_name()
         temp1 = self.soup.body.find_all("a", {"class": "app_tag"})
         self.tag = [re.sub(r"[\n\t\r]*", "", temp1[i].text) for i in range(len(temp1))]
