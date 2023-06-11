@@ -46,7 +46,7 @@ config.update(setting)
 pkg.__init__()
 yml = produce_yaml(args.url)
 if args.output is None:
-    exit(2)
+    print(yml)
 elif "." not in args.output:
     if args.output == "zip":
         with open(get_valid_filename(yml.raw_dict['name']) + ".zip", 'wb') as f:
