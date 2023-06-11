@@ -22,7 +22,7 @@ class ItchIO(BasePlugin):
     def __init__(self, link: str) -> None:
         self.link = link
         self.data_html = get_text(link)
-        self.soup = BeautifulSoup(self.data_html, "html.parser")
+        self.soup = BeautifulSoup(self.data_html, "lxml")
         self.data = [
             ii
             for ii in [
