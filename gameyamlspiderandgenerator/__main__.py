@@ -3,6 +3,7 @@ import argparse
 from yaml import safe_load
 
 from .util.config import config
+from .util.fgi import default_config
 from .util.fgi_yaml import get_valid_filename
 from .util.plugin_manager import pkg
 import sys
@@ -16,7 +17,7 @@ parser.add_argument(
     "-f",
     "--config",
     type=str,
-    default={"plugin": ["steam", "itchio"], "hook": ["search", "validate"]},
+    default=default_config,
     help="The location of config.yaml (default null)",
 )
 parser.add_argument(
