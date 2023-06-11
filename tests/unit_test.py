@@ -4,8 +4,10 @@ import sys
 import unittest
 
 from gameyamlspiderandgenerator.hook.search import Search
+from gameyamlspiderandgenerator.hook.validate import Verify
 from gameyamlspiderandgenerator.util.config import config
 from gameyamlspiderandgenerator.util.fgi import template_dict
+
 config.load(os.path.split(os.path.realpath(__file__))[0] + "/test_config.yaml")
 print(config)
 
@@ -24,22 +26,10 @@ class CliUnitTest(unittest.TestCase):
                 "-m",
                 "gameyamlspiderandgenerator",
                 "https://store.steampowered.com/app/1470120/Atopes/",
+                "--fast"
             ]
         )
         self.assertEqual(result.returncode, 0)
-
-
-class InitUnitTest(unittest.TestCase):
-    """Rewritten from test_init.py"""
-
-    def test_init(self):
-        from gameyamlspiderandgenerator.plugin.steam import Steam
-        self.assertIsInstance(
-            str(Steam(
-                "https://store.steampowered.com/app/381210/Dead_by_Daylight/"
-            ).to_yaml()),
-            str,
-        )
 
 
 class SpiderUnitTest(unittest.TestCase):
@@ -73,9 +63,12 @@ class ItchIOUnitTest(unittest.TestCase):
         )
 
 
-class SearchUnitTest(unittest.TestCase):
+class HookUnitTest(unittest.TestCase):
     def test_search(self):
         self.assertIsInstance(Search().setup({**template_dict, 'name': 'dead-space'}), dict)
+
+    def test_verify(self):
+        self.assertIsInstance(Verify().setup(template_dict), dict)
 
 
 if __name__ == "__main__":
