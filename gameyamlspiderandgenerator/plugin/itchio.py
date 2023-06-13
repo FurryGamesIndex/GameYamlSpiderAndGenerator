@@ -67,7 +67,7 @@ class ItchIO(BasePlugin):
             "HTML5": "web",
             "iOS": "ios",
         }
-        platforms = self.more_info["Platforms"][0].split(",") if "Platforms" in self.more_info else ["Windows"]
+        platforms = self.more_info["Platforms"] if "Platforms" in self.more_info else ["Windows"]
         return [repl[i.strip()] for i in platforms]
 
     def get_authors(self) -> list[dict]:
@@ -168,7 +168,7 @@ class ItchIO(BasePlugin):
 
     def get_type_tag(self):
         repl = {
-            "Visual Novel": "visual-nove",
+            "Visual Novel": "visual-novel",
             "Real time strategy": "real-time-strategy",
             "Strategy": "strategy",
             "Casual": "casual",

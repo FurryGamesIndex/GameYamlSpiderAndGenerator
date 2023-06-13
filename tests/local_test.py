@@ -22,7 +22,7 @@ pkg.__init__()
 
 @get_time
 def test1():
-    yml = produce_yaml("https://finji.itch.io/longest-night")
+    yml = produce_yaml("https://tukiyo-akeno.itch.io/nekorin")
     print(yml)
     with open(get_valid_filename(yml.raw_dict['name']) + ".zip", 'wb') as f:
         f.write(bytes(yml))

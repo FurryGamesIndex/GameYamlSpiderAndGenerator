@@ -10,7 +10,7 @@ fgi_dict = [
         "replace": "youtube:\\g<1>",
     },
     {
-        "match": "^https://twitter.com/(.{1,})",
+        "match": "^https://twitter.com/([A-Za-z0-9_]+).*",
         "prefix": ".twitter",
         "replace": "twitter:\\g<1>",
     },
