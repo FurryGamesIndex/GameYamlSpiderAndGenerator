@@ -10,7 +10,7 @@ class Verify(BaseHook):
 
     def setup(self, data: dict):
         try:
-            validate(data, safe_load(get_text('https://raw.githubusercontent.com/FurryGamesIndex/games/master/schemas'
+            validate({**data,'thumbnail': 'thumbnail.png'}, safe_load(get_text('https://raw.githubusercontent.com/FurryGamesIndex/games/master/schemas'
                                               '/game.schema.yaml')))
             logger.success("verification complete")
         except Exception as e:

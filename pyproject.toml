@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gameyamlspiderandgenerator"
-version = "1.6.0"
+version = "1.6.1"
 description = "A useful tool for generating Furrygameindex yaml files"
 authors = ["kaesinol"]
 license = "MIT"
@@ -25,6 +25,7 @@ epicstore-api = "^0.1.6"
 jsonschema = "^4.17.3"
 openai = "^0.27.6"
 lxml = "^4.9.2"
+py3langid = "^0.2.2"
 
 [build-system]
 requires = ["poetry-core"]
