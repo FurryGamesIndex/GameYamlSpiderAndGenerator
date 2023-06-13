@@ -4,6 +4,7 @@ from json import loads
 from bs4 import BeautifulSoup
 from html2text import html2text
 from langcodes import find
+from py3langid import langid, classify
 
 from ._base import BasePlugin
 from ..util.fgi import fgi_dict
@@ -110,7 +111,11 @@ class ItchIO(BasePlugin):
         return list(set(ret))
 
     def get_langs(self) -> list[str]:
-        temp = self.more_info["Languages"] if "Languages" in self.more_info else ["English"]
+        if "Languages" in self.more_info:
+            temp = self.more_info["Languages"]
+        else:
+            return [classify(self.get_desc())[0]]
+
         return list(set(find(i).language for i in temp))
 
     def get_links(self) -> list[dict]:
