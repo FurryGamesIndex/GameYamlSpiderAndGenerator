@@ -51,12 +51,13 @@ class Package:
                 logger.error(f"Imported {_dir} but no {_type.__name__} found: {plugin}")
 
     def load_plugins(self):
-        if self.plugin:
+        print(self.plugin)
+        if not self.plugin:
             return
         self._load("plugin", BasePlugin)
 
     def load_hooks(self):
-        if self.hook:
+        if not self.hook:
             return
         if config["hook"] is None:
             if None not in self["log"]:
