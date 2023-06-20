@@ -11,7 +11,6 @@ from loguru import logger
 from gameyamlspiderandgenerator import produce_yaml
 
 parser = argparse.ArgumentParser()
-logger.add(sys.stderr, level="INFO")
 parser.add_argument(
     "-f",
     "--config",
@@ -42,6 +41,7 @@ else:
 if args.fast:
     setting['hook'] = None
 config.update(setting)
+pkg.__init__()
 yml = produce_yaml(args.url)
 if args.output is None:
     print(yml)
