@@ -42,6 +42,7 @@ else:
 if args.fast:
     setting['hook'] = None
 config.update(setting)
+pkg.__init__()
 yml = produce_yaml(args.url)
 if args.output is None:
     print(yml)
