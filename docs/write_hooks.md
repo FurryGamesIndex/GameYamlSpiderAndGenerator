@@ -1,4 +1,4 @@
-## Create a new __init__.py file
+## Create a new \_\_init\_\_.py file
 ```python
 from gameyamlspiderandgenerator.hook import BaseHook
 class YourHookName(BaseHook):
