@@ -3,8 +3,8 @@ import subprocess
 import sys
 import unittest
 
-from gameyamlspiderandgenerator.hook.search import Search
-from gameyamlspiderandgenerator.hook.validate import Verify
+from yamlgenerator_hook_search import Search
+from yamlgenerator_hook_validate import Verify
 from gameyamlspiderandgenerator.util.config import config
 from gameyamlspiderandgenerator.util.fgi import template_dict
 
