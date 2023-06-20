@@ -2,6 +2,8 @@
 ## Install
 ```commandline
 pip install gameyamlspiderandgenerator -i https://pypi.org/simple
+# install extra hook
+# pip install yamlgenerator-hook-openai
 python3.10
 ```
 ## Create a new configuration file
