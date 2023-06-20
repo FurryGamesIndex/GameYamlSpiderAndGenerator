@@ -58,13 +58,13 @@ class Package:
 
     def load_hooks(self):
         if config["hook"] is None:
-            if None not in self["log"]:
+            if None not in self.log:
                 logger.warning(f"All hooks are disabled")
-                self["log"].append(None)
+                self.log.append(None)
             return
         for plugin in getattr(config, "hook", []):
             try:
-                if plugin in self["log"]:
+                if plugin in self.log:
                     continue
                 logger.info(f"Loading hook: {plugin}")
                 self["log"].append(plugin)

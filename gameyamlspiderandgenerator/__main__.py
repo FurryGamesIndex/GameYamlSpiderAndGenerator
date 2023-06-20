@@ -6,7 +6,6 @@ from .util.config import config
 from .util.fgi import default_config
 from .util.fgi_yaml import get_valid_filename
 from .util.plugin_manager import pkg
-import sys
 from loguru import logger
 from gameyamlspiderandgenerator import produce_yaml
 
@@ -44,7 +43,8 @@ config.update(setting)
 pkg.__init__()
 yml = produce_yaml(args.url)
 if args.output is None:
-    print(yml)
+    if yml is not None:
+        print(yml)
 elif "." not in args.output:
     if args.output == "zip":
         with open(get_valid_filename(yml.raw_dict['name']) + ".zip", 'wb') as f:
