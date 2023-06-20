@@ -26,6 +26,7 @@ py3langid = "^0.2.2"
 yamlgenerator-hook-validate = "^0.1.0"
 yamlgenerator-hook-search = "^0.1.0"
 
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
