@@ -25,7 +25,7 @@ Example:
 Hook plugin for processing data
 - Example：
 ```python
-from gameyamlspiderandgenerator.hook.search import Search
+from yamlgenerator_hook_search import Search
 from gameyamlspiderandgenerator.util.fgi import template_dict
 assert type(Search().setup({**template_dict, 'name':'dead-space'})) is dict
 ```
@@ -35,7 +35,7 @@ Hook plugin that uses openai to write a brief introduction to the data file for 
 **You need to fill in the config.yaml with your secret**
 - Example：
 ```python
-from gameyamlspiderandgenerator.hook.openai import OpenAI
+from yamlgenerator_hook_openai import OpenAI
 from gameyamlspiderandgenerator.util.fgi import template_dict
 assert type(OpenAI().setup({**template_dict,"description": "YOUR DESC"})) is dict
 
@@ -44,7 +44,7 @@ assert type(OpenAI().setup({**template_dict,"description": "YOUR DESC"})) is dic
 Hook plugin to verify whether the format of the data file is correct
 - Example：
 ```python
-from gameyamlspiderandgenerator.hook.validate import Verify
+from yamlgenerator_hook_validate import Verify
 from gameyamlspiderandgenerator.util.fgi import template_dict
 assert type(Verify().setup(template_dict)) is dict
 ```
