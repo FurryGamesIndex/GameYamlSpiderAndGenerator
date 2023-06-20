@@ -37,8 +37,6 @@ class Package:
                 continue
             try:
                 package = f"{base}.{plugin}"
-                if plugin in self["log"]:
-                    continue
                 logger.info(f"Loading {_dir}: {plugin}")
                 temp = importlib.import_module(package)
                 self[_dir][plugin] = [
@@ -46,7 +44,6 @@ class Package:
                     for o in temp.__dict__.values()
                     if isinstance(o, type) and issubclass(o, _type) and o is not _type
                 ][-1]
-                self["log"].append(temp.__name__.split(".")[-1])
             except ImportError as e:
                 logger.trace(e)
                 logger.error(f"Failed to import {_dir}: {plugin}")
@@ -64,10 +61,7 @@ class Package:
             return
         for plugin in getattr(config, "hook", []):
             try:
-                if plugin in self["log"]:
-                    continue
                 logger.info(f"Loading hook: {plugin}")
-                self["log"].append(plugin)
                 temp = importlib.import_module(f"yamlgenerator_hook_{plugin}")
                 self["hook"][plugin] = [
                     o
