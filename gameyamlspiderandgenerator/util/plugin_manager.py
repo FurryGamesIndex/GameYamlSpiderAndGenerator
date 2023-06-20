@@ -11,7 +11,7 @@ from ..util.config import config
 class Package:
     plugin: dict[str, BasePlugin] = {}
     hook: dict[str, BaseHook] = {}
-    log: list[str] = []
+    log: list[str | None] = []
 
     def __init__(self):
         self.load_plugins()
@@ -32,13 +32,13 @@ class Package:
     ):
         base = __package__.split(".")[0] + "." + _dir
         for plugin in getattr(config, _dir, []):
+            if plugin in self.log:
+                continue
             if plugin.startswith("_"):
                 logger.warning(f"Skip loading protected {_dir} {plugin}")
                 continue
             try:
                 package = f"{base}.{plugin}"
-                if plugin in self["log"]:
-                    continue
                 logger.info(f"Loading {_dir}: {plugin}")
                 temp = importlib.import_module(package)
                 self[_dir][plugin] = [

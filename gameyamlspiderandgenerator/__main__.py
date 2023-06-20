@@ -11,7 +11,6 @@ from loguru import logger
 from gameyamlspiderandgenerator import produce_yaml
 
 parser = argparse.ArgumentParser()
-logger.add(sys.stderr, level="INFO")
 parser.add_argument(
     "-f",
     "--config",
