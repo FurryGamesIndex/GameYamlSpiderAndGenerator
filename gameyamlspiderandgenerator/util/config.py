@@ -40,8 +40,8 @@ class Config:
         try:
             with open(file_data, "r", encoding="utf-8") as fp:
                 self.__dict__.update(fgi.load(fp))
-        except Exception:
-            raise ReadOrWriteConfigFailed from None
+        except Exception as e:
+            raise ReadOrWriteConfigFailed from e
 
     def update(self, data: dict):
         self.__dict__.update(data)

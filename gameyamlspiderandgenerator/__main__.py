@@ -25,6 +25,12 @@ parser.add_argument(
     help="The location of the output file (zip format or yaml format)",
 )
 parser.add_argument(
+    "--lang",
+    type=str,
+    default='en',
+    help="The display language of the game. ISO 639-1 code(default: en)",
+)
+parser.add_argument(
     "--fast",
     action='store_true',
     default=False,
@@ -41,7 +47,7 @@ if args.fast:
     setting['hook'] = None
 config.update(setting)
 pkg.__init__()
-yml = produce_yaml(args.url)
+yml = produce_yaml(args.url,args.lang)
 if args.output is None:
     if yml is not None:
         print(yml)
