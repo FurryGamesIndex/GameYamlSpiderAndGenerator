@@ -1,9 +1,9 @@
 import re
 from urllib.parse import parse_qs, urlparse
-
+from yaml import dump
 from bs4 import BeautifulSoup
 from html2text import html2text
-from langcodes import find
+from langcodes import find, Language
 
 from ._base import BasePlugin
 from ..util.fgi import fgi_dict
@@ -27,10 +27,12 @@ class Steam(BasePlugin):
         s = re.sub(r"\?t=\d{6,12}", "", s)
         return s.replace("![]", "![img]")
 
-    def __init__(self, link: str) -> None:
+    def __init__(self, link: str, lang:str ='en') -> None:
         self.id = self.get_steam_id(link)
+        if lang!='en':
+            print(dump(get_json(f'https://store.steampowered.com/api/appdetails?appids={self.id}&l={Language.get(lang).display_name("en").lower()}'),allow_unicode=True))
         fn_list = [ThreadWithReturnValue(target=get_json,
-                                         args=(f"https://store.steampowered.com/api/appdetails?appids={self.id}&cc=us"
+                                         args=(f"https://store.steampowered.com/api/appdetails?appids={self.id}"
                                                f"&l=english",)),
                    ThreadWithReturnValue(target=get_text, args=(link,))]
         for i in fn_list:

@@ -1,5 +1,5 @@
 from typing import Optional
-
+from inspect import signature
 from loguru import logger
 
 from .plugin import BasePlugin
@@ -18,9 +18,12 @@ def verify(url: str):
     return next((cls for func, cls in verify_list if func(url)), None)
 
 
-def produce_yaml(url: str) -> Optional[YamlData]:
+def produce_yaml(url: str, lang:str="en") -> Optional[YamlData]:
     ret = verify(url)
     if ret is None:
         logger.error("URL is invalid")
         return
-    return ret(url).to_yaml()
+    if 'lang' in [i.name for i in signature(ret).parameters.values()]:
+        return ret(url,lang).to_yaml()
+    else:
+        return ret(url).to_yaml()
