@@ -51,6 +51,8 @@ yml = produce_yaml(args.url,args.lang)
 if args.output is None:
     if yml is not None:
         print(yml)
+    else:
+        exit(2)
 elif "." not in args.output:
     if args.output == "zip":
         with open(get_valid_filename(yml.raw_dict['name']) + ".zip", 'wb') as f:
@@ -67,8 +69,8 @@ elif "." in args.output:
             f.write(str(yml))
     else:
         logger.error(f"unsupported file format: {args.output[args.output.rfind('.'):]}")
-        exit(3)
+        exit(1)
 
 else:
     logger.error(f"unsupported file format: {args.output[args.output.rfind('.'):]}")
-    exit(3)
+    exit(1)
