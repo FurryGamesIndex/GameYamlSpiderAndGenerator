@@ -16,7 +16,7 @@ def get_time(f):
     return inner
 
 
-config.load("C:\\Users\\Administrator\\Desktop\\config.yaml")
+config.load("C:\\Users\\keiplyer\\Desktop\\config.yaml")
 pkg.__init__()
 
 
@@ -30,7 +30,7 @@ def test1():
 
 @get_time
 def test2():
-    yml = produce_yaml("https://store.steampowered.com/app/1470120/Atopes/")
+    yml = produce_yaml("https://store.steampowered.com/app/1710540/Fall_of_Porcupine/")
     print(yml)
     with open(get_valid_filename(yml.raw_dict['name']) + ".zip", 'wb') as f:
         f.write(bytes(yml))

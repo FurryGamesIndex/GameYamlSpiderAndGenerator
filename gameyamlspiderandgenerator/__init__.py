@@ -8,6 +8,8 @@ from .util.plugin_manager import pkg
 
 
 def verify(url: str):
+    if not pkg.plugin:
+        raise Exception("Plugin not yet loaded")
     verify_list = [
         [
             pkg.plugin[n].verify,
