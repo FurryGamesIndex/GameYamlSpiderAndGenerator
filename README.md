@@ -20,11 +20,11 @@ hook:
 proxy: { }
 # http: socks5://127.0.0.1:7891
 # https: socks5://127.0.0.1:7891
-gitToken: 'your token'
 api:
   google-play: a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90 # Get your api key via serpapi.com
   apple: a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90
   openai: yourkey
+  git_proxy: null # your git proxy website
 
 ```
 ## Try to make yaml data file
