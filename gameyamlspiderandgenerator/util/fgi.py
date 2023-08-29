@@ -41,7 +41,8 @@ fgi_dict = [
     },
 ]
 default_config = {'api': {'apple': 'a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90',
-                          'google-play': 'a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90'},
+                          'google-play': 'a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90',
+                          'git_proxy': None},
                   'hook': ['search', 'validate'],
                   'plugin': ['steam', 'itchio'],
                   'proxy': {}}
