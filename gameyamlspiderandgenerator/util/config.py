@@ -1,5 +1,5 @@
-from .fgi_yaml import fgi
 from .fgi import default_config
+from .fgi_yaml import fgi
 from ..exception import ReadOrWriteConfigFailed
 
 

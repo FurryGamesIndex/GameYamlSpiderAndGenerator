@@ -1,5 +1,5 @@
 import importlib
-from typing import Literal, Type, Union
+from typing import Literal, Type
 
 from loguru import logger
 

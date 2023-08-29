@@ -1,10 +1,11 @@
 import re
 from contextlib import suppress
 from json import loads
+
 from bs4 import BeautifulSoup
 from html2text import html2text
 from langcodes import find
-from py3langid import langid, classify
+from py3langid import classify
 
 from ._base import BasePlugin
 from ..util.fgi import fgi_dict

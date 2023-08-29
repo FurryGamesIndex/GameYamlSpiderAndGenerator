@@ -1,13 +1,13 @@
 import argparse
 
+from loguru import logger
 from yaml import safe_load
 
+from gameyamlspiderandgenerator import produce_yaml
 from .util.config import config
 from .util.fgi import default_config
 from .util.fgi_yaml import get_valid_filename
 from .util.plugin_manager import pkg
-from loguru import logger
-from gameyamlspiderandgenerator import produce_yaml
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -47,7 +47,7 @@ if args.fast:
     setting['hook'] = None
 config.update(setting)
 pkg.__init__()
-yml = produce_yaml(args.url,args.lang)
+yml = produce_yaml(args.url, args.lang)
 if args.output is None:
     if yml is not None:
         print(yml)
