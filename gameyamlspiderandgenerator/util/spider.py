@@ -29,7 +29,7 @@ class GetResponse:
             allow_redirects: 是否允许重定向
             kwargs: 其他应传入 requests.get 的参数，proxies 会被自动添加
         """
-        if not config.api['git_proxy'] and 'raw.githubusercontent.com' in url:
+        if config.api['git_proxy'] and 'raw.githubusercontent.com' in url:
             self.url = config.api['git_proxy'] + url
         else:
             self.url = url
