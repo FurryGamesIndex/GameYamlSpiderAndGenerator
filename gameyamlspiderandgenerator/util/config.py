@@ -8,6 +8,7 @@ class Config:
     api = {}
     plugin = {}
     hook = {}
+    api['git_proxy'] = None
 
     def __getitem__(self, item):
         # Compatibility with the old version
