@@ -48,8 +48,8 @@ class SpiderUnitTest(unittest.TestCase):
     """Rewritten from test_spider.py"""
 
     def test_spider(self):
-        from gameyamlspiderandgenerator.util.spider import get_status, get_text
-        self.assertGreaterEqual(get_status("https://example.com/"), 200)
+        from gameyamlspiderandgenerator.util.spider import get_bytes, get_text
+        self.assertIsInstance(get_bytes("https://example.com/"), bytes)
         self.assertIsInstance(get_text("https://example.com/"), str)
 
 
