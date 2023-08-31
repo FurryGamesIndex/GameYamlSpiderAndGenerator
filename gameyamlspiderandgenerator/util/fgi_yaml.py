@@ -20,6 +20,8 @@ fgi.width = 4096
 
 
 def dump_to_yaml(data: dict) -> str:
+    data['brief-description'] = pss_dedent(data['brief-description'])
+    data['description'] = pss_dedent(data['description'])
     temp = fgi.dump_to_string(data)
     for i in list(data.keys())[1:]:
         temp = temp.replace("\n" + i, "\n\n" + i)

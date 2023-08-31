@@ -71,8 +71,7 @@ class Steam(BasePlugin):
         return list({find(i).language for i in temp})
 
     def get_desc(self):
-        return pss_dedent(
-            self.remove_query(
+        return self.remove_query(
                 (
                     html2text(
                         self.data[str(self.id)]["data"]["detailed_description"],
@@ -80,12 +79,11 @@ class Steam(BasePlugin):
                     )
                 )
             ).replace("\n" * 4, "\n").strip()
-        )
+
 
     def get_brief_desc(self):
-        return pss_dedent(
-            html2text(self.data[str(self.id)]["data"]["short_description"], bodywidth=0)
-        )
+        return html2text(self.data[str(self.id)]["data"]["short_description"], bodywidth=0)
+
 
     def get_authors(self) -> list[dict]:
         temp = self.data[str(self.id)]["data"]

@@ -9,7 +9,7 @@ from py3langid import classify
 
 from ._base import BasePlugin
 from ..util.fgi import fgi_dict
-from ..util.fgi_yaml import YamlData, pss_dedent
+from ..util.fgi_yaml import YamlData
 from ..util.spider import get_text
 
 
@@ -55,10 +55,10 @@ class ItchIO(BasePlugin):
         return [i.attrs['href'] for i in temp]
 
     def get_desc(self):
-        return pss_dedent(self.remove_query(html2text(
+        return self.remove_query(html2text(
             str(self.soup.select_one("div.formatted_description.user_formatted")),
             bodywidth=0,
-        )).replace("\n" * 3, "\n").strip())
+        )).replace("\n" * 3, "\n").strip()
 
     def get_platforms(self):
         repl = {
