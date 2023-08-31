@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gameyamlspiderandgenerator"
-version = "1.6.15"
+version = "1.6.16"
 description = "A useful tool for generating Furrygameindex yaml files"
 authors = ["kaesinol"]
 license = "MIT"

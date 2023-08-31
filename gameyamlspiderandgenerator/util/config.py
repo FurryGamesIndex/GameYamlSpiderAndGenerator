@@ -8,7 +8,9 @@ class Config:
     api = {}
     plugin = {}
     hook = {}
-    api['git_proxy'] = None
+
+    def __init__(self):
+        self.__dict__.update(default_config)
 
     def __getitem__(self, item):
         # Compatibility with the old version
@@ -34,9 +36,6 @@ class Config:
         """
         if type(file_data) is dict:
             self.__dict__.update(file_data)
-            return
-        if file_data is None:
-            self.__dict__.update(default_config)
             return
         try:
             with open(file_data, "r", encoding="utf-8") as fp:
