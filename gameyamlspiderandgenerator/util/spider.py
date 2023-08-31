@@ -5,29 +5,28 @@ from ..exception import (
     InvalidTargetResourceError,
     InvalidResponse,
 )
-from ..util.config import config
 
 
 class GetResponse:
     """
-    对 requests.get 的简单封装，使用上下文以保证资源被正确释放
+    Simple wrapper around requests.get, using context to ensure resources are released properly
 
-    使用方法：
-
-    with GetResponse("https://www.example.com/") as resp:
-        print(resp.response)  # 响应内容
-        response.to_disk("example.html")  # 将响应内容写入磁盘
+    Instructions:
+     with GetResponse("https://www.example.com/") as resp:
+         print(resp.response) # response content
+         response.to_disk("example.html") # write the response content to disk
     """
 
     def __init__(self, url: str, allow_redirects: bool = True, /, **kwargs):
         """
-        获取响应
+        get response
 
         Args:
-            url: 请求的 URL
-            allow_redirects: 是否允许重定向
-            kwargs: 其他应传入 requests.get 的参数，proxies 会被自动添加
+             url: URL of the request
+             allow_redirects: whether to allow redirection
+             kwargs: Other parameters that should be passed to requests.get, proxies will be added automatically
         """
+        from ..util.config import config
         if config.api['git_proxy'] and 'raw.githubusercontent.com' in url:
             self.url = config.api['git_proxy'] + url
         else:
@@ -48,14 +47,14 @@ class GetResponse:
         self.response.close()
 
     @property
-    def json(self):
+    def json(self)->dict:
         """
-        将响应内容解析为 JSON
+        Parse the response content as dict
 
         Proxied for self.response.json()
 
         Returns:
-            JSON
+             dict
         """
         try:
             return self.response.json()
@@ -65,26 +64,14 @@ class GetResponse:
     @property
     def text(self) -> str:
         """
-        将响应内容解析为文本
+        Parse the response content as text
 
         Proxied for self.response.text
 
         Returns:
-            文本
+             str
         """
         return self.response.text.encode(self.response.encoding).decode(self.response.apparent_encoding)
-
-    @property
-    def status(self) -> int:
-        """
-        获取响应状态码
-
-        Proxied for `self.response.status_code`
-
-        Returns:
-            状态码
-        """
-        return self.response.status_code
 
     @property
     def bytes(self):
@@ -99,11 +86,6 @@ def get_json(url: str) -> dict:
 def get_text(url: str) -> str:
     with GetResponse(url) as resp:
         return resp.text
-
-
-def get_status(url: str) -> int:
-    with GetResponse(url) as resp:
-        return resp.status
 
 
 def get_bytes(url: str) -> bytes:
