@@ -22,7 +22,7 @@ fgi.width = 4096
 def dump_to_yaml(data: dict) -> str:
     data['brief-description'] = pss_dedent(data['brief-description'])
     data['description'] = pss_dedent(data['description'])
-    temp = fgi.dump_to_string(data)
+    temp = fgi.dump_to_string(data) # type: ignore
     for i in list(data.keys())[1:]:
         temp = temp.replace("\n" + i, "\n\n" + i)
     temp = temp.replace("description: |-", "description: |")
@@ -63,6 +63,6 @@ class YamlData:
         return _io.getvalue()
 
 
-def get_valid_filename(s):
+def get_valid_filename(s: str):
     s = s.strip().replace(' ', '_')
     return re.sub(r'(?u)[^-\w.]', '_', s)

@@ -40,7 +40,7 @@ class Steam(BasePlugin):
                    ThreadWithReturnValue(target=get_text, args=(link,))]
         for i in fn_list:
             i.start()
-        self.data, self.data_html = (ii.join() for ii in fn_list)
+        self.data, self.data_html = (ii.join_() for ii in fn_list)
         self.soup = BeautifulSoup(self.data_html, "lxml")
         self.name = self.get_name()
         temp1 = self.soup.body.find_all("a", {"class": "app_tag"})

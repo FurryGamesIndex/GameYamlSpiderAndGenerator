@@ -1,5 +1,5 @@
 from inspect import signature
-from typing import Optional
+from typing import Optional, Callable
 
 from loguru import logger
 
@@ -8,7 +8,7 @@ from .util.fgi_yaml import YamlData
 from .util.plugin_manager import pkg
 
 
-def verify(url: str):
+def verify(url: str) -> Callable:
     if not pkg.plugin:
         raise Exception("Plugin not yet loaded")
     verify_list = [

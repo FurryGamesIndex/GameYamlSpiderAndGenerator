@@ -45,7 +45,7 @@ class BasePlugin(abc.ABC):
         fn_list = [(ThreadWithReturnValue(target=i, args=(data,)), _) for i, _ in fn]
         for i, _ in fn_list:
             i.start()
-        result = [(ii.join(), changed) for ii, changed in fn_list]
+        result = [(ii.join_(), changed) for ii, changed in fn_list]
         for _data, changed in result:
             if changed is not None:
                 for i in changed:
