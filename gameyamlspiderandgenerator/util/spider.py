@@ -47,7 +47,7 @@ class GetResponse:
         self.response.close()
 
     @property
-    def json(self)->dict:
+    def json(self) -> dict:
         """
         Parse the response content as dict
 

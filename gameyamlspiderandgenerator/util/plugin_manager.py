@@ -11,9 +11,8 @@ from ..util.config import config
 class Package:
     plugin: dict[str, BasePlugin] = {}
     hook: dict[str, BaseHook] = {}
-    log: list[str | None] = []
 
-    def __init__(self):
+    def init(self):
         self.load_plugins()
         self.load_hooks()
 
@@ -32,8 +31,6 @@ class Package:
     ):
         base = __package__.split(".")[0] + "." + _dir
         for plugin in getattr(config, _dir, []):
-            if plugin in self.log:
-                continue
             if plugin.startswith("_"):
                 logger.warning(f"Skip loading protected {_dir} {plugin}")
                 continue
@@ -46,7 +43,6 @@ class Package:
                     for o in temp.__dict__.values()
                     if isinstance(o, type) and issubclass(o, _type) and o is not _type
                 ][-1]
-                self["log"].append(temp.__name__.split(".")[-1])
             except ImportError as e:
                 logger.trace(e)
                 logger.error(f"Failed to import {_dir}: {plugin}")
@@ -58,16 +54,11 @@ class Package:
 
     def load_hooks(self):
         if config["hook"] is None:
-            if None not in self.log:
-                logger.warning(f"All hooks are disabled")
-                self.log.append(None)
+            logger.warning(f"All hooks are disabled")
             return
         for plugin in getattr(config, "hook", []):
             try:
-                if plugin in self.log:
-                    continue
                 logger.info(f"Loading hook: {plugin}")
-                self["log"].append(plugin)
                 temp = importlib.import_module(f"yamlgenerator_hook_{plugin}")
                 self["hook"][plugin] = [
                     o

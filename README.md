@@ -41,7 +41,7 @@ from gameyamlspiderandgenerator.util.config import config
 from gameyamlspiderandgenerator.util.plugin_manager import pkg
 
 config.load("/home/user/desktop/config.yaml")
-pkg.__init__()
+pkg.init()
 print(produce_yaml("https://store.steampowered.com/app/1470120/Atopes/"))
 ```
 

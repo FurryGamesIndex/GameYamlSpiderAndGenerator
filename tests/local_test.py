@@ -17,7 +17,7 @@ def get_time(f):
 
 
 config.load("C:\\Users\\keiplyer\\Desktop\\config.yaml")
-pkg.__init__()
+pkg.init()
 
 
 @get_time

@@ -3,7 +3,6 @@ from typing import Optional, Callable
 
 from loguru import logger
 
-from .plugin import BasePlugin
 from .util.fgi_yaml import YamlData
 from .util.plugin_manager import pkg
 

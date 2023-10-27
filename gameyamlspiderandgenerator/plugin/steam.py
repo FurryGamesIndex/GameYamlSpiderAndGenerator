@@ -8,9 +8,9 @@ from yaml import dump
 
 from ._base import BasePlugin
 from ..util.fgi import fgi_dict
-from ..util.fgi_yaml import YamlData, pss_dedent
+from ..util.fgi_yaml import YamlData
 from ..util.spider import get_json, get_text
-from ..util.thread import ThreadWithReturnValue
+import concurrent.futures
 
 
 class Steam(BasePlugin):
@@ -33,14 +33,13 @@ class Steam(BasePlugin):
         if lang != 'en':
             print(dump(get_json(
                 f'https://store.steampowered.com/api/appdetails?appids={self.id}&l={Language.get(lang).display_name("en").lower()}'),
-                       allow_unicode=True))
-        fn_list = [ThreadWithReturnValue(target=get_json,
-                                         args=(f"https://store.steampowered.com/api/appdetails?appids={self.id}"
-                                               f"&l=english",)),
-                   ThreadWithReturnValue(target=get_text, args=(link,))]
-        for i in fn_list:
-            i.start()
-        self.data, self.data_html = (ii.join_() for ii in fn_list)
+                allow_unicode=True))
+        result = []
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            result.append(
+                executor.submit(get_json, f"https://store.steampowered.com/api/appdetails?appids={self.id}&l=english"))
+            result.append(executor.submit(get_text, link))
+        self.data, self.data_html = (result[0].result(), result[1].result())
         self.soup = BeautifulSoup(self.data_html, "lxml")
         self.name = self.get_name()
         temp1 = self.soup.body.find_all("a", {"class": "app_tag"})
@@ -72,18 +71,16 @@ class Steam(BasePlugin):
 
     def get_desc(self):
         return self.remove_query(
-                (
-                    html2text(
-                        self.data[str(self.id)]["data"]["detailed_description"],
-                        bodywidth=0,
-                    )
+            (
+                html2text(
+                    self.data[str(self.id)]["data"]["detailed_description"],
+                    bodywidth=0,
                 )
-            ).replace("\n" * 4, "\n").strip()
-
+            )
+        ).replace("\n" * 4, "\n").strip()
 
     def get_brief_desc(self):
         return html2text(self.data[str(self.id)]["data"]["short_description"], bodywidth=0)
-
 
     def get_authors(self) -> list[dict]:
         temp = self.data[str(self.id)]["data"]

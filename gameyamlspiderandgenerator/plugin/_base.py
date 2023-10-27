@@ -3,7 +3,7 @@ import re
 from typing import List
 
 from ..util.fgi_yaml import YamlData
-from ..util.thread import ThreadWithReturnValue
+import concurrent.futures
 
 
 class BasePlugin(abc.ABC):
@@ -33,23 +33,9 @@ class BasePlugin(abc.ABC):
             data: 钩子数据
         """
         from gameyamlspiderandgenerator.util.plugin_manager import pkg
-        pkg.__init__()
 
-        def get_fn_address():
-            fn_: list = []
-            for i in pkg.hook.values():
-                fn_.append([i().setup, i.CHANGED])
-            return fn_
-
-        fn = get_fn_address()
-        fn_list = [(ThreadWithReturnValue(target=i, args=(data,)), _) for i, _ in fn]
-        for i, _ in fn_list:
-            i.start()
-        result = [(ii.join_(), changed) for ii, changed in fn_list]
-        for _data, changed in result:
-            if changed is not None:
-                for i in changed:
-                    data[i] = _data[i]
+        for i in pkg.hook.values():
+            data = i().setup(data)
         return data
 
     @abc.abstractmethod
