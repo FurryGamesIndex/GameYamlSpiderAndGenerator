@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gameyamlspiderandgenerator"
-version = "1.7.0"
+version = "1.7.1"
 description = "A useful tool for generating Furrygameindex yaml files"
 authors = ["kaesinol"]
 license = "MIT"
@@ -24,7 +24,7 @@ pysocks = "^1.7.1"
 lxml = "^4.9.2"
 py3langid = "^0.2.2"
 yamlgenerator-hook-validate = ">=0.1.0"
-yamlgenerator-hook-search = ">=0.1.0"
+yamlgenerator-hook-search = "^0.3.1"
 
 
 [build-system]

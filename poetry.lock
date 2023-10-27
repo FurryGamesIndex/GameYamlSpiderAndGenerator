@@ -994,4 +994,4 @@ loguru = ">=0.7.0,<0.8.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "81071da6ede95d4cb9d83fbeece360e717454859d03efa2be8fe4689155ac34e"
+content-hash = "78effd3adb5290fc9ee876748a68af9616c9cf58bc2152d810c2557361a272d9"
