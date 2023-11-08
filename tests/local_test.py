@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from gameyamlspiderandgenerator import produce_yaml
 from gameyamlspiderandgenerator.util.config import config
 from gameyamlspiderandgenerator.util.plugin_manager import pkg
@@ -16,7 +18,7 @@ def get_time(f):
     return inner
 
 
-config.load("C:\\Users\\keiplyer\\Desktop\\config.yaml")
+config.load(Path(__file__).parent / "config.yaml")
 pkg.init()
 
 

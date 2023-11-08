@@ -181,7 +181,7 @@ class Steam(BasePlugin):
 
     def get_links(self) -> list[dict]:
         def remove_query_string(x: str):
-            return parse_qs(urlparse(x).query)["url"][0] if "linkfilter" in x else x  # type: ignore
+            return parse_qs(urlparse(x).query)["u"][0] if "linkfilter" in x else x
 
         temp1 = self.soup.body.find(
             "div",

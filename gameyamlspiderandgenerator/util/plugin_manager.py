@@ -1,4 +1,6 @@
 import importlib
+import inspect
+from types import ModuleType
 from typing import Literal, Type
 
 from loguru import logger
@@ -6,6 +8,12 @@ from loguru import logger
 from ..hook import BaseHook
 from ..plugin import BasePlugin
 from ..util.config import config
+
+
+def get_subclasses(module: ModuleType, base_class: Type) -> Type:
+    for name, obj in inspect.getmembers(module, inspect.isclass):
+        if issubclass(obj, base_class) and obj is not base_class:
+            return obj
 
 
 class Package:
@@ -38,11 +46,7 @@ class Package:
                 package = f"{base}.{plugin}"
                 logger.info(f"Loading {_dir}: {plugin}")
                 temp = importlib.import_module(package)
-                self[_dir][plugin] = [
-                    o
-                    for o in temp.__dict__.values()
-                    if isinstance(o, type) and issubclass(o, _type) and o is not _type
-                ][-1]
+                self[_dir][plugin] = get_subclasses(temp, BasePlugin)
             except ImportError as e:
                 logger.trace(e)
                 logger.error(f"Failed to import {_dir}: {plugin}")
@@ -60,11 +64,7 @@ class Package:
             try:
                 logger.info(f"Loading hook: {plugin}")
                 temp = importlib.import_module(f"yamlgenerator_hook_{plugin}")
-                self["hook"][plugin] = [
-                    o
-                    for o in temp.__dict__.values()
-                    if isinstance(o, type) and issubclass(o, BaseHook) and o is not BaseHook
-                ][-1]
+                self["hook"][plugin] = get_subclasses(temp, BaseHook)
             except ImportError as e:
                 logger.trace(e)
                 logger.error(f"Failed to import hook: {plugin}")
