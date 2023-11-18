@@ -16,7 +16,7 @@ def get_subclasses(module: ModuleType, base_class: Type) -> Type:
             obj = getattr(module, i)
             if isinstance(obj, type) and issubclass(obj, base_class) and obj is not base_class:
                 return getattr(module, i)
-    raise NotImplementedError(base_class.__name__)
+    raise NotImplementedError
 
 
 class Package:
@@ -53,7 +53,7 @@ class Package:
             except ImportError as e:
                 logger.trace(e)
                 logger.error(f"Failed to import {_dir}: {plugin}")
-            except IndexError:
+            except NotImplementedError:
                 logger.error(f"Imported {_dir} but no {_type.__name__} found: {plugin}")
 
     def load_plugins(self):
@@ -71,7 +71,7 @@ class Package:
             except ImportError as e:
                 logger.trace(e)
                 logger.error(f"Failed to import hook: {plugin}")
-            except IndexError:
+            except NotImplementedError:
                 logger.error(f"Imported hook but no BaseHook found: {plugin}")
 
 
