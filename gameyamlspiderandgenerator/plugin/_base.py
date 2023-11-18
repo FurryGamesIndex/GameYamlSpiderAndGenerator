@@ -3,7 +3,6 @@ import re
 from typing import List
 
 from ..util.fgi_yaml import YamlData
-import concurrent.futures
 
 
 class BasePlugin(abc.ABC):

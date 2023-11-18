@@ -1,14 +1,15 @@
-import os
 import subprocess
-import sys
 import unittest
+from pathlib import Path
 
+import sys
 from yamlgenerator_hook_search import Search
 from yamlgenerator_hook_validate import Verify
+
 from gameyamlspiderandgenerator.util.config import config
 from gameyamlspiderandgenerator.util.fgi import template_dict
 
-config.load(os.path.split(os.path.realpath(__file__))[0] + "/test_config.yaml")
+config.load(Path(__file__).parent / "config.yaml")
 print(config)
 
 
@@ -26,7 +27,6 @@ class CliUnitTest(unittest.TestCase):
                 "-m",
                 "gameyamlspiderandgenerator",
                 "https://store.steampowered.com/app/1470120/Atopes/",
-                "--fast"
             ]
         )
         self.assertEqual(result.returncode, 0)
@@ -38,7 +38,6 @@ class CliUnitTest(unittest.TestCase):
                 "-m",
                 "gameyamlspiderandgenerator",
                 "https://fymm-game.itch.io/ddp",
-                "--fast"
             ]
         )
         self.assertEqual(result.returncode, 0)

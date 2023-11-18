@@ -1,5 +1,4 @@
 import importlib
-import inspect
 from types import ModuleType
 from typing import Literal, Type
 
@@ -11,14 +10,13 @@ from ..util.config import config
 
 
 def get_subclasses(module: ModuleType, base_class: Type) -> Type:
-    for name, obj in inspect.getmembers(module, lambda o: type(o) is type):
-        # class a:
-        #   pass
-        # Question: Why inspect.isclass(tuple) returns True
-        # But issubclass(tuple,a) raised "issubclass() arg 1 must be a class" error
-        # Even more puzzling issubclass(tuple,a) is on my computer it returns False. Why?
-        if issubclass(obj, base_class) and obj is not base_class:
-            return obj
+    class_dir = dir(module)
+    if base_class.__name__ in class_dir:
+        for i in class_dir:
+            obj = getattr(module, i)
+            if isinstance(obj, type) and issubclass(obj, base_class) and obj is not base_class:
+                return getattr(module, i)
+    raise NotImplementedError(base_class.__name__)
 
 
 class Package:

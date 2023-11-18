@@ -1,3 +1,4 @@
+import concurrent.futures
 import re
 from urllib.parse import parse_qs, urlparse
 
@@ -10,7 +11,6 @@ from ._base import BasePlugin
 from ..util.fgi import fgi_dict
 from ..util.fgi_yaml import YamlData
 from ..util.spider import get_json, get_text
-import concurrent.futures
 
 
 class Steam(BasePlugin):

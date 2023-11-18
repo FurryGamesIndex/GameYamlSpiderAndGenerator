@@ -1,10 +1,11 @@
 from pathlib import Path
 
+import time
+
 from gameyamlspiderandgenerator import produce_yaml
 from gameyamlspiderandgenerator.util.config import config
-from gameyamlspiderandgenerator.util.plugin_manager import pkg
 from gameyamlspiderandgenerator.util.fgi_yaml import get_valid_filename
-import time
+from gameyamlspiderandgenerator.util.plugin_manager import pkg
 
 
 def get_time(f):
