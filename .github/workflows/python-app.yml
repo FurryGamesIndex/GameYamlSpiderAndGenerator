@@ -5,6 +5,7 @@ on:
     branches:
       - dev
       - master
+      - dev-c
     paths:
       - '**.py'
       - '**.yml' 
@@ -23,10 +24,10 @@ jobs:
       with:
         path: ~/.cache/pypoetry
         key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
-    - name: Set up Python 3.10
+    - name: Set up Python 3.11
       uses: actions/setup-python@v3
       with:
-        python-version: "3.10"
+        python-version: "3.11"
     - name: Install Poetry
       run: |
         pip install poetry
