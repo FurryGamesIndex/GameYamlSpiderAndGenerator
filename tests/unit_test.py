@@ -9,7 +9,7 @@ from yamlgenerator_hook_validate import Verify
 from gameyamlspiderandgenerator.util.config import config
 from gameyamlspiderandgenerator.util.fgi import template_dict
 
-config.load(Path(__file__).parent / "config.yaml")
+config.load(Path(__file__).parent / "test_config.yaml")
 print(config)
 
 
