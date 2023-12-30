@@ -1,8 +1,3 @@
-class InitializeFailed(Exception):
-    def __init__(self):
-        super().__init__("Failed to initialize")
-
-
 class ReadOrWriteConfigFailed(Exception):
     def __init__(self):
         super().__init__("Failed to read or write config")

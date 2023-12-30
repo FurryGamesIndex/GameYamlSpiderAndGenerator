@@ -45,7 +45,7 @@ class Steam(BasePlugin):
         temp1 = self.soup.body.find_all("a", {"class": "app_tag"})
         self.tag = [re.sub(r"[\n\t\r]*", "", temp1[i].text) for i in range(len(temp1))]
 
-    def to_yaml(self) -> YamlData:
+    def to_yaml(self):
         ret = {
             "name": self.get_name(),
             "brief-description": self.get_brief_desc(),
@@ -61,11 +61,11 @@ class Steam(BasePlugin):
             },
             "links": self.get_links(),
             "thumbnail": self.get_thumbnail(),
-            "screenshots": self.get_screenshots() + self.get_video(),  # type: ignore
+            "screenshots": self.get_screenshots() + self.get_video(),
         }
-        return YamlData(self.__load_hook__(ret))
+        return YamlData(self._load_hook(ret))
 
-    def get_langs(self) -> list[str]:
+    def get_langs(self):
         temp = self.data[str(self.id)]["data"]["supported_languages"].split(",")
         return list({find(i).language for i in temp})
 
@@ -82,7 +82,7 @@ class Steam(BasePlugin):
     def get_brief_desc(self):
         return html2text(self.data[str(self.id)]["data"]["short_description"], bodywidth=0)
 
-    def get_authors(self) -> list[dict]:
+    def get_authors(self):
         temp = self.data[str(self.id)]["data"]
         developers = [{"name": i.strip(), "role": ["producer"]} for i in temp["developers"]]
         publishers = [{"name": i.strip(), "role": ["publisher"]} for i in temp["publishers"]]
@@ -121,7 +121,8 @@ class Steam(BasePlugin):
             ret.extend(value for ii in self.tag if i in ii)
         return list(set(ret))
 
-    def get_tags(self) -> list[str]:
+    @property
+    def get_tags(self):
         return self.tag
 
     def get_misc_tags(self):
@@ -179,7 +180,7 @@ class Steam(BasePlugin):
             for i in range(len(video_webm))
         ]
 
-    def get_links(self) -> list[dict]:
+    def get_links(self):
         def remove_query_string(x: str):
             return parse_qs(urlparse(x).query)["u"][0] if "linkfilter" in x else x
 

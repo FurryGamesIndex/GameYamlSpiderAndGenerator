@@ -1,6 +1,5 @@
 import abc
 import re
-from typing import List
 
 from ..util.fgi_yaml import YamlData
 
@@ -24,7 +23,7 @@ class BasePlugin(abc.ABC):
         return bool(cls._VERIFY_PATTERN.match(url))
 
     @staticmethod
-    def __load_hook__(data: dict):
+    def _load_hook(data: dict):
         """
         加载钩子
 
@@ -74,7 +73,7 @@ class BasePlugin(abc.ABC):
         """
 
     @abc.abstractmethod
-    def get_authors(self) -> List[dict]:
+    def get_authors(self) -> list[dict]:
         """
         获取游戏作者
 
@@ -83,7 +82,7 @@ class BasePlugin(abc.ABC):
         """
 
     @abc.abstractmethod
-    def get_tags(self) -> List[dict]:
+    def get_tags(self) -> list[dict]:
         """
         获取游戏标签
 
@@ -92,7 +91,7 @@ class BasePlugin(abc.ABC):
         """
 
     @abc.abstractmethod
-    def get_misc_tags(self) -> List[dict]:
+    def get_misc_tags(self) -> list[dict]:
         """
         获取游戏其他标签
 
@@ -101,7 +100,7 @@ class BasePlugin(abc.ABC):
         """
 
     @abc.abstractmethod
-    def get_platforms(self) -> List[str]:
+    def get_platforms(self) -> list[str]:
         """
         获取游戏平台
 
@@ -110,7 +109,7 @@ class BasePlugin(abc.ABC):
         """
 
     @abc.abstractmethod
-    def get_langs(self) -> List[str]:
+    def get_langs(self) -> list[str]:
         """
         获取游戏语言
 
@@ -119,7 +118,7 @@ class BasePlugin(abc.ABC):
         """
 
     @abc.abstractmethod
-    def get_links(self) -> List[dict]:
+    def get_links(self) -> list[dict]:
         """
         获取游戏链接
 
@@ -128,7 +127,7 @@ class BasePlugin(abc.ABC):
         """
 
     @abc.abstractmethod
-    def get_screenshots(self) -> List[str]:
+    def get_screenshots(self) -> list[str]:
         """
         获取游戏截图
 

@@ -1,8 +1,8 @@
 import subprocess
+import sys
 import unittest
 from pathlib import Path
 
-import sys
 from yamlgenerator_hook_search import Search
 from yamlgenerator_hook_validate import Verify
 

@@ -1,6 +1,5 @@
-from pathlib import Path
-
 import time
+from pathlib import Path
 
 from gameyamlspiderandgenerator import produce_yaml
 from gameyamlspiderandgenerator.util.config import config

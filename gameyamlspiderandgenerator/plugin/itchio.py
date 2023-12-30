@@ -72,7 +72,7 @@ class ItchIO(BasePlugin):
         platforms = self.more_info["Platforms"] if "Platforms" in self.more_info else ["Windows"]
         return [repl[i.strip()] for i in platforms]
 
-    def get_authors(self) -> list[dict]:
+    def get_authors(self):
         temp = []
         if "Authors" in self.more_info:
             temp = self.more_info["Authors"]
@@ -80,7 +80,7 @@ class ItchIO(BasePlugin):
             temp = self.more_info["Author"]
         return [{"name": i.strip(), "role": ["producer"]} for i in temp]
 
-    def get_tags(self) -> list[str]:
+    def get_tags(self):
         temp = self.more_info["Genre"] if "Genre" in self.more_info else []
         temp1 = self.more_info["Made with"] if "Made with" in self.more_info else []
         temp2 = self.more_info["Tags"] if "Tags" in self.more_info else []
@@ -111,7 +111,7 @@ class ItchIO(BasePlugin):
             ret.extend(value for ii in self.tag if i in ii)
         return list(set(ret))
 
-    def get_langs(self) -> list[str]:
+    def get_langs(self):
         if "Languages" in self.more_info:
             temp = self.more_info["Languages"]
         else:
@@ -119,7 +119,7 @@ class ItchIO(BasePlugin):
 
         return list(set(find(i).language for i in temp))
 
-    def get_links(self) -> list[dict]:
+    def get_links(self):
         link = [i.attrs["href"]
                 for i in self.soup.select_one("div.left_col.column > "
                                               "div.formatted_description.user_formatted").select("a[href]")]
@@ -152,7 +152,7 @@ class ItchIO(BasePlugin):
                 d[temp[0]] = temp[1:][0].split(",")
         return d
 
-    def to_yaml(self) -> YamlData:
+    def to_yaml(self):
         ret = {
             "name": self.get_name(),
             "brief-description": self.get_brief_desc(),
@@ -168,9 +168,9 @@ class ItchIO(BasePlugin):
             },
             "links": self.get_links(),
             "thumbnail": self.get_thumbnail(),
-            "screenshots": self.get_screenshots()  # + self.get_video(),
+            "screenshots": self.get_screenshots()
         }
-        return YamlData(self.__load_hook__(ret))
+        return YamlData(self._load_hook(ret))
 
     def get_type_tag(self):
         repl = {
