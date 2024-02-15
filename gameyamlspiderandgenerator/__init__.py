@@ -1,8 +1,7 @@
 from inspect import signature
 from typing import Callable
 
-from loguru import logger
-
+from .exception import PluginNotLoadedError, InvalidUrlError
 from .plugin import BasePlugin
 from .util.fgi_yaml import YamlData
 from .util.plugin_manager import pkg
@@ -10,7 +9,7 @@ from .util.plugin_manager import pkg
 
 def verify(url: str) -> Callable[..., BasePlugin]:
     if not pkg.plugin:
-        raise Exception("Plugin not yet loaded")
+        raise PluginNotLoadedError
     verify_list = [
         [
             pkg.plugin[n].verify,
@@ -24,8 +23,7 @@ def verify(url: str) -> Callable[..., BasePlugin]:
 def produce_yaml(url: str, lang: str = "en") -> YamlData | None:
     ret = verify(url)
     if ret is None:
-        logger.error("URL is invalid")
-        return
+        raise InvalidUrlError
     if 'lang' in [i.name for i in signature(ret).parameters.values()]:
         return ret(url, lang).to_yaml()
     else:
