@@ -23,7 +23,7 @@ def verify(url: str) -> Callable[..., BasePlugin]:
 def produce_yaml(url: str, lang: str = "en") -> YamlData | None:
     ret = verify(url)
     if ret is None:
-        raise InvalidUrlError
+        raise InvalidUrlError(url)
     if 'lang' in [i.name for i in signature(ret).parameters.values()]:
         return ret(url, lang).to_yaml()
     else:

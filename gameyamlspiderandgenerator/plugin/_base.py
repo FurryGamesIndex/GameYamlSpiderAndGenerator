@@ -20,7 +20,7 @@ class BasePlugin(abc.ABC):
         Returns:
             是否符合要求
         """
-        return bool(cls._VERIFY_PATTERN.match(url))
+        return cls._VERIFY_PATTERN.match(url) is not None
 
     @staticmethod
     def _load_hook(data: dict):

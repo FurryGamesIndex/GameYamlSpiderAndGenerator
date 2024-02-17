@@ -16,7 +16,7 @@ def get_subclasses(module: ModuleType, base_class: Type) -> Type:
             obj = getattr(module, i)
             if isinstance(obj, type) and issubclass(obj, base_class) and obj is not base_class:
                 return getattr(module, i)
-    raise NotImplementedError
+    raise NotImplementedError(base_class.__name__)
 
 
 class Package:
