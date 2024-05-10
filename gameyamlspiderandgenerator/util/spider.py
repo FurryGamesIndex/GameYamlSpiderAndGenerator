@@ -9,7 +9,7 @@ from ..exception import (
 
 class GetResponse:
     """
-    Simple wrapper around requests.get, using context to ensure resources are released properly
+    Simple wrapper around `requests.get`, using context to ensure resources are released properly
 
     Instructions:
      with GetResponse("https://www.example.com/") as resp:
@@ -24,7 +24,7 @@ class GetResponse:
         Args:
              url: URL of the request
              allow_redirects: whether to allow redirection
-             kwargs: Other parameters that should be passed to requests.get, proxies will be added automatically
+             kwargs: Other parameters that should be passed to `requests.get`, proxies will be added automatically
         """
         from ..util.config import config
         if config.api['git_proxy'] and 'raw.githubusercontent.com' in url:

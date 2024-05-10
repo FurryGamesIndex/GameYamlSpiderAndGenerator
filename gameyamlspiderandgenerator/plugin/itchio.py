@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from html2text import html2text
 from langcodes import find
 from py3langid import classify
-
+from bs4.element import Tag
 from ._base import BasePlugin
 from ..util.fgi import fgi_dict
 from ..util.fgi_yaml import YamlData
@@ -143,11 +143,12 @@ class ItchIO(BasePlugin):
 
     def get_more_info(self):
         d = {}
-        for i in range(1, 18):
+        for _ in range(18):
             with suppress(Exception):
                 cache = self.soup.select_one(
-                    f"div.info_panel_wrapper > div > table > tbody > tr:nth-child({str(i)})"
+                    f"div.info_panel_wrapper > div > table > tbody > tr:nth-child({str(_+1)})"
                 )
+                i: Tag
                 temp = [i.get_text() for i in list(cache.children)]
                 d[temp[0]] = temp[1:][0].split(",")
         return d

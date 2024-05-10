@@ -10,6 +10,20 @@ from ..util.config import config
 
 
 def get_subclasses(module: ModuleType, base_class: Type) -> Type:
+    """
+    Get the subclasses of the specified base class from the given module.
+
+    Args:
+        module (ModuleType): The module to search for subclasses.
+        base_class (Type): The base class to find subclasses for.
+
+    Returns:
+        Type: The subclass of the specified base class.
+
+    Raises:
+        NotImplementedError: If the specified base class is not found in the module.
+    """
+
     class_dir = dir(module)
     if base_class.__name__ in class_dir:
         for i in class_dir:

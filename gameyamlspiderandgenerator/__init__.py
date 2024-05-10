@@ -7,7 +7,7 @@ from .util.fgi_yaml import YamlData
 from .util.plugin_manager import pkg
 
 
-def verify(url: str) -> Callable[..., BasePlugin]:
+def verify(url: str) -> Callable[..., BasePlugin] | None:
     if not pkg.plugin:
         raise PluginNotLoadedError
     verify_list = [

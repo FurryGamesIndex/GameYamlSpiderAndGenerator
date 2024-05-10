@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gameyamlspiderandgenerator"
-version = "1.7.6"
+version = "1.7.7"
 description = "A useful tool for generating Furrygameindex yaml files"
 authors = ["kaesinol"]
 license = "MIT"
@@ -28,9 +28,54 @@ yamlgenerator-hook-search = "^0.3.1"
 epicstore-api = "^0.1.7"
 
 
+[[tool.poetry.source]]
+name = "mirrors"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
+priority = "primary"
+
+
+[tool.pdm]
+[tool.pdm.build]
+includes = []
+
+[[tool.pdm.source]]
+name = "mirrors"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
+verify_ssl = true
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
 
 [tool.isort]
 profile = "black"
+
+[project]
+authors = [
+    {name = "kaesinol"},
+]
+license = {text = "MIT"}
+requires-python = "<4.0,>=3.11"
+dependencies = [
+    "langcodes<4.0.0,>=3.3.0",
+    "language-data<2.0,>=1.1",
+    "html2text<2021.0.0,>=2020.1.16",
+    "ruamel-yaml<1.0.0,>=0.17.21",
+    "ruamel-yaml-string<1.0.0,>=0.1.0",
+    "urllib3<2.0.0,>=1.26.14",
+    "beautifulsoup4<5.0.0,>=4.11.1",
+    "pillow<10.0.0,>=9.4.0",
+    "requests<3.0.0,>=2.28.2",
+    "ruamel-base<2.0.0,>=1.0.0",
+    "loguru<1.0.0,>=0.7.0",
+    "pyyaml<7.0,>=6.0",
+    "pysocks<2.0.0,>=1.7.1",
+    "lxml<5.0.0,>=4.9.2",
+    "py3langid<1.0.0,>=0.2.2",
+    "yamlgenerator-hook-validate>=0.1.0",
+    "yamlgenerator-hook-search<1.0.0,>=0.3.1",
+    "epicstore-api<1.0.0,>=0.1.7",
+]
+name = "gameyamlspiderandgenerator"
+version = "1.7.6"
+description = "A useful tool for generating Furrygameindex yaml files"
+readme = "README.md"

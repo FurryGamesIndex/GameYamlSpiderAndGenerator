@@ -32,7 +32,8 @@ class Steam(BasePlugin):
         self.id = self.get_steam_id(link)
         if lang != 'en':
             print(dump(get_json(
-                f'https://store.steampowered.com/api/appdetails?appids={self.id}&l={Language.get(lang).display_name("en").lower()}'),
+                f'https://store.steampowered.com/api/appdetails?appids='
+                f'{self.id}&l={Language.get(lang).display_name("en").lower()}'),
                 allow_unicode=True))
         result = []
         with concurrent.futures.ThreadPoolExecutor() as executor:
