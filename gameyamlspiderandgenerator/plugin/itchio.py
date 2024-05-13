@@ -3,14 +3,15 @@ from contextlib import suppress
 from json import loads
 
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 from html2text import html2text
 from langcodes import find
 from py3langid import classify
-from bs4.element import Tag
-from ._base import BasePlugin
+
 from ..util.fgi import fgi_dict
 from ..util.fgi_yaml import YamlData
 from ..util.spider import get_text
+from . import BasePlugin
 
 
 class ItchIO(BasePlugin):
@@ -51,14 +52,24 @@ class ItchIO(BasePlugin):
         return self.data["name"]
 
     def get_screenshots(self):
-        temp = self.soup.select_one("div.columns > div.right_col.column > div.screenshot_list").select('a')
-        return [i.attrs['href'] for i in temp]
+        temp = self.soup.select_one(
+            "div.columns > div.right_col.column > div.screenshot_list"
+        ).select("a")
+        return [i.attrs["href"] for i in temp]
 
     def get_desc(self):
-        return self.remove_query(html2text(
-            str(self.soup.select_one("div.formatted_description.user_formatted")),
-            bodywidth=0,
-        )).replace("\n" * 3, "\n").strip()
+        return (
+            self.remove_query(
+                html2text(
+                    str(
+                        self.soup.select_one("div.formatted_description.user_formatted")
+                    ),
+                    bodywidth=0,
+                )
+            )
+            .replace("\n" * 3, "\n")
+            .strip()
+        )
 
     def get_platforms(self):
         repl = {
@@ -69,7 +80,11 @@ class ItchIO(BasePlugin):
             "HTML5": "web",
             "iOS": "ios",
         }
-        platforms = self.more_info["Platforms"] if "Platforms" in self.more_info else ["Windows"]
+        platforms = (
+            self.more_info["Platforms"]
+            if "Platforms" in self.more_info
+            else ["Windows"]
+        )
         return [repl[i.strip()] for i in platforms]
 
     def get_authors(self):
@@ -117,12 +132,15 @@ class ItchIO(BasePlugin):
         else:
             return [classify(self.get_desc())[0]]
 
-        return list(set(find(i).language for i in temp))
+        return list({find(i).language for i in temp})
 
     def get_links(self):
-        link = [i.attrs["href"]
-                for i in self.soup.select_one("div.left_col.column > "
-                                              "div.formatted_description.user_formatted").select("a[href]")]
+        link = [
+            i.attrs["href"]
+            for i in self.soup.select_one(
+                "div.left_col.column > " "div.formatted_description.user_formatted"
+            ).select("a[href]")
+        ]
         data = [{"url": i, "processed": False} for i in list(set(link))]
         processed_data = []
         for i in data:
@@ -169,7 +187,7 @@ class ItchIO(BasePlugin):
             },
             "links": self.get_links(),
             "thumbnail": self.get_thumbnail(),
-            "screenshots": self.get_screenshots()
+            "screenshots": self.get_screenshots(),
         }
         return YamlData(self._load_hook(ret))
 
@@ -197,7 +215,7 @@ class ItchIO(BasePlugin):
             "Gore": "gore",
             "Comedy": "comedy",
             "tragedy": "tragedy",
-            "Horror": "horror"
+            "Horror": "horror",
         }
 
         ret = []

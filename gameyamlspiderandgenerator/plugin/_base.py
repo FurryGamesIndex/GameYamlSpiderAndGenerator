@@ -1,6 +1,8 @@
 import abc
 import re
 
+from loguru import logger
+
 from ..util.fgi_yaml import YamlData
 
 
@@ -32,8 +34,12 @@ class BasePlugin(abc.ABC):
         """
         from gameyamlspiderandgenerator.util.plugin_manager import pkg
 
-        for i in pkg.hook.values():
-            data = i().setup(data)
+        for i in pkg.hook:
+            try:
+                data = pkg.hook[i]().setup(data)
+            except Exception as e:
+                logger.warning(f'An error occurred while running the {i} hook')
+                logger.error(str(e))
         return data
 
     @abc.abstractmethod

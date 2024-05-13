@@ -1,6 +1,6 @@
 import importlib
 from types import ModuleType
-from typing import Literal, Type
+from typing import Literal
 
 from loguru import logger
 
@@ -9,7 +9,7 @@ from ..plugin import BasePlugin
 from ..util.config import config
 
 
-def get_subclasses(module: ModuleType, base_class: Type) -> Type:
+def get_subclasses(module: ModuleType, base_class: type) -> type:
     """
     Get the subclasses of the specified base class from the given module.
 
@@ -52,7 +52,7 @@ class Package:
     def _load(
             self,
             _dir: Literal["plugin"],
-            _type: Type[BasePlugin],
+            _type: type[BasePlugin],
     ):
         base = __package__.split(".")[0] + "." + _dir
         for plugin in getattr(config, _dir, []):
@@ -75,13 +75,13 @@ class Package:
 
     def load_hooks(self):
         if config["hook"] is None:
-            logger.warning(f"All hooks are disabled")
+            logger.warning("All hooks are disabled")
             return
         for plugin in getattr(config, "hook", []):
             try:
                 logger.info(f"Loading hook: {plugin}")
                 temp = importlib.import_module(f"yamlgenerator_hook_{plugin}")
-                self["hook"][plugin] = get_subclasses(temp, BaseHook)
+                self["hook"][f"yamlgenerator_hook_{plugin}"] = get_subclasses(temp, BaseHook)
             except ImportError as e:
                 logger.trace(e)
                 logger.error(f"Failed to import hook: {plugin}")

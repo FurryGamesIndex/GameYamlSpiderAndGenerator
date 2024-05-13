@@ -1,6 +1,6 @@
+from ..exception import ReadOrWriteConfigFailed
 from .fgi import default_config
 from .fgi_yaml import fgi
-from ..exception import ReadOrWriteConfigFailed
 
 
 class Config:
@@ -38,7 +38,7 @@ class Config:
             self.__dict__.update(file_data)
             return
         try:
-            with open(file_data, "r", encoding="utf-8") as fp:
+            with open(file_data, encoding="utf-8") as fp:
                 self.__dict__.update(fgi.load(fp))
         except Exception as e:
             raise ReadOrWriteConfigFailed from e

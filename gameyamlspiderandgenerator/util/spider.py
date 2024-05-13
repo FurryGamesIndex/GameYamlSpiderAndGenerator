@@ -2,8 +2,8 @@ import requests
 from requests import JSONDecodeError
 
 from ..exception import (
-    InvalidTargetResourceError,
     InvalidResponse,
+    InvalidTargetResourceError,
 )
 
 

@@ -3,8 +3,8 @@ import zipfile
 from io import BytesIO
 from textwrap import dedent
 
-from PIL import Image
 from loguru import logger
+from PIL import Image
 from ruamel.yaml import YAML
 from ruamel.yaml.scalarstring import PreservedScalarString
 

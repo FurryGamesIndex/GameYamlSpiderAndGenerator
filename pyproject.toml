@@ -1,38 +1,9 @@
-[tool.poetry]
-name = "gameyamlspiderandgenerator"
-version = "1.7.7"
-description = "A useful tool for generating Furrygameindex yaml files"
-authors = ["kaesinol"]
-license = "MIT"
-readme = "README.md"
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
 
-[tool.poetry.dependencies]
-python = "^3.11"
-langcodes = "^3.3.0"
-language-data = "^1.1"
-html2text = "^2020.1.16"
-"ruamel.yaml" = "^0.17.21"
-"ruamel.yaml.string" = "^0.1.0"
-urllib3 = "^1.26.14"
-beautifulsoup4 = "^4.11.1"
-pillow = "^9.4.0"
-requests = "^2.28.2"
-ruamel-base = "^1.0.0"
-loguru = "^0.7.0"
-pyyaml = "^6.0"
-pysocks = "^1.7.1"
-lxml = "^4.9.2"
-py3langid = "^0.2.2"
-yamlgenerator-hook-validate = ">=0.1.0"
-yamlgenerator-hook-search = "^0.3.1"
-epicstore-api = "^0.1.7"
-
-
-[[tool.poetry.source]]
-name = "mirrors"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
-priority = "primary"
-
+[tool.isort]
+profile = "ruff"
 
 [tool.pdm]
 [tool.pdm.build]
@@ -42,13 +13,11 @@ includes = []
 name = "mirrors"
 url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
 verify_ssl = true
-[build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"
 
-[tool.isort]
-profile = "black"
-
+[tool.pdm.dev-dependencies]
+lint = [
+    "ruff>=0.4.4",
+]
 [project]
 authors = [
     {name = "kaesinol"},
@@ -76,6 +45,24 @@ dependencies = [
     "epicstore-api<1.0.0,>=0.1.7",
 ]
 name = "gameyamlspiderandgenerator"
-version = "1.7.6"
+version = "1.7.7"
 description = "A useful tool for generating Furrygameindex yaml files"
 readme = "README.md"
+[tool.ruff]
+select = [
+    "B", # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "E", # pycodestyle - Error
+    "F", # Pyflakes
+    "I", # isort
+    "W", # pycodestyle - Warning
+    "UP", # pyupgrade
+]
+ignore = [
+    "E501", # line-too-long
+    "W191", # tab-indentation
+]
+include = ["**/*.py", "**/*.pyi", "**/pyproject.toml"]
+
+[tool.ruff.pydocstyle]
+convention = "google"

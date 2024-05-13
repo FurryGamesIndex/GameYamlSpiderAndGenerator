@@ -12,7 +12,7 @@ def get_time(f):
         s_time = time.time()
         res = f(*arg, **kwarg)
         e_time = time.time()
-        print('耗时：{:.2f}秒'.format(e_time - s_time))
+        print(f'耗时：{e_time - s_time:.2f}秒')
         return res
 
     return inner

@@ -4,13 +4,13 @@ from urllib.parse import parse_qs, urlparse
 
 from bs4 import BeautifulSoup
 from html2text import html2text
-from langcodes import find, Language
+from langcodes import Language, find
 from yaml import dump
 
-from ._base import BasePlugin
 from ..util.fgi import fgi_dict
 from ..util.fgi_yaml import YamlData
 from ..util.spider import get_json, get_text
+from . import BasePlugin
 
 
 class Steam(BasePlugin):
@@ -28,17 +28,26 @@ class Steam(BasePlugin):
         s = re.sub(r"\?t=\d{6,12}", "", s)
         return s.replace("![]", "![img]")
 
-    def __init__(self, link: str, lang: str = 'en') -> None:
+    def __init__(self, link: str, lang: str = "en") -> None:
         self.id = self.get_steam_id(link)
-        if lang != 'en':
-            print(dump(get_json(
-                f'https://store.steampowered.com/api/appdetails?appids='
-                f'{self.id}&l={Language.get(lang).display_name("en").lower()}'),
-                allow_unicode=True))
+        if lang != "en":
+            print(
+                dump(
+                    get_json(
+                        f'https://store.steampowered.com/api/appdetails?appids='
+                        f'{self.id}&l={Language.get(lang).display_name("en").lower()}'
+                    ),
+                    allow_unicode=True,
+                )
+            )
         result = []
         with concurrent.futures.ThreadPoolExecutor() as executor:
             result.append(
-                executor.submit(get_json, f"https://store.steampowered.com/api/appdetails?appids={self.id}&l=english"))
+                executor.submit(
+                    get_json,
+                    f"https://store.steampowered.com/api/appdetails?appids={self.id}&l=english",
+                )
+            )
             result.append(executor.submit(get_text, link))
         self.data, self.data_html = (result[0].result(), result[1].result())
         self.soup = BeautifulSoup(self.data_html, "lxml")
@@ -71,22 +80,30 @@ class Steam(BasePlugin):
         return list({find(i).language for i in temp})
 
     def get_desc(self):
-        return self.remove_query(
-            (
+        return (
+            self.remove_query(
                 html2text(
                     self.data[str(self.id)]["data"]["detailed_description"],
                     bodywidth=0,
                 )
             )
-        ).replace("\n" * 4, "\n").strip()
+            .replace("\n" * 4, "\n")
+            .strip()
+        )
 
     def get_brief_desc(self):
-        return html2text(self.data[str(self.id)]["data"]["short_description"], bodywidth=0)
+        return html2text(
+            self.data[str(self.id)]["data"]["short_description"], bodywidth=0
+        )
 
     def get_authors(self):
         temp = self.data[str(self.id)]["data"]
-        developers = [{"name": i.strip(), "role": ["producer"]} for i in temp["developers"]]
-        publishers = [{"name": i.strip(), "role": ["publisher"]} for i in temp["publishers"]]
+        developers = [
+            {"name": i.strip(), "role": ["producer"]} for i in temp["developers"]
+        ]
+        publishers = [
+            {"name": i.strip(), "role": ["publisher"]} for i in temp["publishers"]
+        ]
         return developers + publishers
 
     def get_platforms(self):
@@ -147,8 +164,8 @@ class Steam(BasePlugin):
 
     def get_if_nsfw(self):
         return (
-                self.soup.body.find_all("div", {"id": "game_area_content_descriptors"})
-                != []
+            self.soup.body.find_all("div", {"id": "game_area_content_descriptors"})
+            != []
         )
 
     def get_screenshots(self):
@@ -169,9 +186,14 @@ class Steam(BasePlugin):
         ]
         return [
             {
-                "video": [{"mime": "video/webm", "sensitive": is_nsfw, "uri": video_webm[i], },
-                          {"mime": "video/mp4", "sensitive": is_nsfw, "uri": video_mp4[i]},
-                          ]
+                "video": [
+                    {
+                        "mime": "video/webm",
+                        "sensitive": is_nsfw,
+                        "uri": video_webm[i],
+                    },
+                    {"mime": "video/mp4", "sensitive": is_nsfw, "uri": video_mp4[i]},
+                ]
                 if is_nsfw
                 else [
                     {"mime": "video/webm", "uri": video_webm[i]},
@@ -215,7 +237,7 @@ class Steam(BasePlugin):
         for i in data:
             if not i["processed"]:
                 processed_data.append({"name": ".website", "uri": i["url"]})
-        processed_data.append({"name": ".steam", "uri": f'steam:{self.id}'})
+        processed_data.append({"name": ".steam", "uri": f"steam:{self.id}"})
         return processed_data
 
     def get_thumbnail(self):

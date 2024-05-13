@@ -1,7 +1,7 @@
+from collections.abc import Callable
 from inspect import signature
-from typing import Callable
 
-from .exception import PluginNotLoadedError, InvalidUrlError
+from .exception import InvalidUrlError, PluginNotLoadedError
 from .plugin import BasePlugin
 from .util.fgi_yaml import YamlData
 from .util.plugin_manager import pkg
