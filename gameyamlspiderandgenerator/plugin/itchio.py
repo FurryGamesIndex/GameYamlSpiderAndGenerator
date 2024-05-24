@@ -209,7 +209,7 @@ class ItchIO(BasePlugin):
             "MMORPG": "mmorpg",
             "Dating Sim": "dating-sim",
             "Roguelike": "roguelike",
-            "Sports": "Sports",
+            "Sports": "sports",
             "Bara": "bara",
             "Yuri": "yuri",
             "Gore": "gore",
