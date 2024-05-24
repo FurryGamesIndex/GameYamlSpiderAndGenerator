@@ -1,3 +1,6 @@
+![](https://github.com/FurryGamesIndex/GameYamlSpiderAndGenerator/actions/workflows/Test%20Default%20Hooks.yml/badge.svg)
+![](https://github.com/FurryGamesIndex/GameYamlSpiderAndGenerator/actions/workflows/Test%20Main%20Program.yml/badge.svg)
+
 # Quick Start
 
 ## Install
