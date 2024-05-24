@@ -34,7 +34,7 @@ class Config:
         Returns:
 
         """
-        if type(file_data) is dict:
+        if type(file_data) is dict:  # noqa: E721
             self.__dict__.update(file_data)
             return
         try:

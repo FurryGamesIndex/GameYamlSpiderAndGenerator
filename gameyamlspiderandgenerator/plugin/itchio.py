@@ -3,7 +3,6 @@ from contextlib import suppress
 from json import loads
 
 from bs4 import BeautifulSoup
-from bs4.element import Tag
 from html2text import html2text
 from langcodes import find
 from py3langid import classify
@@ -166,8 +165,7 @@ class ItchIO(BasePlugin):
                 cache = self.soup.select_one(
                     f"div.info_panel_wrapper > div > table > tbody > tr:nth-child({str(_+1)})"
                 )
-                i: Tag
-                temp = [i.get_text() for i in list(cache.children)]
+                temp = [i.get_text() for i in list(cache.children)] # noqa
                 d[temp[0]] = temp[1:][0].split(",")
         return d
 

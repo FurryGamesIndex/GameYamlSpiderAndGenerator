@@ -1,4 +1,4 @@
-name: Python application
+name: Test Default Hooks
 
 on:
   push:
@@ -37,4 +37,4 @@ jobs:
           pdm install
       - name: Test with unittest
         run: |
-          pdm run python -m unittest tests.unit_test
+          pdm run python -m unittest tests.hook_test
