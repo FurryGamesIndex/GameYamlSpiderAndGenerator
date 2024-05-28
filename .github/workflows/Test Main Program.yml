@@ -18,11 +18,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Install dependencies
+      - name: Setup PDM
         uses: pdm-project/setup-pdm@v3
         with:
           python-version: 3.11
           cache: true
+      - name: Install dependencies
         run: pdm install
       - name: Test with unittest
         run: |
