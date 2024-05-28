@@ -17,11 +17,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
       - name: Install dependencies
         uses: pdm-project/setup-pdm@v3
         with:
           python-version: 3.11
           cache: true
+        run: pdm install
       - name: Test with unittest
         run: |
           pdm run python -m unittest tests.unit_test
