@@ -69,6 +69,7 @@ class Steam(BasePlugin):
                 "publish": ["steam"],
                 "misc": self.get_misc_tags(),
             },
+            "links": self.get_links(),
             "thumbnail": self.get_thumbnail(),
             "screenshots": self.get_screenshots() + self.get_video(),
         }

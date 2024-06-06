@@ -7,6 +7,7 @@ from gameyamlspiderandgenerator.util.config import config
 
 config.load(Path(__file__).parent / "test_config.yaml")
 print(config)
+print("*" * 10)
 
 
 class CliUnitTest(unittest.TestCase):
@@ -44,6 +45,7 @@ class SpiderUnitTest(unittest.TestCase):
 
     def test_spider(self):
         from gameyamlspiderandgenerator.util.spider import get_bytes, get_text
+
         self.assertIsInstance(get_bytes("https://example.com/"), bytes)
         self.assertIsInstance(get_text("https://example.com/"), str)
 

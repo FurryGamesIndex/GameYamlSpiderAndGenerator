@@ -1,11 +1,8 @@
-from dataclasses import dataclass
-
 from fgi_yaml_formattor import fgi
 
 from ..exception import ReadOrWriteConfigFailed
 
 
-@dataclass
 class Config:
     proxy = {}
     api = {}
@@ -40,6 +37,9 @@ class Config:
 
     def update(self, data: dict):
         self.__dict__.update(data)
+
+    def __str__(self):
+        return fgi.dumps(self.__dict__)
 
 
 config = Config()
