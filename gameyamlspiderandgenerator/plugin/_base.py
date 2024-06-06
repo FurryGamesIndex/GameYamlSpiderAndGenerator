@@ -3,7 +3,7 @@ import re
 
 from loguru import logger
 
-from ..util.fgi_yaml import YamlData
+from ..data_types import YamlData
 
 
 class BasePlugin(abc.ABC):

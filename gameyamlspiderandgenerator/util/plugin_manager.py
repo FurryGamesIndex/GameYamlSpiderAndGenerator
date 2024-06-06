@@ -28,7 +28,11 @@ def get_subclasses(module: ModuleType, base_class: type) -> type:
     if base_class.__name__ in class_dir:
         for i in class_dir:
             obj = getattr(module, i)
-            if isinstance(obj, type) and issubclass(obj, base_class) and obj is not base_class:
+            if (
+                isinstance(obj, type)
+                and issubclass(obj, base_class)
+                and obj is not base_class
+            ):
                 return getattr(module, i)
     raise NotImplementedError(base_class.__name__)
 
@@ -50,9 +54,9 @@ class Package:
         self.__setattr__(key, value)
 
     def _load(
-            self,
-            _dir: Literal["plugin"],
-            _type: type[BasePlugin],
+        self,
+        _dir: Literal["plugin"],
+        _type: type[BasePlugin],
     ):
         base = __package__.split(".")[0] + "." + _dir
         for plugin in getattr(config, _dir, []):
@@ -74,14 +78,16 @@ class Package:
         self._load("plugin", BasePlugin)
 
     def load_hooks(self):
-        if config["hook"] is None:
+        if config.hook is None:
             logger.warning("All hooks are disabled")
             return
-        for plugin in getattr(config, "hook", []):
+        for plugin in config.hook:
             try:
                 logger.info(f"Loading hook: {plugin}")
                 temp = importlib.import_module(f"yamlgenerator_hook_{plugin}")
-                self["hook"][f"yamlgenerator_hook_{plugin}"] = get_subclasses(temp, BaseHook)
+                self["hook"][f"yamlgenerator_hook_{plugin}"] = get_subclasses(
+                    temp, BaseHook
+                )
             except ImportError as e:
                 logger.trace(e)
                 logger.error(f"Failed to import hook: {plugin}")

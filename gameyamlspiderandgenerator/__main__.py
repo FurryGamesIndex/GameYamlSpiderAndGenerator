@@ -1,7 +1,9 @@
 import argparse
+import sys
 
 from loguru import logger
 from yaml import safe_load
+from typing import TextIO
 
 from gameyamlspiderandgenerator import produce_yaml
 
@@ -10,7 +12,15 @@ from .util.fgi import default_config
 from .util.fgi_yaml import get_valid_filename
 from .util.plugin_manager import pkg
 
+logger.remove()
+
 parser = argparse.ArgumentParser()
+parser.add_argument(
+    "-d",
+    "--debug",
+    action="store_true",
+    default=False,
+)
 parser.add_argument(
     "-f",
     "--config",
@@ -28,24 +38,30 @@ parser.add_argument(
 parser.add_argument(
     "--lang",
     type=str,
-    default='en',
+    default="en",
     help="The display language of the game. ISO 639-1 code(default: en)",
 )
 parser.add_argument(
     "--fast",
-    action='store_true',
+    action="store_true",
     default=False,
     help="Whether to disable all hooks (default: false)",
 )
 parser.add_argument("url", metavar="URL")
 args = parser.parse_args()
+log_data: TextIO | None = None
+if args.debug:
+    logger.add(sys.stdout, level="DEBUG")
+    logger.add(log_data, level="DEBUG")
+else:
+    logger.add(sys.stdout, level="WARNING")
 if isinstance(args.config, str):
     with open(args.config) as f:
         setting = safe_load(f)
 else:
     setting = args.config
 if args.fast:
-    setting['hook'] = None
+    setting["hook"] = None
 config.update(setting)
 pkg.init()
 yml = produce_yaml(args.url, args.lang)
@@ -56,17 +72,18 @@ if args.output is None:
         exit(2)
 elif "." not in args.output:
     if args.output == "zip":
-        with open(get_valid_filename(yml.raw_dict['name']) + ".zip", 'wb') as f:
+        with open(get_valid_filename(yml.raw_dict["name"]) + ".zip", "wb") as f:
+            yml.meta_data.log = log_data.read()
             f.write(bytes(yml))
     elif args.output == "yaml":
-        with open(get_valid_filename(yml.raw_dict['name']) + ".yaml", 'w') as f:
+        with open(get_valid_filename(yml.raw_dict["name"]) + ".yaml", "w") as f:
             f.write(str(yml))
 elif "." in args.output:
     if "zip" in args.output:
-        with open(args.output, 'wb') as f:
+        with open(args.output, "wb") as f:
             f.write(bytes(yml))
     elif "yaml" in args.output:
-        with open(args.output, 'w') as f:
+        with open(args.output, "w") as f:
             f.write(str(yml))
     else:
         logger.error(f"unsupported file format: {args.output[args.output.rfind('.'):]}")

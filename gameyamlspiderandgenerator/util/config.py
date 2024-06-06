@@ -1,24 +1,19 @@
+from dataclasses import dataclass
+
+from fgi_yaml_formattor import fgi
+
 from ..exception import ReadOrWriteConfigFailed
-from .fgi import default_config
-from .fgi_yaml import fgi
 
 
+@dataclass
 class Config:
     proxy = {}
     api = {}
     plugin = {}
     hook = {}
 
-    def __init__(self):
-        self.__dict__.update(default_config)
-
     def __getitem__(self, item):
-        # Compatibility with the old version
         return self.__getattribute__(item)
-
-    def __setitem__(self, key, value):
-        # Compatibility with the old version
-        self.__setattr__(key, value)
 
     def load(self, file_data: str | dict = None):
         """
@@ -45,12 +40,6 @@ class Config:
 
     def update(self, data: dict):
         self.__dict__.update(data)
-
-    def __str__(self):
-        fgi.preserve_quotes = True
-        fgi.explicit_start = True
-        fgi.indent = 1
-        return fgi.dump_to_string(self.__dict__)
 
 
 config = Config()

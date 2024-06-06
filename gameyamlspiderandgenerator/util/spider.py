@@ -27,12 +27,13 @@ class GetResponse:
              kwargs: Other parameters that should be passed to `requests.get`, proxies will be added automatically
         """
         from ..util.config import config
-        if config.api['git_proxy'] and 'raw.githubusercontent.com' in url:
-            self.url = config.api['git_proxy'] + url
+
+        if config.api["git_proxy"] and "raw.githubusercontent.com" in url:
+            self.url = config.api["git_proxy"] + url
         else:
             self.url = url
         self.args = {
-            "proxies": config["proxy"],
+            "proxies": config.proxy,
             "allow_redirects": allow_redirects,
             **kwargs,
         }
@@ -71,7 +72,9 @@ class GetResponse:
         Returns:
              str
         """
-        return self.response.text.encode(self.response.encoding).decode(self.response.apparent_encoding)
+        return self.response.text.encode(self.response.encoding).decode(
+            self.response.apparent_encoding
+        )
 
     @property
     def bytes(self):

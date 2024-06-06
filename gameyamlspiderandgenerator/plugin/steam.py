@@ -7,8 +7,8 @@ from html2text import html2text
 from langcodes import Language, find
 from yaml import dump
 
+from .. import YamlData
 from ..util.fgi import fgi_dict
-from ..util.fgi_yaml import YamlData
 from ..util.spider import get_json, get_text
 from . import BasePlugin
 
@@ -69,7 +69,6 @@ class Steam(BasePlugin):
                 "publish": ["steam"],
                 "misc": self.get_misc_tags(),
             },
-            "links": self.get_links(),
             "thumbnail": self.get_thumbnail(),
             "screenshots": self.get_screenshots() + self.get_video(),
         }
