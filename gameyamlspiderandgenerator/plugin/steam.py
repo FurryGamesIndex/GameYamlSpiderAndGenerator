@@ -5,7 +5,6 @@ from urllib.parse import parse_qs, urlparse
 from bs4 import BeautifulSoup
 from html2text import html2text
 from langcodes import Language, find
-from yaml import dump
 
 from .. import YamlData
 from ..util.fgi import fgi_dict
@@ -21,7 +20,11 @@ class Steam(BasePlugin):
         return int(urlparse(link).path.split("/")[2])
 
     def get_name(self):
-        return self.data[str(self.id)]["data"]["name"]
+        return (
+            self.data[str(self.id)]["data"]["name"]
+            if self.lang == "en"
+            else self.lang[3]
+        )
 
     @staticmethod
     def remove_query(s: str):
@@ -30,16 +33,20 @@ class Steam(BasePlugin):
 
     def __init__(self, link: str, lang: str = "en") -> None:
         self.id = self.get_steam_id(link)
-        if lang != "en":
-            print(
-                dump(
-                    get_json(
-                        f'https://store.steampowered.com/api/appdetails?appids='
-                        f'{self.id}&l={Language.get(lang).display_name("en").lower()}'
-                    ),
-                    allow_unicode=True,
-                )
-            )
+        self.json = get_json(
+            f"https://store.steampowered.com/api/appdetails?appids="
+            f"{self.id}&l={Language.get(lang).display_name('en').lower()}"
+        )[str(self.id)]
+        self.lang = (
+            lang,
+            self.json["data"]["detailed_description"],
+            self.json["data"]["short_description"],
+            self.json["data"]["name"],
+        )
+        print(
+            f"https://store.steampowered.com/api/appdetails?appids="
+            f"{self.id}&l={Language.get(lang).display_name('en').lower()}"
+        )
         result = []
         with concurrent.futures.ThreadPoolExecutor() as executor:
             result.append(
@@ -86,6 +93,11 @@ class Steam(BasePlugin):
                     self.data[str(self.id)]["data"]["detailed_description"],
                     bodywidth=0,
                 )
+                if self.lang[0] == "en"
+                else html2text(
+                    self.lang[1],
+                    bodywidth=0,
+                )
             )
             .replace("\n" * 4, "\n")
             .strip()
@@ -93,7 +105,10 @@ class Steam(BasePlugin):
 
     def get_brief_desc(self):
         return html2text(
-            self.data[str(self.id)]["data"]["short_description"], bodywidth=0
+            self.data[str(self.id)]["data"]["short_description"]
+            if self.lang[0] == "en"
+            else self.lang[2],
+            bodywidth=0,
         )
 
     def get_authors(self):
@@ -218,11 +233,18 @@ class Steam(BasePlugin):
             for i in temp2
             if "data-tooltip-text" in i.attrs
         ]
+        temp5: str | None = self.json["data"]["website"]
+        if temp5:
+            temp5 = temp5.replace(r"\/", "\\")
         temp = temp1.select("a[href]")
         ret = []
         for i in temp:
             ret.append(remove_query_string(i.attrs["href"]))
-        data = [{"url": i, "processed": False} for i in list(set(ret + temp4))]
+
+        data = [
+            {"url": i, "processed": False}
+            for i in list(set(ret + temp4 + [temp5] if temp5 else []))
+        ]
         processed_data = []
         for i in data:
             for p in fgi_dict:
