@@ -11,8 +11,8 @@ version("gameyamlspiderandgenerator")
 
 def verify(url: str) -> Callable[..., BasePlugin] | None:
     if not pkg.plugin:
-        _ = PluginNotLoadedError
-        _.add_note("Did you forget to use pkg.init()?")
+        _ = PluginNotLoadedError()
+        _.add_note("Did you forget to use config.load()?")
         raise _
     verify_list = [
         [
