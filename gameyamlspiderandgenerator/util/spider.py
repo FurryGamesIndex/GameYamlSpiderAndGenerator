@@ -1,4 +1,5 @@
 import requests
+from loguru import logger
 from requests import JSONDecodeError
 
 from ..exception import (
@@ -37,6 +38,8 @@ class GetResponse:
             "allow_redirects": allow_redirects,
             **kwargs,
         }
+        if len(self.args) != 2:
+            logger.debug(self.args)
 
     def __enter__(self):
         self.response = requests.get(self.url, **self.args)
@@ -81,16 +84,16 @@ class GetResponse:
         return self.response.content
 
 
-def get_json(url: str) -> dict:
-    with GetResponse(url) as resp:
+def get_json(url: str, **kwargs) -> dict:
+    with GetResponse(url, **kwargs) as resp:
         return resp.json
 
 
-def get_text(url: str) -> str:
-    with GetResponse(url) as resp:
+def get_text(url: str, **kwargs) -> str:
+    with GetResponse(url, **kwargs) as resp:
         return resp.text
 
 
-def get_bytes(url: str) -> bytes:
-    with GetResponse(url) as resp:
+def get_bytes(url: str, **kwargs) -> bytes:
+    with GetResponse(url, **kwargs) as resp:
         return resp.bytes

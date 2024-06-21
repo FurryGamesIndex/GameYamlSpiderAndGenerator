@@ -1,12 +1,12 @@
 import argparse
 import sys
+from importlib.metadata import version
+from typing import TextIO
 
 from loguru import logger
 from yaml import safe_load
-from typing import TextIO
 
 from gameyamlspiderandgenerator import produce_yaml
-
 from .util.config import config
 from .util.fgi import default_config
 from .util.fgi_yaml import get_valid_filename
@@ -51,10 +51,9 @@ parser.add_argument("url", metavar="URL")
 args = parser.parse_args()
 log_data: TextIO | None = None
 if args.debug:
+    logger.remove()
     logger.add(sys.stdout, level="DEBUG")
-    logger.add(log_data, level="DEBUG")
-else:
-    logger.add(sys.stdout, level="WARNING")
+logger.debug("version:" + version("gameyamlspiderandgenerator"))
 if isinstance(args.config, str):
     with open(args.config) as f:
         setting = safe_load(f)

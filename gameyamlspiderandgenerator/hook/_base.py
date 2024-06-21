@@ -3,6 +3,7 @@ import abc
 
 class BaseHook(abc.ABC):
     """钩子基类"""
+
     CHANGED: list | None
 
     @abc.abstractmethod

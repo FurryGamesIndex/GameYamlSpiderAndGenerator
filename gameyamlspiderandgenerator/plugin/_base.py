@@ -3,7 +3,7 @@ import re
 
 from loguru import logger
 
-from ..data_types import YamlData
+from gameyamlspiderandgenerator.util.fgi_yaml import YamlData
 
 
 class BasePlugin(abc.ABC):
@@ -38,7 +38,7 @@ class BasePlugin(abc.ABC):
             try:
                 data = pkg.hook[i]().setup(data)
             except Exception as e:
-                logger.warning(f'An error occurred while running the {i} hook')
+                logger.warning(f"An error occurred while running the {i} hook")
                 logger.error(str(e))
         return data
 

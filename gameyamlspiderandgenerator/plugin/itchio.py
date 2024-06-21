@@ -7,9 +7,8 @@ from html2text import html2text
 from langcodes import find
 from py3langid import classify
 
-from .. import BasePlugin
+from .. import BasePlugin, YamlData
 from ..util.fgi import fgi_dict
-from ..data_types import YamlData
 from ..util.spider import get_text
 
 
@@ -163,7 +162,7 @@ class ItchIO(BasePlugin):
         for _ in range(18):
             with suppress(Exception):
                 cache = self.soup.select_one(
-                    f"div.info_panel_wrapper > div > table > tbody > tr:nth-child({str(_+1)})"
+                    f"div.info_panel_wrapper > div > table > tbody > tr:nth-child({str(_ + 1)})"
                 )
                 temp = [i.get_text() for i in list(cache.children)]  # noqa
                 d[temp[0]] = temp[1:][0].split(",")

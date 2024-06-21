@@ -5,11 +5,11 @@ from urllib.parse import parse_qs, urlparse
 from bs4 import BeautifulSoup
 from html2text import html2text
 from langcodes import Language, find
+from loguru import logger
 
-from .. import YamlData
+from .. import BasePlugin, YamlData
 from ..util.fgi import fgi_dict
 from ..util.spider import get_json, get_text
-from . import BasePlugin
 
 
 class Steam(BasePlugin):
@@ -35,7 +35,8 @@ class Steam(BasePlugin):
         self.id = self.get_steam_id(link)
         self.json = get_json(
             f"https://store.steampowered.com/api/appdetails?appids="
-            f"{self.id}&l={Language.get(lang).display_name('en').lower()}"
+            f"{self.id}&l={Language.get(lang).display_name('en').lower()}",
+            headers={"Accept-Language": lang, "Content-Language": lang},
         )[str(self.id)]
         self.lang = (
             lang,
@@ -43,7 +44,7 @@ class Steam(BasePlugin):
             self.json["data"]["short_description"],
             self.json["data"]["name"],
         )
-        print(
+        logger.debug(
             f"https://store.steampowered.com/api/appdetails?appids="
             f"{self.id}&l={Language.get(lang).display_name('en').lower()}"
         )

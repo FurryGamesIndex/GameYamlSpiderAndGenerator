@@ -43,7 +43,6 @@ dependencies = [
     "yamlgenerator-hook-validate>=0.1.0",
     "yamlgenerator-hook-search>=0.3.1",
     "epicstore-api>=0.1.7",
-    "msgpack>=1.0.8",
     "deepdiff>=7.0.1",
     "FGI-YAML-Formattor>=0.1.0",
 ]

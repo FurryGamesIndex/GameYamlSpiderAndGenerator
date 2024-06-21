@@ -1,12 +1,20 @@
+import sys
 from collections.abc import Callable
 from inspect import signature
-from importlib.metadata import version
+
+from loguru import logger
+
+
 from .exception import InvalidUrlError, PluginNotLoadedError
 from .plugin import BasePlugin
-from .data_types import YamlData
+from .util.fgi_yaml import YamlData
 from .util.plugin_manager import pkg
 
-version("gameyamlspiderandgenerator")
+logger.remove()
+logger.add(
+    sys.stdout,
+    level="WARNING",
+)
 
 
 def verify(url: str) -> Callable[..., BasePlugin] | None:

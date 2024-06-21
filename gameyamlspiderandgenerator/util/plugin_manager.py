@@ -1,6 +1,5 @@
 import importlib
 from types import ModuleType
-from typing import Literal
 
 from loguru import logger
 
@@ -9,7 +8,7 @@ from ..plugin import BasePlugin
 from ..util.config import config
 
 
-def get_subclasses(module: ModuleType, base_class: type) -> type:
+def get_subclasses(module: ModuleType, base_class: type) -> [BasePlugin, BaseHook]:
     """
     Get the subclasses of the specified base class from the given module.
 
@@ -53,29 +52,21 @@ class Package:
         # Compatibility with the old version
         self.__setattr__(key, value)
 
-    def _load(
-        self,
-        _dir: Literal["plugin"],
-        _type: type[BasePlugin],
-    ):
-        base = __package__.split(".")[0] + "." + _dir
-        for plugin in getattr(config, _dir, []):
-            if plugin.startswith("_"):
-                logger.warning(f"Skip loading protected {_dir} {plugin}")
-                continue
+    def load_plugins(self):
+        for plugin in config.plugin:
             try:
-                package = f"{base}.{plugin}"
-                logger.info(f"Loading {_dir}: {plugin}")
-                temp = importlib.import_module(package)
-                self[_dir][plugin] = get_subclasses(temp, BasePlugin)
+                logger.info(f"Loading plugin: {plugin}")
+                temp = importlib.import_module(
+                    f"gameyamlspiderandgenerator.plugin.{plugin}"
+                )
+                self.plugin[f"gameyamlspiderandgenerator.plugin.{plugin}"] = (
+                    get_subclasses(temp, BasePlugin)
+                )
             except ImportError as e:
                 logger.trace(e)
-                logger.error(f"Failed to import {_dir}: {plugin}")
+                logger.error(f"Failed to import plugin: {plugin}")
             except NotImplementedError:
-                logger.error(f"Imported {_dir} but no {_type.__name__} found: {plugin}")
-
-    def load_plugins(self):
-        self._load("plugin", BasePlugin)
+                logger.error(f"Imported plugin but no BasePlugin found: {plugin}")
 
     def load_hooks(self):
         if config.hook is None:
@@ -85,7 +76,7 @@ class Package:
             try:
                 logger.info(f"Loading hook: {plugin}")
                 temp = importlib.import_module(f"yamlgenerator_hook_{plugin}")
-                self["hook"][f"yamlgenerator_hook_{plugin}"] = get_subclasses(
+                self.hook[f"yamlgenerator_hook_{plugin}"] = get_subclasses(
                     temp, BaseHook
                 )
             except ImportError as e:
