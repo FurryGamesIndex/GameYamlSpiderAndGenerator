@@ -72,9 +72,9 @@ else:
     setting = args.config
 if args.fast:
     setting["hook"] = None
+config.update(setting)
 if args.proxy:
     config.proxy = {"http": args.proxy, "https": args.proxy}
-config.update(setting)
 pkg.init()
 yml = produce_yaml(args.url, args.lang)
 if args.output is None:
