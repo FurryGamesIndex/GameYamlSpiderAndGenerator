@@ -34,6 +34,10 @@ parser.add_argument(
     help="The location of config.yaml (default null)",
 )
 parser.add_argument(
+    "--proxy",
+    type=str,
+)
+parser.add_argument(
     "-o",
     "--output",
     type=str,
@@ -59,6 +63,7 @@ if args.debug:
     logger.add(sys.stdout, level="DEBUG")
 if args.silent:
     logger.remove()
+logger.debug(sys.version)
 logger.debug("version:" + version("gameyamlspiderandgenerator"))
 if isinstance(args.config, str):
     with open(args.config) as f:
@@ -67,6 +72,8 @@ else:
     setting = args.config
 if args.fast:
     setting["hook"] = None
+if args.proxy:
+    config.proxy = {"http": args.proxy, "https": args.proxy}
 config.update(setting)
 pkg.init()
 yml = produce_yaml(args.url, args.lang)
