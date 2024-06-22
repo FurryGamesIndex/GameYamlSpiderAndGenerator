@@ -3,6 +3,7 @@ from types import ModuleType
 
 from loguru import logger
 
+from ..exception import ApiKeyNotFoundError
 from ..hook import BaseHook
 from ..plugin import BasePlugin
 from ..util.config import config
@@ -79,6 +80,11 @@ class Package:
                 self.hook[f"yamlgenerator_hook_{plugin}"] = get_subclasses(
                     temp, BaseHook
                 )
+                if (
+                    self.hook[f"yamlgenerator_hook_{plugin}"].REQUIRE_CONFIG
+                    and plugin not in config["hook_configs"]
+                ):
+                    raise ApiKeyNotFoundError(f"yamlgenerator_hook_{plugin}")
             except ImportError as e:
                 logger.trace(e)
                 logger.error(f"Failed to import hook: {plugin}")

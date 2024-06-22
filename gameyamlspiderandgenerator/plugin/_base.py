@@ -1,5 +1,6 @@
 import abc
 import re
+import traceback
 
 from loguru import logger
 
@@ -38,8 +39,10 @@ class BasePlugin(abc.ABC):
             try:
                 data = pkg.hook[i]().setup(data)
             except Exception as e:
-                logger.warning(f"An error occurred while running the {i} hook")
-                logger.error(str(e))
+                logger.warning(
+                    rf"An {type(e).__name__} error occurred while running the {i} hook. (Use --debug for more details)"
+                )
+                logger.debug(traceback.format_exc())
         return data
 
     @abc.abstractmethod

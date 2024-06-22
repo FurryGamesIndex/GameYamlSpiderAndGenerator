@@ -2,8 +2,14 @@ class GenerateError(Exception):
     pass
 
 
+class ApiKeyNotFoundError(GenerateError):
+    def __init__(self, hook: str):
+        super().__init__(f"The {hook} hook API key is required but not configured.")
+
+
 class PluginNotLoadedError(GenerateError):
-    pass
+    def __init__(self):
+        super().__init__("Did you forget to use config.load()?")
 
 
 class InvalidUrlError(GenerateError):
@@ -11,8 +17,7 @@ class InvalidUrlError(GenerateError):
 
 
 class ReadOrWriteConfigFailed(GenerateError):
-    def __init__(self):
-        super().__init__("Failed to read or write config")
+    pass
 
 
 class InvalidTargetResourceError(GenerateError):

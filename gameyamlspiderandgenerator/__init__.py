@@ -16,9 +16,7 @@ logger.add(sys.stdout, level="WARNING")
 
 def verify(url: str) -> Callable[..., BasePlugin] | None:
     if not pkg.plugin:
-        _ = PluginNotLoadedError()
-        _.add_note("Did you forget to use config.load()?")
-        raise _
+        raise PluginNotLoadedError
     verify_list = [
         [
             pkg.plugin[n].verify,

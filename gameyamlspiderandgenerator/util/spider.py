@@ -30,7 +30,7 @@ class GetResponse:
         from ..util.config import config
 
         logger.debug(url)
-        if config.api["git_proxy"] and "raw.githubusercontent.com" in url:
+        if config["git_proxy"] and "raw.githubusercontent.com" in url:
             self.url = config.api["git_proxy"] + url
         else:
             self.url = url
