@@ -11,10 +11,7 @@ from .util.fgi_yaml import YamlData
 from .util.plugin_manager import pkg
 
 logger.remove()
-logger.add(
-    sys.stdout,
-    level="WARNING",
-)
+logger.add(sys.stdout, level="WARNING")
 
 
 def verify(url: str) -> Callable[..., BasePlugin] | None:

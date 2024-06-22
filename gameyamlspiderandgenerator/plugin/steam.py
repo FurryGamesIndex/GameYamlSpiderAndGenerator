@@ -5,7 +5,6 @@ from urllib.parse import parse_qs, urlparse
 from bs4 import BeautifulSoup
 from html2text import html2text
 from langcodes import Language, find
-from loguru import logger
 
 from .. import BasePlugin, YamlData
 from ..util.fgi import fgi_dict
@@ -43,10 +42,6 @@ class Steam(BasePlugin):
             self.json["data"]["detailed_description"],
             self.json["data"]["short_description"],
             self.json["data"]["name"],
-        )
-        logger.debug(
-            f"https://store.steampowered.com/api/appdetails?appids="
-            f"{self.id}&l={Language.get(lang).display_name('en').lower()}"
         )
         result = []
         with concurrent.futures.ThreadPoolExecutor() as executor:

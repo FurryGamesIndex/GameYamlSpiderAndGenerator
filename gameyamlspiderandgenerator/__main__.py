@@ -1,7 +1,6 @@
 import argparse
 import sys
 from importlib.metadata import version
-from typing import TextIO
 
 from loguru import logger
 from yaml import safe_load
@@ -13,14 +12,20 @@ from .util.fgi_yaml import get_valid_filename
 from .util.plugin_manager import pkg
 
 logger.remove()
-
+logger.add(sys.stdout, level="WARNING")
 parser = argparse.ArgumentParser()
-parser.add_argument(
-    "-d",
-    "--debug",
-    action="store_true",
-    default=False,
+group = parser.add_mutually_exclusive_group()
+
+# 添加 --silent 参数到互斥组中
+group.add_argument(
+    "--silent", action="store_true", default=False, help="Enable silent log mode"
 )
+
+# 添加 --debug 参数到互斥组中
+group.add_argument(
+    "--debug", action="store_true", default=False, help="Enable debug log mode"
+)
+
 parser.add_argument(
     "-f",
     "--config",
@@ -49,10 +54,11 @@ parser.add_argument(
 )
 parser.add_argument("url", metavar="URL")
 args = parser.parse_args()
-log_data: TextIO | None = None
 if args.debug:
     logger.remove()
     logger.add(sys.stdout, level="DEBUG")
+if args.silent:
+    logger.remove()
 logger.debug("version:" + version("gameyamlspiderandgenerator"))
 if isinstance(args.config, str):
     with open(args.config) as f:
@@ -72,7 +78,6 @@ if args.output is None:
 elif "." not in args.output:
     if args.output == "zip":
         with open(get_valid_filename(yml.raw_dict["name"]) + ".zip", "wb") as f:
-            yml.meta_data.log = log_data.read()
             f.write(bytes(yml))
     elif args.output == "yaml":
         with open(get_valid_filename(yml.raw_dict["name"]) + ".yaml", "w") as f:
