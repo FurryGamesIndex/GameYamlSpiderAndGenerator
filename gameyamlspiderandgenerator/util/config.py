@@ -1,5 +1,5 @@
 from fgi_yaml_formattor import fgi
-
+from .fgi import default_config
 from ..exception import ReadOrWriteConfigFailed
 
 
@@ -8,6 +8,9 @@ class Config:
     api = {}
     plugin = {}
     hook = {}
+
+    def __init__(self):
+        self.load(default_config)
 
     def __getitem__(self, item):
         return self.__getattribute__(item)

@@ -1,4 +1,5 @@
 import argparse
+import os
 import sys
 from importlib.metadata import version
 
@@ -72,9 +73,21 @@ else:
     setting = args.config
 if args.fast:
     setting["hook"] = None
-config.update(setting)
 if args.proxy:
-    config.proxy = {"http": args.proxy, "https": args.proxy}
+    setting["proxy"] = {"http": args.proxy, "https": args.proxy}
+
+
+def getenv_case_insensitive(key):
+    # 使用 next() 函数获取第一个找到的匹配环境变量的值，不区分大小写
+    return next((v for k, v in os.environ.items() if k.lower() == key.lower()), None)
+
+
+if getenv_case_insensitive("HTTP_PROXY"):
+    setting["proxy"] = {
+        "http": getenv_case_insensitive("HTTP_PROXY"),
+        "https": getenv_case_insensitive("HTTPS_PROXY"),
+    }
+config.update(setting)
 pkg.init()
 yml = produce_yaml(args.url, args.lang)
 if args.output is None:
