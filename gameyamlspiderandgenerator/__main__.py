@@ -65,7 +65,7 @@ if args.debug:
 if args.silent:
     logger.remove()
 logger.debug(sys.version)
-logger.debug("version:" + version("gameyamlspiderandgenerator"))
+logger.debug("version: " + version("gameyamlspiderandgenerator"))
 if isinstance(args.config, str):
     with open(args.config) as f:
         setting = safe_load(f)
