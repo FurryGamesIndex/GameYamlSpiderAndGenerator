@@ -64,7 +64,7 @@ class Package:
                     get_subclasses(temp, BasePlugin)
                 )
             except ImportError as e:
-                logger.trace(e)
+                logger.debug(e)
                 logger.error(f"Failed to import plugin: {plugin}")
             except NotImplementedError:
                 logger.error(f"Imported plugin but no BasePlugin found: {plugin}")
@@ -73,23 +73,21 @@ class Package:
         if config.hook is None:
             logger.warning("All hooks are disabled")
             return
-        for plugin in config.hook:
+        for hook in config.hook:
             try:
-                logger.info(f"Loading hook: {plugin}")
-                temp = importlib.import_module(f"yamlgenerator_hook_{plugin}")
-                self.hook[f"yamlgenerator_hook_{plugin}"] = get_subclasses(
-                    temp, BaseHook
-                )
+                logger.info(f"Loading hook: {hook}")
+                temp = importlib.import_module(f"yamlgenerator_hook_{hook}")
+                self.hook[f"yamlgenerator_hook_{hook}"] = get_subclasses(temp, BaseHook)
                 if (
-                    self.hook[f"yamlgenerator_hook_{plugin}"].REQUIRE_CONFIG
-                    and plugin not in config["hook_configs"]
+                    self.hook[f"yamlgenerator_hook_{hook}"].REQUIRE_CONFIG
+                    and hook not in config["hook_configs"]
                 ):
-                    raise ApiKeyNotFoundError(f"yamlgenerator_hook_{plugin}")
+                    raise ApiKeyNotFoundError(f"yamlgenerator_hook_{hook}")
             except ImportError as e:
-                logger.trace(e)
-                logger.error(f"Failed to import hook: {plugin}")
+                logger.debug(e)
+                logger.error(f"Failed to import hook: {hook}")
             except NotImplementedError:
-                logger.error(f"Imported hook but no BaseHook found: {plugin}")
+                logger.error(f"Imported hook but no BaseHook found: {hook}")
 
 
 pkg = Package()

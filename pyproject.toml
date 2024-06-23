@@ -47,6 +47,6 @@ dependencies = [
     "yamlgenerator-hook-validate>=0.1.0",
 ]
 name = "gameyamlspiderandgenerator"
-version = "2.0.0a4"
+version = "2.0.0b1"
 description = "A useful tool for generating Furrygameindex yaml files"
 readme = "README.md"
