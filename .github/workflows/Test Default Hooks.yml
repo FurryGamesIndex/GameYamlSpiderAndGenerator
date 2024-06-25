@@ -9,6 +9,7 @@ on:
     paths:
       - '**.py'
       - '**.yml'
+      - '**.lock'
 permissions:
   contents: read
 
