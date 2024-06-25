@@ -1,6 +1,3 @@
-plugin:
-  - steam
-  - itchio
 hook:
   - search
   - validate
