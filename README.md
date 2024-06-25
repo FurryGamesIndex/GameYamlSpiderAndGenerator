@@ -6,10 +6,10 @@
 ## Install
 
 ```commandline
-pip install gameyamlspiderandgenerator -i https://pypi.org/simple
+pip install gameyamlspiderandgenerator
 # install extra hook
 # pip install yamlgenerator-hook-openai
-python3.10
+python3
 ```
 
 ## Create a new configuration file
@@ -17,31 +17,27 @@ python3.10
 - config.yaml
 
 ```yaml
-plugin:
-  - steam
-  - itchio
 hook:
   - search
   - validate
-# - openai
-# if you don't want to set proxy, please fill in {}
 proxy: { }
+# if you don't want to set proxy, please fill in {}
 # http: socks5://127.0.0.1:7891
 # https: socks5://127.0.0.1:7891
-api:
-  google-play: a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90 # Get your api key via serpapi.com
-  apple: a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90
-  openai: yourkey
-  git_proxy: null # your git proxy website
+git_proxy: null
+hook_config:
+  search:
+    google-play: a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90
+    apple: a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90
 
 ```
 
 ## Try to make yaml data file
 
 ```bash
- python3.10 -m gameyamlspiderandgenerator -f /home/user/desktop/config.yaml  https://store.steampowered.com/app/290340/Armello/ -o 1.zip
+ python -m gameyamlspiderandgenerator -f /home/user/desktop/config.yaml  https://store.steampowered.com/app/290340/Armello/ -o 1.zip
  # or omit some options
- python3.10 -m gameyamlspiderandgenerator https://store.steampowered.com/app/290340/Armello/
+ python -m gameyamlspiderandgenerator https://store.steampowered.com/app/290340/Armello/
 
 ```
 
