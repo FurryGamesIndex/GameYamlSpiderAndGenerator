@@ -12,7 +12,7 @@ def get_time(f):
         s_time = time.time()
         res = f(*arg, **kwarg)
         e_time = time.time()
-        print(f'耗时：{e_time - s_time:.2f}秒')
+        print(f"耗时：{e_time - s_time:.2f}秒")
         return res
 
     return inner
@@ -26,7 +26,7 @@ pkg.init()
 def test1():
     yml = produce_yaml("https://finji.itch.io/longest-night")
     print(yml)
-    with open(get_valid_filename(yml.raw_dict['name']) + ".zip", 'wb') as f:
+    with open(get_valid_filename(yml.raw_dict["name"]) + ".zip", "wb") as f:
         f.write(bytes(yml))
 
 
@@ -34,9 +34,10 @@ def test1():
 def test2():
     yml = produce_yaml("https://store.steampowered.com/app/1710540/Fall_of_Porcupine/")
     print(yml)
-    with open(get_valid_filename(yml.raw_dict['name']) + ".zip", 'wb') as f:
+    with open(get_valid_filename(yml.raw_dict["name"]) + ".zip", "wb") as f:
         f.write(bytes(yml))
 
 
 test1()
 test2()
+print(config)

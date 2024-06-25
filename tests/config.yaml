@@ -1,13 +1,11 @@
-plugin:
-  - steam
-  - itchio
 hook:
   - search
   - validate
 proxy:
-  http: socks5://127.0.0.1:7890
-  https: socks5://127.0.0.1:7890
-api:
-  google-play: a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90
-  apple: a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90
-  git_proxy: null
+  http: socks5://127.0.0.1:7897
+  https: socks5://127.0.0.1:7897
+hook_config:
+  search:
+    google-play: a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90
+    apple: a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90
+    git_proxy: null

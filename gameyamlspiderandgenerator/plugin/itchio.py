@@ -3,15 +3,13 @@ from contextlib import suppress
 from json import loads
 
 from bs4 import BeautifulSoup
-from bs4.element import Tag
 from html2text import html2text
 from langcodes import find
 from py3langid import classify
 
+from .. import BasePlugin, YamlData
 from ..util.fgi import fgi_dict
-from ..util.fgi_yaml import YamlData
 from ..util.spider import get_text
-from . import BasePlugin
 
 
 class ItchIO(BasePlugin):
@@ -164,10 +162,9 @@ class ItchIO(BasePlugin):
         for _ in range(18):
             with suppress(Exception):
                 cache = self.soup.select_one(
-                    f"div.info_panel_wrapper > div > table > tbody > tr:nth-child({str(_+1)})"
+                    f"div.info_panel_wrapper > div > table > tbody > tr:nth-child({str(_ + 1)})"
                 )
-                i: Tag
-                temp = [i.get_text() for i in list(cache.children)]
+                temp = [i.get_text() for i in list(cache.children)]  # noqa
                 d[temp[0]] = temp[1:][0].split(",")
         return d
 
@@ -209,7 +206,7 @@ class ItchIO(BasePlugin):
             "MMORPG": "mmorpg",
             "Dating Sim": "dating-sim",
             "Roguelike": "roguelike",
-            "Sports": "Sports",
+            "Sports": "sports",
             "Bara": "bara",
             "Yuri": "yuri",
             "Gore": "gore",

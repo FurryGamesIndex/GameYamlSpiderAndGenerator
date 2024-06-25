@@ -1,15 +1,15 @@
 import importlib
 from types import ModuleType
-from typing import Literal
 
 from loguru import logger
-
+from pathlib import Path
+from ..exception import ApiKeyNotFoundError
 from ..hook import BaseHook
 from ..plugin import BasePlugin
 from ..util.config import config
 
 
-def get_subclasses(module: ModuleType, base_class: type) -> type:
+def get_subclasses(module: ModuleType, base_class: type) -> [BasePlugin, BaseHook]:
     """
     Get the subclasses of the specified base class from the given module.
 
@@ -28,7 +28,11 @@ def get_subclasses(module: ModuleType, base_class: type) -> type:
     if base_class.__name__ in class_dir:
         for i in class_dir:
             obj = getattr(module, i)
-            if isinstance(obj, type) and issubclass(obj, base_class) and obj is not base_class:
+            if (
+                isinstance(obj, type)
+                and issubclass(obj, base_class)
+                and obj is not base_class
+            ):
                 return getattr(module, i)
     raise NotImplementedError(base_class.__name__)
 
@@ -38,6 +42,12 @@ class Package:
     hook: dict[str, BaseHook] = {}
 
     def init(self):
+        config.plugin = (
+            _.stem
+            for _ in (
+                (Path(__file__).resolve().parent.parent / "plugin").glob("[!_]*.py")
+            )
+        )
         self.load_plugins()
         self.load_hooks()
 
@@ -49,44 +59,41 @@ class Package:
         # Compatibility with the old version
         self.__setattr__(key, value)
 
-    def _load(
-            self,
-            _dir: Literal["plugin"],
-            _type: type[BasePlugin],
-    ):
-        base = __package__.split(".")[0] + "." + _dir
-        for plugin in getattr(config, _dir, []):
-            if plugin.startswith("_"):
-                logger.warning(f"Skip loading protected {_dir} {plugin}")
-                continue
-            try:
-                package = f"{base}.{plugin}"
-                logger.info(f"Loading {_dir}: {plugin}")
-                temp = importlib.import_module(package)
-                self[_dir][plugin] = get_subclasses(temp, BasePlugin)
-            except ImportError as e:
-                logger.trace(e)
-                logger.error(f"Failed to import {_dir}: {plugin}")
-            except NotImplementedError:
-                logger.error(f"Imported {_dir} but no {_type.__name__} found: {plugin}")
-
     def load_plugins(self):
-        self._load("plugin", BasePlugin)
+        for plugin in config.plugin:
+            try:
+                logger.info(f"Loading plugin: {plugin}")
+                temp = importlib.import_module(
+                    f"gameyamlspiderandgenerator.plugin.{plugin}"
+                )
+                self.plugin[f"gameyamlspiderandgenerator.plugin.{plugin}"] = (
+                    get_subclasses(temp, BasePlugin)
+                )
+            except ImportError as e:
+                logger.debug(e)
+                logger.error(f"Failed to import plugin: {plugin}")
+            except NotImplementedError:
+                logger.error(f"Imported plugin but no BasePlugin found: {plugin}")
 
     def load_hooks(self):
-        if config["hook"] is None:
+        if config.hook is None:
             logger.warning("All hooks are disabled")
             return
-        for plugin in getattr(config, "hook", []):
+        for hook in config.hook:
             try:
-                logger.info(f"Loading hook: {plugin}")
-                temp = importlib.import_module(f"yamlgenerator_hook_{plugin}")
-                self["hook"][f"yamlgenerator_hook_{plugin}"] = get_subclasses(temp, BaseHook)
+                logger.info(f"Loading hook: {hook}")
+                temp = importlib.import_module(f"yamlgenerator_hook_{hook}")
+                self.hook[f"yamlgenerator_hook_{hook}"] = get_subclasses(temp, BaseHook)
+                if (
+                    self.hook[f"yamlgenerator_hook_{hook}"].REQUIRE_CONFIG
+                    and hook not in config["hook_configs"]
+                ):
+                    raise ApiKeyNotFoundError(f"yamlgenerator_hook_{hook}")
             except ImportError as e:
-                logger.trace(e)
-                logger.error(f"Failed to import hook: {plugin}")
+                logger.debug(e)
+                logger.error(f"Failed to import hook: {hook}")
             except NotImplementedError:
-                logger.error(f"Imported hook but no BaseHook found: {plugin}")
+                logger.error(f"Imported hook but no BaseHook found: {hook}")
 
 
 pkg = Package()

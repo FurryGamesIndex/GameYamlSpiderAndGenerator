@@ -1,9 +1,12 @@
 import abc
 import re
+import traceback
 
+from deepdiff import DeepDiff as diff
 from loguru import logger
 
 from ..util.fgi_yaml import YamlData
+from ..hook import HookLoadingSequence
 
 
 class BasePlugin(abc.ABC):
@@ -32,14 +35,26 @@ class BasePlugin(abc.ABC):
         Args:
             data: 钩子数据
         """
-        from gameyamlspiderandgenerator.util.plugin_manager import pkg
+        from ..util.plugin_manager import pkg
 
-        for i in pkg.hook:
+        load_order = (
+            [_ for _ in pkg.hook if pkg.hook[_].ORDER == HookLoadingSequence.FIRST]
+            + [_ for _ in pkg.hook if pkg.hook[_].ORDER == HookLoadingSequence.NORMAL]
+            + [_ for _ in pkg.hook if pkg.hook[_].ORDER == HookLoadingSequence.LAST]
+        )
+        for i in load_order:
             try:
+                _old_data = data
                 data = pkg.hook[i]().setup(data)
+                if pkg.hook[i].CHANGED is not None:
+                    logger.debug(
+                        f"{i} changed: {diff(_old_data, data, ignore_order=True).to_json()}"
+                    )
             except Exception as e:
-                logger.warning(f'An error occurred while running the {i} hook')
-                logger.error(str(e))
+                logger.warning(
+                    f"An {type(e).__name__} error occurred while running the {i} hook. (Use --debug for more details)"
+                )
+                logger.debug(traceback.format_exc())
         return data
 
     @abc.abstractmethod

@@ -1,3 +1,3 @@
-from ._base import BaseHook
+from ._base import BaseHook, HookLoadingSequence
 
-__all__ = ["BaseHook"]
+__all__ = ["BaseHook", "HookLoadingSequence"]

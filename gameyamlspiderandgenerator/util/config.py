@@ -1,6 +1,6 @@
-from ..exception import ReadOrWriteConfigFailed
+from fgi_yaml_formattor import fgi
 from .fgi import default_config
-from .fgi_yaml import fgi
+from ..exception import ReadOrWriteConfigFailed
 
 
 class Config:
@@ -10,15 +10,10 @@ class Config:
     hook = {}
 
     def __init__(self):
-        self.__dict__.update(default_config)
+        self.load(default_config)
 
     def __getitem__(self, item):
-        # Compatibility with the old version
         return self.__getattribute__(item)
-
-    def __setitem__(self, key, value):
-        # Compatibility with the old version
-        self.__setattr__(key, value)
 
     def load(self, file_data: str | dict = None):
         """
@@ -34,7 +29,7 @@ class Config:
         Returns:
 
         """
-        if type(file_data) is dict:
+        if type(file_data) is dict:  # noqa: E721
             self.__dict__.update(file_data)
             return
         try:
@@ -47,10 +42,7 @@ class Config:
         self.__dict__.update(data)
 
     def __str__(self):
-        fgi.preserve_quotes = True
-        fgi.explicit_start = True
-        fgi.indent = 1
-        return fgi.dump_to_string(self.__dict__)
+        return fgi.dumps(self.__dict__)
 
 
 config = Config()
