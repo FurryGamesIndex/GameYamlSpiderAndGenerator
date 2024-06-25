@@ -33,5 +33,10 @@ def produce_yaml(url: str, lang: str = "en") -> YamlData | None:
         raise InvalidUrlError(url)
     if "lang" in [i.name for i in signature(ret).parameters.values()]:
         return ret(url, lang).to_yaml()
-    else:
-        return ret(url).to_yaml()
+    elif lang != "en" and "lang" not in [
+        i.name for i in signature(ret).parameters.values()
+    ]:
+        logger.warning(
+            "This parser does not support the --lang option and will be ignored..."
+        )
+    return ret(url).to_yaml()

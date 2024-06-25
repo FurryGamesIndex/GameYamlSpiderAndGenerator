@@ -2,7 +2,7 @@ import importlib
 from types import ModuleType
 
 from loguru import logger
-
+from pathlib import Path
 from ..exception import ApiKeyNotFoundError
 from ..hook import BaseHook
 from ..plugin import BasePlugin
@@ -42,6 +42,12 @@ class Package:
     hook: dict[str, BaseHook] = {}
 
     def init(self):
+        config.plugin = (
+            _.stem
+            for _ in (
+                (Path(__file__).resolve().parent.parent / "plugin").glob("[!_]*.py")
+            )
+        )
         self.load_plugins()
         self.load_hooks()
 
