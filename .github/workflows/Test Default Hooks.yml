@@ -10,6 +10,7 @@ on:
       - '**.py'
       - '**.yml'
       - '**.lock'
+      - '**.yaml'
 permissions:
   contents: read
 

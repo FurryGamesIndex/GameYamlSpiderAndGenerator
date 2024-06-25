@@ -1,28 +1,31 @@
 ## gameyamlspiderandgenerator
 
-- *python3.11 -m gameyamlspiderandgenerator -h*
+- *python -m gameyamlspiderandgenerator -h*
 
 ```text
-usage: __main__.py [-h] [-f CONFIG] [-o OUTPUT] URL
+usage: __main__.py [-h] [--silent | --debug] [-f CONFIG] [--proxy PROXY] [-o OUTPUT] [--lang LANG] [--fast] URL
 
 positional arguments:
   URL
 
 options:
   -h, --help            show this help message and exit
+  --silent              Enable silent log mode
+  --debug               Enable debug log mode
   -f CONFIG, --config CONFIG
                         The location of config.yaml (default null)
+  --proxy PROXY
   -o OUTPUT, --output OUTPUT
                         The location of the output file (zip format or yaml format)
+  --lang LANG           The display language of the game. ISO 639-1 code(default: en)
   --fast                Whether to disable all hooks (default: false)
-
 ```
 
 Example:
 
-- python3.11 -m gameyamlspiderandgenerator **url**
-- python3.11 -m gameyamlspiderandgenerator **url** -o zip
-- python3.11 -m gameyamlspiderandgenerator **url** -o /home/user/desktop/output.yaml
+- python -m gameyamlspiderandgenerator **url**
+- python -m gameyamlspiderandgenerator **url** -o zip
+- python -m gameyamlspiderandgenerator **url** -o /home/user/desktop/output.yaml
 
 ## hook
 
