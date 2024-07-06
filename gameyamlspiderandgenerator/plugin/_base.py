@@ -2,11 +2,12 @@ import abc
 import re
 import traceback
 
-from deepdiff import DeepDiff as diff
+from deepdiff import DeepDiff
 from loguru import logger
 
 from ..util.fgi_yaml import YamlData
 from ..hook import HookLoadingSequence
+from ..exception import GenerateError
 
 
 class BasePlugin(abc.ABC):
@@ -48,13 +49,16 @@ class BasePlugin(abc.ABC):
                 data = pkg.hook[i]().setup(data)
                 if pkg.hook[i].CHANGED is not None:
                     logger.debug(
-                        f"{i} changed: {diff(_old_data, data, ignore_order=True).to_json()}"
+                        f"{i} changed: {DeepDiff(_old_data, data, ignore_order=True).to_json()}"
                     )
             except Exception as e:
                 logger.warning(
                     f"An {type(e).__name__} error occurred while running the {i} hook. (Use --debug for more details)"
                 )
-                logger.debug(traceback.format_exc())
+                if not isinstance(e, GenerateError):
+                    logger.debug(traceback.format_exc())
+                else:
+                    logger.error(traceback.format_exc())
         return data
 
     @abc.abstractmethod
