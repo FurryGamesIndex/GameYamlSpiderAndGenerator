@@ -1,6 +1,6 @@
 hook:
-  - search
   - validate
+  #- search
 proxy: { }
 # if you don't want to set proxy, please fill in {}
 # http: socks5://127.0.0.1:7891
@@ -8,5 +8,5 @@ proxy: { }
 git_proxy: null
 hook_configs:
   search:
-    google-play: a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90
-    apple: a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90
+    google-play: null
+    apple: null

@@ -5,7 +5,7 @@
 groups = ["default", "lint"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:cb1705b4638b69da3bc699633b91ce211795a12c9ef506bcf1672b958c61b158"
+content_hash = "sha256:47e031294e26ee4a0793521ec2497164b42cbfa72522119ef58fa14ee4e91cf8"
 
 [[package]]
 name = "attrs"
@@ -832,19 +832,19 @@ files = [
 
 [[package]]
 name = "yamlgenerator-hook-search"
-version = "1.0.2a0"
+version = "1.0.1"
 requires_python = "<4.0,>=3.11"
 summary = ""
 groups = ["default"]
 dependencies = [
     "epicstore-api<0.2.0,>=0.1.6",
-    "gameyamlspiderandgenerator<3.0,>=2.0.1a",
+    "gameyamlspiderandgenerator<3.0,>=2.0.0b2",
     "google-search-results<3.0.0,>=2.4.2",
     "serpapi<0.2.0,>=0.1.5",
 ]
 files = [
-    {file = "yamlgenerator_hook_search-1.0.2a0-py3-none-any.whl", hash = "sha256:08939912dd32432c36207b0d385f662bc6a74000e81676fe8a4dd88b6584c26e"},
-    {file = "yamlgenerator_hook_search-1.0.2a0.tar.gz", hash = "sha256:629862da9d1b940e76e0788e09c754d7cde7f2967236d994c0c4ecbfeb4ee881"},
+    {file = "yamlgenerator_hook_search-1.0.1-py3-none-any.whl", hash = "sha256:f8296297eec5d5f8f22952d0bb5bd668771efec8d811dfea05f24aec036163f1"},
+    {file = "yamlgenerator_hook_search-1.0.1.tar.gz", hash = "sha256:03f611a557b087f6f264f9a4c4d732031e9a4dcb3580f1b3ff97572c92a09364"},
 ]
 
 [[package]]
