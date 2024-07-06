@@ -1,3 +1,6 @@
+from http import HTTPStatus
+
+
 class GenerateError(Exception):
     pass
 
@@ -22,7 +25,7 @@ class ReadOrWriteConfigFailed(GenerateError):
 
 class InvalidTargetResourceError(GenerateError):
     def __init__(self, code: int):
-        super().__init__(f"The target resource is no longer valid.status code: {code}")
+        super().__init__(f"{code}: {HTTPStatus(code).description}")
 
 
 class ResponseNotInitialized(GenerateError):

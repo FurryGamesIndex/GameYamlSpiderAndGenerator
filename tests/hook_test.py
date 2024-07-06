@@ -4,9 +4,10 @@ from pathlib import Path
 from yamlgenerator_hook_search import Search
 from yamlgenerator_hook_validate import Verify
 
-from gameyamlspiderandgenerator.util.config import config
 from gameyamlspiderandgenerator.util.fgi import template_dict
 from gameyamlspiderandgenerator.util.plugin_manager import pkg
+
+from gameyamlspiderandgenerator.util.config import config
 
 config.load(Path(__file__).parent / "test_config.yaml")
 pkg.init()

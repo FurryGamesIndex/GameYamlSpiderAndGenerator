@@ -1,19 +1,19 @@
 from fgi_yaml_formattor import fgi
 from .fgi import default_config
 from ..exception import ReadOrWriteConfigFailed
+from dataclasses import dataclass, field
+from deprecated import deprecated
 
 
+@dataclass
 class Config:
-    proxy = {}
-    api = {}
-    plugin = {}
-    hook = {}
-
-    def __init__(self):
-        self.load(default_config)
+    proxy: field(default_factory=dict)
+    hook: field(default_factory=dict)
+    hook_configs: field(default_factory=dict)
+    git_proxy: str
 
     def __getitem__(self, item):
-        return self.__getattribute__(item)
+        return self.__dict__[item]
 
     def load(self, file_data: str | dict = None):
         """
@@ -29,7 +29,7 @@ class Config:
         Returns:
 
         """
-        if type(file_data) is dict:  # noqa: E721
+        if isinstance(file_data, dict):
             self.__dict__.update(file_data)
             return
         try:
@@ -38,11 +38,9 @@ class Config:
         except Exception as e:
             raise ReadOrWriteConfigFailed from e
 
+    @deprecated(version="2.0.2b")
     def update(self, data: dict):
-        self.__dict__.update(data)
-
-    def __str__(self):
-        return fgi.dumps(self.__dict__)
+        self.load(data)
 
 
-config = Config()
+config = Config(**default_config)

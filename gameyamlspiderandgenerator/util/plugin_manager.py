@@ -42,12 +42,12 @@ class Package:
     hook: dict[str, BaseHook] = {}
 
     def init(self):
-        config.plugin = (
+        config.plugin = [
             _.stem
             for _ in (
                 (Path(__file__).resolve().parent.parent / "plugin").glob("[!_]*.py")
             )
-        )
+        ]
         self.load_plugins()
         self.load_hooks()
 
