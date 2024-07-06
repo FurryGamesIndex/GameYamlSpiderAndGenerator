@@ -1,8 +1,6 @@
 import unittest
 from pathlib import Path
 
-from yamlgenerator_hook_search import Search
-from yamlgenerator_hook_validate import Verify
 
 from gameyamlspiderandgenerator.util.fgi import template_dict
 from gameyamlspiderandgenerator.util.plugin_manager import pkg
@@ -14,10 +12,16 @@ pkg.init()
 
 
 class HookUnitTest(unittest.TestCase):
-    def test_search(self):
-        self.assertIsInstance(
-            Search().setup({**template_dict, "name": "dead-space"}), dict
-        )
-
-    def test_verify(self):
-        self.assertIsInstance(Verify().setup(template_dict), dict)
+    def test_all(self):
+        test_config = {
+            "search": {"name": "dead-space"},
+            "validate": {},
+        }
+        for i in config.hook:
+            print(template_dict | test_config[i])
+            self.assertIsInstance(
+                pkg.hook[f"yamlgenerator_hook_{i}"]().setup(
+                    template_dict | test_config[i]
+                ),
+                dict,
+            )
