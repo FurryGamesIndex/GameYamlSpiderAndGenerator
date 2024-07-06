@@ -48,7 +48,6 @@ default_config = {
         }
     },
     "git_proxy": None,
-    "api": {},
     "hook": ["search", "validate"],
     "proxy": {},
 }
