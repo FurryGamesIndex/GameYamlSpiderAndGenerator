@@ -9,7 +9,7 @@ from ..plugin import BasePlugin
 from ..util.config import config
 
 
-def get_subclasses(module: ModuleType, base_class: type) -> [BasePlugin, BaseHook]:
+def get_subclasses(module: ModuleType, base_class: type) -> BasePlugin | BaseHook:
     """
     Get the subclasses of the specified base class from the given module.
 

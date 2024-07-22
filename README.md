@@ -5,10 +5,9 @@
 
 ## Install
 
-```commandline
+```sh
 pip install gameyamlspiderandgenerator
-# install extra hook
-# pip install yamlgenerator-hook-openai
+pip install yamlgenerator-hook-openai # install extra hook
 python3
 ```
 
@@ -43,7 +42,7 @@ hook_configs:
 
 *or use the library in your script*
 
-```python
+```python3
 from gameyamlspiderandgenerator import produce_yaml
 from gameyamlspiderandgenerator.util.config import config
 from gameyamlspiderandgenerator.util.plugin_manager import pkg

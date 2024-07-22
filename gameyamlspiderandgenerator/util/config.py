@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from deprecated import deprecated
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Config:
     proxy: field(default_factory=dict)
     hook: field(default_factory=dict)
