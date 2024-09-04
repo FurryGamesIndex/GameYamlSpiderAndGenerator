@@ -87,7 +87,7 @@ if getenv_case_insensitive("HTTP_PROXY"):
         "http": getenv_case_insensitive("HTTP_PROXY"),
         "https": getenv_case_insensitive("HTTPS_PROXY"),
     }
-config.update(setting)
+config.load(setting)
 pkg.init()
 yml = produce_yaml(args.url, args.lang)
 if args.output is None:

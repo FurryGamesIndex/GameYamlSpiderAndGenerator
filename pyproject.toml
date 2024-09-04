@@ -45,7 +45,6 @@ dependencies = [
     "FGI-YAML-Formattor>=0.1.0",
     "yamlgenerator-hook-search>=1.0.1, <2.0",
     "yamlgenerator-hook-validate>=1.0.0a1, <2.0",
-    "deprecated>=1.2.14",
 ]
 name = "gameyamlspiderandgenerator"
 version = "2.0.3"

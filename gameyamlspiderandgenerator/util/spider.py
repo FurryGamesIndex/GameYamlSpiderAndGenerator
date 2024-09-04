@@ -38,9 +38,10 @@ class GetResponse:
             "allow_redirects": allow_redirects,
             **kwargs,
         }
-        logger.debug(url)
         if len(self.args) != 2:
             logger.debug(self.args)
+        else:
+            logger.debug(url)
 
     def __enter__(self):
         self.response = requests.get(self.url, **self.args)
