@@ -9,37 +9,36 @@ from ..plugin import BasePlugin
 from ..util.config import config
 
 
-def get_subclasses(module: ModuleType, base_class: type) -> BasePlugin | BaseHook:
+def get_subclasses(
+    module: ModuleType, base_class: type[BaseHook, BasePlugin]
+) -> type[BaseHook, BasePlugin]:
     """
-    Get the subclasses of the specified base class from the given module.
+    Get the first subclass of the specified base class from the given module.
 
     Args:
         module (ModuleType): The module to search for subclasses.
         base_class (Type): The base class to find subclasses for.
 
     Returns:
-        Type: The subclass of the specified base class.
+        Type: The first subclass of the specified base class found.
 
     Raises:
-        NotImplementedError: If the specified base class is not found in the module.
+        NotImplementedError: If no subclass of the base class is found.
     """
-
-    class_dir = dir(module)
-    if base_class.__name__ in class_dir:
-        for i in class_dir:
-            obj = getattr(module, i)
-            if (
-                isinstance(obj, type)
-                and issubclass(obj, base_class)
-                and obj is not base_class
-            ):
-                return getattr(module, i)
-    raise NotImplementedError(base_class.__name__)
+    for name in dir(module):
+        obj = getattr(module, name)
+        if (
+            isinstance(obj, type)
+            and issubclass(obj, base_class)
+            and obj is not base_class
+        ):
+            return obj
+    raise NotImplementedError(f"No subclass of {base_class.__name__} found in module.")
 
 
 class Package:
-    plugin: dict[str, BasePlugin] = {}
-    hook: dict[str, BaseHook] = {}
+    plugin: dict[str, type[BasePlugin]] = {}
+    hook: dict[str, type[BaseHook]] = {}
 
     def init(self):
         config.plugin = [

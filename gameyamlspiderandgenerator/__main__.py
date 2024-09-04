@@ -6,7 +6,7 @@ from importlib.metadata import version
 from loguru import logger
 from yaml import safe_load
 
-from gameyamlspiderandgenerator import produce_yaml
+from . import produce_yaml
 from .util.config import config
 from .util.fgi import default_config
 from .util.fgi_yaml import get_valid_filename
