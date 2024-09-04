@@ -1,11 +1,11 @@
 import abc
-from enum import Enum
+from enum import Enum, auto
 
 
 class HookLoadingSequence(Enum):
-    FIRST = 1
-    NORMAL = 2
-    LAST = 3
+    FIRST = auto()
+    NORMAL = auto()
+    LAST = auto()
 
 
 class BaseHook(abc.ABC):

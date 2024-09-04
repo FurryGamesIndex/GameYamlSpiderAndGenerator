@@ -38,6 +38,7 @@ class GetResponse:
             "allow_redirects": allow_redirects,
             **kwargs,
         }
+        logger.debug(url)
         if len(self.args) != 2:
             logger.debug(self.args)
 
