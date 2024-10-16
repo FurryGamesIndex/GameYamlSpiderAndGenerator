@@ -23,7 +23,7 @@ authors = [
     {name = "kaesinol"},
 ]
 license = {text = "MIT"}
-requires-python = "<4.0,>=3.10"
+requires-python = "<4.0,>=3.11"
 dependencies = [
     "langcodes>=3.3.0",
     "language-data>=1.1",
