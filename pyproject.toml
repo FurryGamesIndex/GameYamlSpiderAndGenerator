@@ -18,7 +18,12 @@ verify_ssl = true
 lint = [
     "ruff>=0.4.4",
 ]
+
 [project]
+name = "gameyamlspiderandgenerator"
+version = "2.0.3"
+description = "A useful tool for generating Furrygameindex yaml files"
+readme = "README.md"
 authors = [
     {name = "kaesinol"},
 ]
@@ -46,7 +51,25 @@ dependencies = [
     "yamlgenerator-hook-search>=1.0.1, <2.0",
     "yamlgenerator-hook-validate>=1.0.0a1, <2.0",
 ]
-name = "gameyamlspiderandgenerator"
-version = "2.0.3"
-description = "A useful tool for generating Furrygameindex yaml files"
-readme = "README.md"
+urls = { "Homepage" = "https://github.com/FurryGamesIndex/GameYamlSpiderAndGenerator/" }
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+    "Topic :: Text Processing",
+    "Command Line Utilities",
+    "Framework :: Module",
+    "Natural Language :: English",
+    "Typing :: Typed"
+]
