@@ -65,6 +65,7 @@ if args.debug:
 if args.silent:
     logger.remove()
 logger.debug(sys.version)
+logger.debug(" ".join(sys.argv))
 logger.debug("version: " + version("gameyamlspiderandgenerator"))
 if isinstance(args.config, str):
     with open(args.config) as f:
