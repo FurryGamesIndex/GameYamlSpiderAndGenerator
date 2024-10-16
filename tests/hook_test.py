@@ -26,7 +26,7 @@ class HookUnitTest(unittest.TestCase):
         print(config.hook)
         for i in config.hook:
             print(template_dict | test_config[i])
-            print(f"version: {version(f"yamlgenerator_hook_{i}")}")
+            print("version: " + version(f"yamlgenerator_hook_{i}"))
             self.assertIsInstance(
                 pkg.hook[f"yamlgenerator_hook_{i}"]().setup(
                     template_dict | test_config[i]
