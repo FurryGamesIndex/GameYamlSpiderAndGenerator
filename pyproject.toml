@@ -1,27 +1,14 @@
-[build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"
-
-[tool.isort]
-profile = "ruff"
-
-[tool.pdm]
-[tool.pdm.build]
-includes = []
-
-[[tool.pdm.source]]
-name = "mirrors"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
-verify_ssl = true
-
 [tool.pdm.dev-dependencies]
 lint = [
     "ruff>=0.4.4",
 ]
+all = [
+    "yamlgenerator-hook-openai"
+]
 
 [project]
 name = "gameyamlspiderandgenerator"
-version = "2.0.3"
+version = "2.0.4dev"
 description = "A useful tool for generating Furrygameindex yaml files"
 readme = "README.md"
 authors = [
@@ -31,26 +18,27 @@ license = {text = "MIT"}
 requires-python = "<4.0,>=3.11"
 dependencies = [
     "langcodes>=3.3.0",
-    "language-data>=1.1",
-    "html2text>=2020.1.16",
-    "ruamel-yaml>=0.17.21",
-    "ruamel-yaml-string>=0.1.0",
-    "urllib3>=1.26.14",
-    "beautifulsoup4>=4.11.1",
-    "pillow>=9.4.0",
+    "language-data>=1.1,<2.0",
+    "html2text>=2020.1.1",
+    "ruamel-yaml>=0.17.21,<1.0",
+    "ruamel-yaml-string>=0.1.0,<1.0",
+    "urllib3>=2.0",
+    "beautifulsoup4>=4.0",
+    "pillow>=10.0",
     "requests>=2.28.2",
     "ruamel-base>=1.0.0",
-    "loguru>=0.7.0, <1.0",
+    "loguru>=0.7.0",
     "pyyaml>=6.0",
     "pysocks>=1.7.1",
     "lxml>=4.9.2",
-    "py3langid>=0.2.2, <1.0",
-    "epicstore-api>=0.1.7, <1.0",
-    "deepdiff>=7.0.1, <8.0",
-    "FGI-YAML-Formattor>=0.1.0",
-    "yamlgenerator-hook-search>=1.0.1, <2.0",
-    "yamlgenerator-hook-validate>=1.0.0a1, <2.0",
+    "py3langid>=0.2.2",
+    "epicstore-api>=0.1.7,<1.0",
+    "deepdiff>=7.0.1",
+    "FGI-YAML-Formattor>=0.1.0,<1.0",
+    "yamlgenerator-hook-search>=1.0.1,<2.0",
+    "yamlgenerator-hook-validate>=1.0.0a1,<2.0",
 ]
+
 urls = { "Homepage" = "https://github.com/FurryGamesIndex/GameYamlSpiderAndGenerator/" }
 
 classifiers = [
@@ -68,8 +56,9 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Utilities",
     "Topic :: Text Processing",
-    "Command Line Utilities",
-    "Framework :: Module",
     "Natural Language :: English",
     "Typing :: Typed"
 ]
+
+[project.optional-dependencies]
+openai = ["yamlgenerator-hook-openai>=1.0.0b,<2.0"]

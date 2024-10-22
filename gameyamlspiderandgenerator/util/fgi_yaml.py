@@ -12,7 +12,7 @@ def process_thumbnail(img_byte: bytes):
     if img.size == (460, 215):
         img_resize = img.resize((360, 168))
         ret_byte = BytesIO()
-        img_resize.save(ret_byte, format="PNG", optimize=True, quality=85)
+        img_resize.save(ret_byte, format="PNG", optimize=True)
         return ret_byte.getvalue()
     logger.warning("Thumbnails cannot be scaled down.")
     return img_byte
@@ -26,6 +26,7 @@ def get_valid_filename(s: str):
 class YamlData:
     raw_dict: dict
 
+    def __add__(self, other): ...
     def __init__(self, raw_data):
         self.raw_dict = raw_data
 
