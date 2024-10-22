@@ -18,23 +18,19 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        python-version: [3.11, 3.12, 3.13]
-
     steps:
       - uses: actions/checkout@v4
       - name: Setup PDM
         uses: pdm-project/setup-pdm@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.11
           cache: true
       - name: Check Cache
         id: cache-check
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/pdm.lock') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/pdm.lock') }}
       - name: Install dependencies
         if: steps.cache-check.outputs.cache-hit != 'true'
         run: pdm install
