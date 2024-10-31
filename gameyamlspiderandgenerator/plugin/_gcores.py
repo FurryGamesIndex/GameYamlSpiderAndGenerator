@@ -1,6 +1,6 @@
 import re
 from jq import compile
-from gameyamlspiderandgenerator import BasePlugin, YamlData
+from ._base import BasePlugin, YamlData
 
 
 class Gcores(BasePlugin):

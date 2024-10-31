@@ -50,10 +50,8 @@ class Steam(BasePlugin):
         self.data, self.data_html = (result[0].result(), result[1].result())
         self._soup = BeautifulSoup(self.data_html, "lxml")
         self.name = self.get_name()
-        temp1 = self._soup.body.find_all("a", {"class": "app_tag"})
-        self.tag = [
-            re.sub(r"[\ntemp1 "", _app_tag[i].text) for i temp1(len(_app_tag))
-        ]
+        _app_tag = self._soup.body.find_all("a", {"class": "app_tag"})
+        self.tag = [re.sub(r"[\n\t\r]*", "", i.text) for i in _app_tag]
 
     def to_yaml(self):
         ret = {
