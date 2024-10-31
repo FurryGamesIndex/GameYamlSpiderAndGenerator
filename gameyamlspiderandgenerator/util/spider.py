@@ -1,7 +1,6 @@
-import requests
+from curl_cffi.requests.exceptions import JSONDecodeError
+from curl_cffi import requests
 from loguru import logger
-from requests import JSONDecodeError
-
 from ..exception import (
     InvalidResponse,
     InvalidTargetResourceError,
@@ -44,7 +43,7 @@ class GetResponse:
             logger.debug(url)
 
     def __enter__(self):
-        self.response = requests.get(self.url, **self.args)
+        self.response = requests.get(self.url, impersonate="chrome", **self.args)
         if self.response.status_code != 200:
             raise InvalidTargetResourceError(self.response.status_code)
         return self
@@ -77,9 +76,7 @@ class GetResponse:
         Returns:
              str
         """
-        return self.response.text.encode(self.response.encoding).decode(
-            self.response.apparent_encoding
-        )
+        return self.response.text
 
     @property
     def bytes(self):

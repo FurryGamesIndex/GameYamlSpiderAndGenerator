@@ -9,7 +9,7 @@ class HookLoadingSequence(Enum):
 
 
 class BaseHook(abc.ABC):
-    """钩子基类"""
+    """Base class for hooks"""
 
     CHANGED: list | None = None
     REQUIRE_CONFIG: bool = False
@@ -18,8 +18,8 @@ class BaseHook(abc.ABC):
     @abc.abstractmethod
     def setup(self, data: dict):
         """
-        运行钩子函数
+        Run the hook function
 
         Args:
-            data: 数据
+            data: The data
         """

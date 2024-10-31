@@ -20,12 +20,9 @@ dependencies = [
     "langcodes>=3.3.0",
     "language-data>=1.1,<2.0",
     "html2text>=2020.1.1",
-    "ruamel-yaml>=0.17.21,<1.0",
-    "ruamel-yaml-string>=0.1.0,<1.0",
     "urllib3>=2.0",
     "beautifulsoup4>=4.0",
     "pillow>=10.0",
-    "requests>=2.28.2",
     "ruamel-base>=1.0.0",
     "loguru>=0.7.0",
     "pyyaml>=6.0",
@@ -37,6 +34,8 @@ dependencies = [
     "FGI-YAML-Formattor>=0.1.0,<1.0",
     "yamlgenerator-hook-search>=1.0.1,<2.0",
     "yamlgenerator-hook-validate>=1.0.0a1,<2.0",
+    "curl-cffi>=0.7.3",
+    "jq>=1.8.0",
 ]
 
 urls = { "Homepage" = "https://github.com/FurryGamesIndex/GameYamlSpiderAndGenerator/" }

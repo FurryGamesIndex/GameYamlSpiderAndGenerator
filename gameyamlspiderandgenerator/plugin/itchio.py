@@ -15,11 +15,6 @@ from ..util.spider import get_text
 class ItchIO(BasePlugin):
     _VERIFY_PATTERN = re.compile(r"https?://.+\.itch\.io/.+")
 
-    @staticmethod
-    def remove_query(s: str):
-        s = re.sub(r"\?t=\d{6,12}", "", s)
-        return s.replace("![]", "![img]")
-
     def __init__(self, link: str) -> None:
         self.link = link
         self.data_html = get_text(link)
@@ -57,7 +52,7 @@ class ItchIO(BasePlugin):
 
     def get_desc(self):
         return (
-            self.remove_query(
+            self._remove_query(
                 html2text(
                     str(
                         self.soup.select_one("div.formatted_description.user_formatted")
