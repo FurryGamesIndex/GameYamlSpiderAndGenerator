@@ -20,7 +20,8 @@ class BasePlugin(abc.ABC):
         s = re.sub(r"\?t=\d{6,12}", "", s)
         return s.replace("![]", "![img]")
 
-    def verify(self, url: str) -> bool:
+    @classmethod
+    def verify(cls, url: str) -> bool:
         """
         Verify if the URL meets the plugin's requirements
 
@@ -30,7 +31,7 @@ class BasePlugin(abc.ABC):
         Returns:
             Whether it meets the requirements
         """
-        return self._VERIFY_PATTERN.match(url) is not None
+        return cls._VERIFY_PATTERN.match(url) is not None
 
     @staticmethod
     def _load_hook(data: dict):
