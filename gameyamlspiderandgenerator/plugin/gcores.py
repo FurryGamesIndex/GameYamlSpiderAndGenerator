@@ -37,6 +37,7 @@ class Gcores(BasePlugin):
             "文案": "screenwriter",
             "美术": "artist",
             "动画": "animation",
+            "制作": "developer",
             "开发": "developer",
             "音乐": "musician",
             "音效": "musician",
@@ -47,21 +48,24 @@ class Gcores(BasePlugin):
         }
 
         def parse_role(role: str | list):
-            ret = []
+            _ret = set()
             if isinstance(role, list):
-                ret = [
+                _ret = {
                     _position_dict[_]
                     for single_role in role
                     for _ in _position_dict
                     if _ in single_role
-                ]
+                }
             else:
-                ret = [_position_dict[_] for _ in _position_dict if _ in role]
-            if not ret:  # check if empty
+                _ret = {_position_dict[_] for _ in _position_dict if _ in role}
+            if isinstance(role, str) and not _ret:
+                logger.warning(f"Can't find {role}")
+                return ["developer"]
+            elif isinstance(role, list) and len(role) != len(_ret):
                 logger.warning(f"Can't find {role}")
                 return ["developer"]
             else:
-                return ret
+                return list(_ret)
 
         author_id: list[str, str] = self.parser(
             '.included | map(select(.type == "users") | [ .attributes.nickname, .id ])'
