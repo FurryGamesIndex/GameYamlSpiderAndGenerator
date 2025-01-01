@@ -33,51 +33,68 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Get Version from pyproject.toml
+        id: get_version
+        run: |
+          version=$(grep -Po '(?<=version = ")[^"]+' pyproject.toml)
+          echo "version=$version" >> $GITHUB_ENV
+
+      - name: Get Last Commit Version
+        id: last_commit_version
+        run: |
+          commit_version=$(git log -1 --pretty=%B | grep -oP 'v?\d+\.\d+\.\d+' || echo "none")
+          echo "last_commit_version=$commit_version" >> $GITHUB_ENV
+
+      - name: Check if Versions Match
+        id: check_versions
+        run: |
+          if [[ "${{ env.version }}" == "${{ env.last_commit_version }}" ]]; then
+            echo "Versions match, skipping build."
+            echo "skip_build=true" >> $GITHUB_ENV
+          else
+            echo "Versions do not match, proceeding with build."
+            echo "skip_build=false" >> $GITHUB_ENV
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+        if: env.skip_build != 'true'
 
       - name: Cache pip dependencies
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('pdm.lock') }}
+        if: env.skip_build != 'true'
 
       - name: Install PDM
         run: pip install pdm
+        if: env.skip_build != 'true'
 
       - name: Install Dependencies
         run: |
           pdm install
           pdm run pip install pyinstaller
+        if: env.skip_build != 'true'
 
       - name: Build Binary with PyInstaller
         run: |
-          pdm run pyinstaller GameYamlSpider.spec --clean --onefile
+          pdm run pyinstaller GameYamlSpider.spec
         env:
           PATH: ${{ github.workspace }}/.pdm/bin:${{ env.PATH }}
+        if: env.skip_build != 'true'
+
+      - name: Package with Zipfile
+        run: |
+          python -m zipfile -c dist/GameYamlSpider.zip dist/GameYamlSpider
+        if: env.skip_build != 'true'
 
   release:
     runs-on: ubuntu-latest
     needs: build
     steps:
       - uses: actions/checkout@v4
-
-      - name: Get Version from pyproject.toml
-        id: version
-        run: |
-          version=$(grep -Po '(?<=version = ")[^"]+' pyproject.toml)
-          echo "version=$version" >> $GITHUB_ENV
-
-      - name: Check if Version is Pre-release
-        id: prerelease-check
-        run: |
-          # 检查版本号是否包含预发布标识（例如 a, b, rc）
-          if [[ "${{ env.version }}" =~ a|b|rc ]]; then
-            echo "prerelease=true" >> $GITHUB_ENV
-          else
-            echo "prerelease=false" >> $GITHUB_ENV
 
       - name: Check Previous Release
         id: release-check
@@ -105,6 +122,6 @@ jobs:
         with:
           repo: ${{ github.repository }}
           release_id: ${{ steps.create-release.outputs.id }}
-          asset_path: dist/
-          asset_name: ${{ matrix.os }}-binary-${{ env.version }}
-          asset_content_type: application/octet-stream
+          asset_path: dist/GameYamlSpider.zip
+          asset_name: ${{ matrix.os }}-binary-${{ env.version }}.zip
+          asset_content_type: application/zip
