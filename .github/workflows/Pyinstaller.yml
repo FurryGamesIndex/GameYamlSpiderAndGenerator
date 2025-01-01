@@ -78,17 +78,19 @@ jobs:
             echo "skip_build=false" >> $env:GITHUB_ENV
           }
 
+      - name: Cache PDM dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pdm
+            ~/.cache/pip
+          key: ${{ runner.os }}-pdm-${{ matrix.python-version }}-${{ hashFiles('pdm.lock', 'pyproject.toml') }}
+        if: env.skip_build != 'true'
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-        if: env.skip_build != 'true'
-
-      - name: Cache pip dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('pdm.lock') }}
         if: env.skip_build != 'true'
 
       - name: Install PDM
@@ -97,7 +99,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pdm install
+          pdm install --no-lock  # Use --no-lock to avoid modifying the lock file
           pdm run -m ensurepip --upgrade
           pdm run pip install pyinstaller
         if: env.skip_build != 'true'
