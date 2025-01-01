@@ -36,7 +36,7 @@ jobs:
       - name: Get Version from pyproject.toml
         id: get_version
         run: |
-          version=$(grep -Po '(?<=version = ")[^"]+' pyproject.toml)
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
           echo "version=$version" >> $GITHUB_ENV
 
       - name: Get Last Commit Version
