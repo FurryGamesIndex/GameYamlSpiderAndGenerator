@@ -103,20 +103,13 @@ jobs:
           pip install pyinstaller
         if: env.skip_build != 'true'
 
-      - name: Build Binary with PyInstaller (Windows)
+      - name: Build Binary with PyInstaller
         run: |
-          ./.venv/bin/activate.ps1
-          pyinstaller GameYamlSpider.spec
+          pdm run pyinstaller GameYamlSpider.spec 
         env:
           PATH: ${{ github.workspace }}/.pdm/bin:${{ env.PATH }}
-        if: env.skip_build != 'true' && runner.os == 'Windows'
-      - name: Build Binary with PyInstaller (Unix)
-        run: |
-          source .venv/bin/activate
-          pyinstaller GameYamlSpider.spec
-        env:
-          PATH: ${{ github.workspace }}/.pdm/bin:${{ env.PATH }}
-        if: env.skip_build != 'true' && runner.os != 'Windows'
+        if: env.skip_build != 'true'
+        
       - name: Package with Zipfile (Unix)
         if: runner.os != 'Windows' && env.skip_build != 'true'
         run: python -m zipfile -c dist/GameYamlSpider.zip dist/GameYamlSpider
