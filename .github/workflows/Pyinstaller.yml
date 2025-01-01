@@ -32,6 +32,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Get Version from pyproject.toml (Unix)
         if: runner.os != 'Windows'
@@ -48,13 +50,13 @@ jobs:
       - name: Get Last Commit Version (Unix)
         if: runner.os != 'Windows'
         run: |
-          commit_version=$(git show HEAD~1:pyproject.toml | grep '^version' | sed 's/^version = "\(.*\)"/\1/')
+          commit_version=$(git show HEAD^:pyproject.toml | grep '^version' | sed 's/^version = "\(.*\)"/\1/')
           echo "last_commit_version=$commit_version" >> $GITHUB_ENV
 
       - name: Get Last Commit Version (Windows)
         if: runner.os == 'Windows'
         run: |
-          $commit_version = (git show HEAD~1:pyproject.toml | grep '^version' | sed 's/^version = "\(.*\)"/\1/')
+          $commit_version = (git show HEAD^:pyproject.toml | grep '^version' | sed 's/^version = "\(.*\)"/\1/')
           if (!$commit_version) { $commit_version = "none" }
           echo "last_commit_version=$commit_version" >> $env:GITHUB_ENV
 
@@ -97,11 +99,11 @@ jobs:
         run: |
           pdm install
           python -m ensurepip --upgrade
-          pdm run python -m pip install pyinstaller
+          pdm run pip install pyinstaller
         if: env.skip_build != 'true'
 
       - name: Build Binary with PyInstaller
-        run: pdm run python -m pyinstaller GameYamlSpider.spec
+        run: pdm run pyinstaller GameYamlSpider.spec
         env:
           PATH: ${{ github.workspace }}/.pdm/bin:${{ env.PATH }}
         if: env.skip_build != 'true'
