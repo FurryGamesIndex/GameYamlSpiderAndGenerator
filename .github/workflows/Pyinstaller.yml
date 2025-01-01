@@ -98,7 +98,7 @@ jobs:
       - name: Install Dependencies
         run: |
           pdm install
-          python -m ensurepip --upgrade
+          pdm run -m ensurepip --upgrade
           pdm run pip install pyinstaller
         if: env.skip_build != 'true'
 
