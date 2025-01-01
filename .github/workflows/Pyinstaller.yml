@@ -22,7 +22,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [windows-latest]
         python-version: [3.11]
         include:
           - os: macos-latest
@@ -99,13 +99,13 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pdm install --no-lock  # Use --no-lock to avoid modifying the lock file
+          pdm install
           pip install pyinstaller
         if: env.skip_build != 'true'
 
       - name: Build Binary with PyInstaller (Windows)
         run: |
-          
+          ./venv/bin/activate.ps1
           pyinstaller GameYamlSpider.spec
         env:
           PATH: ${{ github.workspace }}/.pdm/bin:${{ env.PATH }}
