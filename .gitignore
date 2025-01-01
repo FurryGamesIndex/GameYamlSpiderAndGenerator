@@ -4,3 +4,7 @@ __pycache__
 dist
 tests/Atopes.zip
 tests/Springblades.zip
+/managed_context/
+/gameyamlspiderandgenerator.egg-info/
+/test_suite_analysis/
+/build/
