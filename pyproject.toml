@@ -8,7 +8,7 @@ all = [
 
 [project]
 name = "gameyamlspiderandgenerator"
-version = "2.0.4dev"
+version = "2.1.0dev"
 description = "A useful tool for generating Furrygameindex yaml files"
 readme = "README.md"
 authors = [
@@ -61,3 +61,5 @@ classifiers = [
 
 [project.optional-dependencies]
 openai = ["yamlgenerator-hook-openai>=1.0.0b,<2.0"]
+[tool.setuptools]
+packages = ["gameyamlspiderandgenerator"]
