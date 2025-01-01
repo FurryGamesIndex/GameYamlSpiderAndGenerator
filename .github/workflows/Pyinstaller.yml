@@ -36,13 +36,21 @@ jobs:
       - name: Get Version from pyproject.toml
         id: get_version
         run: |
-          version=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
+          if [[ "${{ runner.os }}" == "macos" || "${{ runner.os }}" == "ubuntu" ]]; then
+            version=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
+          elif [[ "${{ runner.os }}" == "windows" ]]; then
+            version=$(Select-String -Path pyproject.toml -Pattern '^version = "(.*)"' | ForEach-Object { $_.Matches.Groups[1].Value })
+          fi
           echo "version=$version" >> $GITHUB_ENV
 
       - name: Get Last Commit Version
         id: last_commit_version
         run: |
-          commit_version=$(git log -1 --pretty=%B | grep -oP 'v?\d+\.\d+\.\d+' || echo "none")
+          if [[ "${{ runner.os }}" == "macos" || "${{ runner.os }}" == "ubuntu" ]]; then
+            commit_version=$(git log -1 --pretty=%B | grep -oP 'v?\d+\.\d+\.\d+' || echo "none")
+          elif [[ "${{ runner.os }}" == "windows" ]]; then
+            commit_version=$(git log -1 --pretty=%B | Select-String -Pattern 'v?\d+\.\d+\.\d+' | ForEach-Object { $_.Matches.Value } || echo "none")
+          fi
           echo "last_commit_version=$commit_version" >> $GITHUB_ENV
 
       - name: Check if Versions Match
@@ -87,7 +95,11 @@ jobs:
 
       - name: Package with Zipfile
         run: |
-          python -m zipfile -c dist/GameYamlSpider.zip dist/GameYamlSpider
+          if [[ "${{ runner.os }}" == "macos" || "${{ runner.os }}" == "ubuntu" ]]; then
+            python -m zipfile -c dist/GameYamlSpider.zip dist/GameYamlSpider
+          elif [[ "${{ runner.os }}" == "windows" ]]; then
+            python -m zipfile -c dist\\GameYamlSpider.zip dist\\GameYamlSpider
+          fi
         if: env.skip_build != 'true'
 
   release:
