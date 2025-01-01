@@ -105,7 +105,7 @@ jobs:
 
       - name: Build Binary with PyInstaller (Windows)
         run: |
-          ./venv/bin/activate.ps1
+          ./.venv/bin/activate.ps1
           pyinstaller GameYamlSpider.spec
         env:
           PATH: ${{ github.workspace }}/.pdm/bin:${{ env.PATH }}

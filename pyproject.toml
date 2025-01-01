@@ -8,7 +8,7 @@ all = [
 
 [project]
 name = "gameyamlspiderandgenerator"
-version = "2.1.0dev8"
+version = "2.1.0dev9"
 description = "A useful tool for generating Furrygameindex yaml files"
 readme = "README.md"
 authors = [
