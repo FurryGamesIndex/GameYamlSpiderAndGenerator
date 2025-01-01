@@ -48,7 +48,7 @@ jobs:
       - name: Get Last Commit Version (Unix)
         if: runner.os != 'Windows'
         run: |
-          commit_version=$(git log -1 --pretty=%B | grep -oP 'v?\d+\.\d+\.\d+' || echo "none")
+          commit_version=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
           echo "last_commit_version=$commit_version" >> $GITHUB_ENV
 
       - name: Get Last Commit Version (Windows)
@@ -96,11 +96,11 @@ jobs:
       - name: Install Dependencies
         run: |
           pdm install
-          pdm run pip install pyinstaller
+          pdm run python -m pip install pyinstaller
         if: env.skip_build != 'true'
 
       - name: Build Binary with PyInstaller
-        run: pdm run pyinstaller GameYamlSpider.spec
+        run: pdm run python -m pyinstaller GameYamlSpider.spec
         env:
           PATH: ${{ github.workspace }}/.pdm/bin:${{ env.PATH }}
         if: env.skip_build != 'true'
