@@ -23,7 +23,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, windows-latest]
-        python-version: [3.13]
+        python-version: [3.11]
         include:
           - os: macos-latest
             spec: GameYamlSpider.spec
@@ -42,19 +42,19 @@ jobs:
       - name: Get Version from pyproject.toml (Windows)
         if: runner.os == 'Windows'
         run: |
-          $version = (Select-String -Path pyproject.toml -Pattern '^version = "(.*)"').Matches.Groups[1].Value
+          $version = (sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
           echo "version=$version" >> $env:GITHUB_ENV
 
       - name: Get Last Commit Version (Unix)
         if: runner.os != 'Windows'
         run: |
-          commit_version=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])" )
+          commit_version=$(git show HEAD:pyproject.toml | grep '^version' | sed 's/^version = "\(.*\)"/\1/')
           echo "last_commit_version=$commit_version" >> $GITHUB_ENV
 
       - name: Get Last Commit Version (Windows)
         if: runner.os == 'Windows'
         run: |
-          $commit_version = (python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          $commit_version = (git show HEAD:pyproject.toml | grep '^version' | sed 's/^version = "\(.*\)"/\1/')
           if (!$commit_version) { $commit_version = "none" }
           echo "last_commit_version=$commit_version" >> $env:GITHUB_ENV
 
