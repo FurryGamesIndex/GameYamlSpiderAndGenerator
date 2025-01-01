@@ -54,7 +54,7 @@ jobs:
           else
             echo "Versions do not match, proceeding with build."
             echo "skip_build=false" >> $GITHUB_ENV
-
+          fi
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
