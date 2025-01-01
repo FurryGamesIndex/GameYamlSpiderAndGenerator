@@ -100,16 +100,23 @@ jobs:
       - name: Install Dependencies
         run: |
           pdm install --no-lock  # Use --no-lock to avoid modifying the lock file
-          pdm run -m ensurepip --upgrade
-          pdm run pip install pyinstaller
+          pip install pyinstaller
         if: env.skip_build != 'true'
 
-      - name: Build Binary with PyInstaller
-        run: pdm run pyinstaller GameYamlSpider.spec
+      - name: Build Binary with PyInstaller (Windows)
+        run: |
+          
+          pyinstaller GameYamlSpider.spec
         env:
           PATH: ${{ github.workspace }}/.pdm/bin:${{ env.PATH }}
-        if: env.skip_build != 'true'
-
+        if: env.skip_build != 'true' && runner.os == 'Windows'
+      - name: Build Binary with PyInstaller (Unix)
+        run: |
+          source .venv/bin/activate
+          pyinstaller GameYamlSpider.spec
+        env:
+          PATH: ${{ github.workspace }}/.pdm/bin:${{ env.PATH }}
+        if: env.skip_build != 'true' && runner.os != 'Windows'
       - name: Package with Zipfile (Unix)
         if: runner.os != 'Windows' && env.skip_build != 'true'
         run: python -m zipfile -c dist/GameYamlSpider.zip dist/GameYamlSpider
