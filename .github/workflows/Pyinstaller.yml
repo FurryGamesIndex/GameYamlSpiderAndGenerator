@@ -14,15 +14,15 @@ on:
       - 'pdm.lock'
 
 permissions:
-  contents: write  # 用于上传 Release 资源
-  actions: write   # 用于创建 Release
+  contents: write
+  actions: write
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]  # 只针对 macOS 和 Windows 构建
+        os: [macos-latest, windows-latest]
         python-version: [3.11]
         include:
           - os: macos-latest
@@ -33,36 +33,49 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Get Version from pyproject.toml
-        id: get_version
+      - name: Get Version from pyproject.toml (Unix)
+        if: runner.os != 'Windows'
         run: |
-          if [[ "${{ runner.os }}" == "macos" || "${{ runner.os }}" == "ubuntu" ]]; then
-            version=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
-          elif [[ "${{ runner.os }}" == "windows" ]]; then
-            version=$(Select-String -Path pyproject.toml -Pattern '^version = "(.*)"' | ForEach-Object { $_.Matches.Groups[1].Value })
-          fi
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
           echo "version=$version" >> $GITHUB_ENV
 
-      - name: Get Last Commit Version
-        id: last_commit_version
+      - name: Get Version from pyproject.toml (Windows)
+        if: runner.os == 'Windows'
         run: |
-          if [[ "${{ runner.os }}" == "macos" || "${{ runner.os }}" == "ubuntu" ]]; then
-            commit_version=$(git log -1 --pretty=%B | grep -oP 'v?\d+\.\d+\.\d+' || echo "none")
-          elif [[ "${{ runner.os }}" == "windows" ]]; then
-            commit_version=$(git log -1 --pretty=%B | Select-String -Pattern 'v?\d+\.\d+\.\d+' | ForEach-Object { $_.Matches.Value } || echo "none")
-          fi
+          $version = (Select-String -Path pyproject.toml -Pattern '^version = "(.*)"').Matches.Groups[1].Value
+          echo "version=$version" >> $env:GITHUB_ENV
+
+      - name: Get Last Commit Version (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          commit_version=$(git log -1 --pretty=%B | grep -oP 'v?\d+\.\d+\.\d+' || echo "none")
           echo "last_commit_version=$commit_version" >> $GITHUB_ENV
 
-      - name: Check if Versions Match
-        id: check_versions
+      - name: Get Last Commit Version (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          $commit_version = (git log -1 --pretty=%B | Select-String -Pattern 'v?\d+\.\d+\.\d+').Matches.Value
+          if (!$commit_version) { $commit_version = "none" }
+          echo "last_commit_version=$commit_version" >> $env:GITHUB_ENV
+
+      - name: Check if Versions Match (Unix)
+        if: runner.os != 'Windows'
         run: |
           if [[ "${{ env.version }}" == "${{ env.last_commit_version }}" ]]; then
-            echo "Versions match, skipping build."
             echo "skip_build=true" >> $GITHUB_ENV
           else
-            echo "Versions do not match, proceeding with build."
             echo "skip_build=false" >> $GITHUB_ENV
           fi
+
+      - name: Check if Versions Match (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          if ("${{ env.version }}" -eq "${{ env.last_commit_version }}") {
+            echo "skip_build=true" >> $env:GITHUB_ENV
+          } else {
+            echo "skip_build=false" >> $env:GITHUB_ENV
+          }
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -87,20 +100,18 @@ jobs:
         if: env.skip_build != 'true'
 
       - name: Build Binary with PyInstaller
-        run: |
-          pdm run pyinstaller GameYamlSpider.spec
+        run: pdm run pyinstaller GameYamlSpider.spec
         env:
           PATH: ${{ github.workspace }}/.pdm/bin:${{ env.PATH }}
         if: env.skip_build != 'true'
 
-      - name: Package with Zipfile
-        run: |
-          if [[ "${{ runner.os }}" == "macos" || "${{ runner.os }}" == "ubuntu" ]]; then
-            python -m zipfile -c dist/GameYamlSpider.zip dist/GameYamlSpider
-          elif [[ "${{ runner.os }}" == "windows" ]]; then
-            python -m zipfile -c dist\\GameYamlSpider.zip dist\\GameYamlSpider
-          fi
-        if: env.skip_build != 'true'
+      - name: Package with Zipfile (Unix)
+        if: runner.os != 'Windows' && env.skip_build != 'true'
+        run: python -m zipfile -c dist/GameYamlSpider.zip dist/GameYamlSpider
+
+      - name: Package with Zipfile (Windows)
+        if: runner.os == 'Windows' && env.skip_build != 'true'
+        run: python -m zipfile -c dist\GameYamlSpider.zip dist\GameYamlSpider
 
   release:
     runs-on: ubuntu-latest
