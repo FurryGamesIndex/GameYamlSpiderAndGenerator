@@ -96,7 +96,7 @@ jobs:
           echo "version=$version" >> $GITHUB_ENV
           if [[ "$version" =~ (a|b|dev|rc)\d? ]]; then
             echo "This is a pre-release version. Skipping GitHub release."
-            exit 0
+            exit 1
           else
             echo "This is a stable release."
           fi
