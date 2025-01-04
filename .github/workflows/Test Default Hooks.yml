@@ -8,7 +8,7 @@ on:
       - master
     paths:
       - '**.py'
-      - '**.yml'
+      - 'Test*.yml'
       - '**.lock'
       - '**.yaml'
 permissions:

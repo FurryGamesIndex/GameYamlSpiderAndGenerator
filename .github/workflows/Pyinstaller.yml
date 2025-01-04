@@ -1,0 +1,114 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - dev
+      - master
+    paths:
+      - 'pyproject.toml'
+
+permissions:
+  contents: write
+  actions: write
+jobs:
+  build:
+    runs-on: windows-latest
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Get Version from pyproject.toml
+        id: get-version
+        run: |
+          $version = (Get-Content pyproject.toml | Select-String -Pattern '^version = "(.*)"' | ForEach-Object { $_.Matches.Groups[1].Value })
+          echo "version=$version" >> $env:GITHUB_ENV
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Get Last Commit Version
+        run: |
+          $commit_version = (git show HEAD^:pyproject.toml | Select-String -Pattern '^version = "(.*)"' | ForEach-Object { $_.Matches.Groups[1].Value })
+          if (!$commit_version) { $commit_version = "none" }
+          echo "last_commit_version=$commit_version" >> $env:GITHUB_ENV
+
+      - name: Check if Versions Match
+        run: |
+          if ("${{ env.version }}" -eq "${{ env.last_commit_version }}") {
+            echo "skip_build=true" >> $env:GITHUB_ENV
+          } else {
+            echo "skip_build=false" >> $env:GITHUB_ENV
+          }
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+        if: env.skip_build != 'true'
+
+      - name: Install PDM
+        run: pip install pdm
+        if: env.skip_build != 'true'
+
+      - name: Install Dependencies
+        run: |
+          pdm install
+          pip install pyinstaller
+        if: env.skip_build != 'true'
+
+      - name: Build Binary with PyInstaller
+        run: |
+          $env:PYTHONPATH = ".\.venv\Lib\site-packages"; pyinstaller --name GameYamlSpider `
+          --add-data "gameyamlspiderandgenerator\plugin:gameyamlspiderandgenerator\plugin" `
+          --add-data "./.venv/lib/site-packages/language_data/data:language_data\data" `
+          --add-data ./.venv/lib/site-packages/ruamel/yaml/string/__plug_in__.py:ruamel/yaml/string `
+          --hidden-import gameyamlspiderandgenerator.plugin.gcores `
+          --hidden-import gameyamlspiderandgenerator.plugin.itchio `
+          --hidden-import gameyamlspiderandgenerator.plugin.steam `
+          --hidden-import yamlgenerator_hook_search `
+          --hidden-import language_data `
+          --hidden-import ruamel.yaml.string `
+          --hidden-import yamlgenerator_hook_validate `
+          pkg.py
+        env:
+          PATH: ${{ github.workspace }}/.pdm/bin:${{ env.PATH }}
+        if: env.skip_build != 'true'
+
+      - name: Package with Zipfile
+        run: python -m zipfile -c dist\GameYamlSpider.zip dist\GameYamlSpider
+        if: env.skip_build != 'true'
+        
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameYamlSpider-zip
+          path: dist/GameYamlSpider.zip
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Set Is Pre-release
+        id: prerelease-check
+        run: |
+          version="${{ needs.build.outputs.version }}"
+          echo "version=$version" >> $GITHUB_ENV
+          if [[ "$version" =~ (a|b|dev|rc)\d? ]]; then
+            echo "This is a pre-release version. Skipping GitHub release."
+            echo "pre_release=true" >> $GITHUB_ENV
+          else
+            echo "This is a stable release."
+            echo "pre_release=false" >> $GITHUB_ENV
+          fi
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: GameYamlSpider-zip
+      - name: Upload Release Assets
+        if: env.pre_release == 'false'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: GameYamlSpider.zip
+          tag_name: v${{ env.version }}
+          target_commitish: ${{ github.ref }}
