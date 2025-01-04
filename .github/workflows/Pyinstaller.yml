@@ -79,7 +79,12 @@ jobs:
       - name: Package with Zipfile
         run: python -m zipfile -c dist\GameYamlSpider.zip dist\GameYamlSpider
         if: env.skip_build != 'true'
-
+        
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: GameYamlSpider-zip
+          path: dist/GameYamlSpider.zip
   release:
     runs-on: ubuntu-latest
     needs: build
@@ -96,9 +101,13 @@ jobs:
             echo "This is a stable release."
             echo "pre_release=false" >> $GITHUB_ENV
           fi
+      - name: Download artifact from build job
+        uses: actions/download-artifact@4
+        with:
+          name: GameYamlSpider-zip
       - name: Upload Release Assets
         if: env.pre_release == 'false'
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/GameYamlSpider.zip
-          tag_name: v${{ env.version }}
+          files: GameYamlSpider.zip
+          tag_name: v${{ needs.build.outputs.version }}
