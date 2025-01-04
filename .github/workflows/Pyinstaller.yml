@@ -3,7 +3,7 @@ name: Build and Release
 on:
   push:
     branches:
-      - fix-ci
+      - dev
       - master
     paths:
       - 'pyproject.toml'
@@ -111,3 +111,4 @@ jobs:
         with:
           files: GameYamlSpider.zip
           tag_name: v${{ env.version }}
+          target_commitish: ${{ github.ref }}
