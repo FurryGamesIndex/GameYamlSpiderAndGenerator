@@ -4,14 +4,9 @@ on:
   push:
     branches:
       - fix-ci
-      - dev
       - master
     paths:
-      - '**.py'
-      - '**.yml'
-      - '**.yaml'
       - 'pyproject.toml'
-      - 'pdm.lock'
 
 permissions:
   contents: write
@@ -19,58 +14,25 @@ permissions:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os:  [windows-latest] #[macos-latest, windows-latest]
-        python-version: [3.11]
-        include:
-         # - os: macos-latest
-         #   spec: GameYamlSpider.spec
-          - os: windows-latest
-            spec: GameYamlSpider.spec
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
-      - name: Get Version from pyproject.toml (Unix)
-        if: runner.os != 'Windows'
+      - name: Get Version from pyproject.toml
         run: |
-          version=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
-          echo "version=$version" >> $GITHUB_ENV
-
-      - name: Get Version from pyproject.toml (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          $version = (sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
+          $version = (Get-Content pyproject.toml | Select-String -Pattern '^version = "(.*)"' | ForEach-Object { $_.Matches.Groups[1].Value })
           echo "version=$version" >> $env:GITHUB_ENV
 
-      - name: Get Last Commit Version (Unix)
-        if: runner.os != 'Windows'
+      - name: Get Last Commit Version
         run: |
-          commit_version=$(git show HEAD^:pyproject.toml | grep '^version' | sed 's/^version = "\(.*\)"/\1/')
-          echo "last_commit_version=$commit_version" >> $GITHUB_ENV
-
-      - name: Get Last Commit Version (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          $commit_version = (git show HEAD^:pyproject.toml | grep '^version' | sed 's/^version = "\(.*\)"/\1/')
+          $commit_version = (git show HEAD^:pyproject.toml | Select-String -Pattern '^version = "(.*)"' | ForEach-Object { $_.Matches.Groups[1].Value })
           if (!$commit_version) { $commit_version = "none" }
           echo "last_commit_version=$commit_version" >> $env:GITHUB_ENV
 
-      - name: Check if Versions Match (Unix)
-        if: runner.os != 'Windows'
-        run: |
-          if [[ "${{ env.version }}" == "${{ env.last_commit_version }}" ]]; then
-            echo "skip_build=true" >> $GITHUB_ENV
-          else
-            echo "skip_build=false" >> $GITHUB_ENV
-          fi
-
-      - name: Check if Versions Match (Windows)
-        if: runner.os == 'Windows'
+      - name: Check if Versions Match
         run: |
           if ("${{ env.version }}" -eq "${{ env.last_commit_version }}") {
             echo "skip_build=true" >> $env:GITHUB_ENV
@@ -84,13 +46,13 @@ jobs:
           path: |
             ~/.cache/pdm
             ~/.cache/pip
-          key: ${{ runner.os }}-pdm-${{ matrix.python-version }}-${{ hashFiles('pdm.lock', 'pyproject.toml') }}
+          key: windows-pdm-${{ matrix.python-version }}-${{ hashFiles('pdm.lock', 'pyproject.toml') }}
         if: env.skip_build != 'true'
 
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.11
         if: env.skip_build != 'true'
 
       - name: Install PDM
@@ -105,18 +67,25 @@ jobs:
 
       - name: Build Binary with PyInstaller
         run: |
-          pdm run pyinstaller GameYamlSpider.spec 
+           $env:PYTHONPATH = ".\.venv\Lib\site-packages"; pyinstaller --name GameYamlSpider `
+           --add-data "gameyamlspiderandgenerator\plugin:gameyamlspiderandgenerator\plugin" `
+           --add-data "./.venv/lib/site-packages/language_data/data:language_data\data" `
+           --add-data ./.venv/lib/site-packages/ruamel/yaml/string/__plug_in__.py:ruamel/yaml/string `
+           --hidden-import gameyamlspiderandgenerator.plugin.gcores `
+           --hidden-import gameyamlspiderandgenerator.plugin.itchio `
+           --hidden-import gameyamlspiderandgenerator.plugin.steam `
+           --hidden-import yamlgenerator_hook_search `
+           --hidden-import language_data `
+           --hidden-import ruamel.yaml.string `
+           --hidden-import yamlgenerator_hook_validate `
+           pkg.py
         env:
           PATH: ${{ github.workspace }}/.pdm/bin:${{ env.PATH }}
         if: env.skip_build != 'true'
         
-      - name: Package with Zipfile (Unix)
-        if: runner.os != 'Windows' && env.skip_build != 'true'
-        run: python -m zipfile -c dist/GameYamlSpider.zip dist/GameYamlSpider
-
-      - name: Package with Zipfile (Windows)
-        if: runner.os == 'Windows' && env.skip_build != 'true'
+      - name: Package with Zipfile
         run: python -m zipfile -c dist\GameYamlSpider.zip dist\GameYamlSpider
+        if: env.skip_build != 'true'
 
   release:
     runs-on: ubuntu-latest
@@ -148,5 +117,5 @@ jobs:
           repo: ${{ github.repository }}
           release_id: ${{ steps.create-release.outputs.id }}
           asset_path: dist/GameYamlSpider.zip
-          asset_name: ${{ matrix.os }}-binary-${{ env.version }}.zip
+          asset_name: windows-binary-${{ env.version }}.zip
           asset_content_type: application/zip
