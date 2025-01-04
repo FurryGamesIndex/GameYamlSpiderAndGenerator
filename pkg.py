@@ -1,0 +1,1 @@
+import gameyamlspiderandgenerator.__main__
