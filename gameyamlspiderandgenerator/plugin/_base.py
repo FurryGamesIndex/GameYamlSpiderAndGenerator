@@ -11,30 +11,35 @@ from ..exception import GenerateError
 
 
 class BasePlugin(abc.ABC):
-    """插件基类"""
+    """Base class for plugins"""
 
     _VERIFY_PATTERN: re.Pattern
+
+    @staticmethod
+    def _remove_query(s: str):
+        s = re.sub(r"\?t=\d{6,12}", "", s)
+        return s.replace("![]", "![img]")
 
     @classmethod
     def verify(cls, url: str) -> bool:
         """
-        验证 URL 是否符合插件的要求
+        Verify if the URL meets the plugin's requirements
 
         Args:
-            url: URL
+            url: The URL
 
         Returns:
-            是否符合要求
+            Whether it meets the requirements
         """
         return cls._VERIFY_PATTERN.match(url) is not None
 
     @staticmethod
     def _load_hook(data: dict):
         """
-        加载钩子
+        Load hooks
 
         Args:
-            data: 钩子数据
+            data: Hook data
         """
         from ..util.plugin_manager import pkg
 
@@ -64,107 +69,111 @@ class BasePlugin(abc.ABC):
     @abc.abstractmethod
     def get_name(self) -> str:
         """
-        获取游戏名称
+        Get the game name
 
         Returns:
-            游戏名称
+            The game name
         """
 
     @abc.abstractmethod
     def get_desc(self) -> str:
         """
-        获取游戏描述
+        Get the game description
 
         Returns:
-            游戏描述
+            The game description
         """
 
     @abc.abstractmethod
     def get_brief_desc(self) -> str:
         """
-        获取游戏简介
+        Get the game brief description
 
         Returns:
-            游戏简介
+            The game brief description
         """
 
     @abc.abstractmethod
     def get_thumbnail(self) -> str:
         """
-        获取游戏封面
+        Get the game cover
 
         Returns:
-            游戏封面
+            The game cover
         """
 
     @abc.abstractmethod
     def get_authors(self) -> list[dict]:
         """
-        获取游戏作者
+        Get the game authors
 
         Returns:
-            游戏作者
+            The game authors
         """
 
     @abc.abstractmethod
-    def get_tags(self) -> list[dict]:
+    def get_tags(self) -> list[str]:
         """
-        获取游戏标签
+        Get the game tags
 
         Returns:
-            游戏标签
+            The game tags
         """
 
     @abc.abstractmethod
     def get_misc_tags(self) -> list[dict]:
         """
-        获取游戏其他标签
+        Get other game tags
 
         Returns:
-            游戏其他标签
+            Other game tags
         """
 
     @abc.abstractmethod
     def get_platforms(self) -> list[str]:
         """
-        获取游戏平台
+        Get the game platforms
 
         Returns:
-            游戏平台
+            The game platforms
         """
 
     @abc.abstractmethod
     def get_langs(self) -> list[str]:
         """
-        获取游戏语言
+        Get the game languages
 
         Returns:
-            游戏语言
+            The game languages
         """
 
     @abc.abstractmethod
     def get_links(self) -> list[dict]:
         """
-        获取游戏链接
+        Get the game links
 
         Returns:
-            游戏链接
+            The game links
         """
 
     @abc.abstractmethod
     def get_screenshots(self) -> list[str]:
         """
-        获取游戏截图
+        Get the game screenshots
 
         Returns:
-            游戏截图
+            The game screenshots
         """
 
     @abc.abstractmethod
     def to_yaml(self) -> YamlData:
         """
-        转换为 YAML
+        Convert to YAML
 
         Returns:
             YAML
         """
+
+    @abc.abstractmethod
+    def get_type_tags(self) -> list[dict]:
+        pass

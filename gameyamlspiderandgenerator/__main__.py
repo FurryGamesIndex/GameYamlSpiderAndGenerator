@@ -6,7 +6,7 @@ from importlib.metadata import version
 from loguru import logger
 from yaml import safe_load
 
-from gameyamlspiderandgenerator import produce_yaml
+from . import produce_yaml
 from .util.config import config
 from .util.fgi import default_config
 from .util.fgi_yaml import get_valid_filename
@@ -65,6 +65,7 @@ if args.debug:
 if args.silent:
     logger.remove()
 logger.debug(sys.version)
+logger.debug(" ".join(sys.argv))
 logger.debug("version: " + version("gameyamlspiderandgenerator"))
 if isinstance(args.config, str):
     with open(args.config) as f:
@@ -87,7 +88,7 @@ if getenv_case_insensitive("HTTP_PROXY"):
         "http": getenv_case_insensitive("HTTP_PROXY"),
         "https": getenv_case_insensitive("HTTPS_PROXY"),
     }
-config.update(setting)
+config.load(setting)
 pkg.init()
 yml = produce_yaml(args.url, args.lang)
 if args.output is None:

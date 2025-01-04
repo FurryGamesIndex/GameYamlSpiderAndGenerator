@@ -25,11 +25,6 @@ class Steam(BasePlugin):
             else self.lang[3]
         )
 
-    @staticmethod
-    def remove_query(s: str):
-        s = re.sub(r"\?t=\d{6,12}", "", s)
-        return s.replace("![]", "![img]")
-
     def __init__(self, link: str, lang: str = "en") -> None:
         self.id = self.get_steam_id(link)
         self.json = get_json(
@@ -53,10 +48,10 @@ class Steam(BasePlugin):
             )
             result.append(executor.submit(get_text, link))
         self.data, self.data_html = (result[0].result(), result[1].result())
-        self.soup = BeautifulSoup(self.data_html, "lxml")
+        self._soup = BeautifulSoup(self.data_html, "lxml")
         self.name = self.get_name()
-        temp1 = self.soup.body.find_all("a", {"class": "app_tag"})
-        self.tag = [re.sub(r"[\n\t\r]*", "", temp1[i].text) for i in range(len(temp1))]
+        _app_tag = self._soup.body.find_all("a", {"class": "app_tag"})
+        self.tag = [re.sub(r"[\n\t\r]*", "", i.text) for i in _app_tag]
 
     def to_yaml(self):
         ret = {
@@ -66,7 +61,7 @@ class Steam(BasePlugin):
             "description-format": "markdown",
             "authors": self.get_authors(),
             "tags": {
-                "type": self.get_type_tag(),
+                "type": self.get_type_tags(),
                 "lang": self.get_langs(),
                 "platform": self.get_platforms(),
                 "publish": ["steam"],
@@ -84,7 +79,7 @@ class Steam(BasePlugin):
 
     def get_desc(self):
         return (
-            self.remove_query(
+            self._remove_query(
                 html2text(
                     self.data[str(self.id)]["data"]["detailed_description"],
                     bodywidth=0,
@@ -122,7 +117,7 @@ class Steam(BasePlugin):
         repl = {"windows": "windows", "mac": "macos", "linux": "linux"}
         return [repl[i] for i in temp if temp[i]]
 
-    def get_type_tag(self):
+    def get_type_tags(self):
         repl = {
             "Adventure": "adventure",
             "Action": "action",
@@ -150,7 +145,6 @@ class Steam(BasePlugin):
             ret.extend(value for ii in self.tag if i in ii)
         return list(set(ret))
 
-    @property
     def get_tags(self):
         return self.tag
 
@@ -174,25 +168,24 @@ class Steam(BasePlugin):
         return list(set(ret))
 
     def get_if_nsfw(self):
-        return (
-            self.soup.body.find_all("div", {"id": "game_area_content_descriptors"})
-            != []
+        return bool(
+            self._soup.body.find_all("div", {"id": "game_area_content_descriptors"})
         )
 
     def get_screenshots(self):
         return [
-            self.remove_query(i["path_full"])
+            self._remove_query(i["path_full"])
             for i in self.data[str(self.id)]["data"]["screenshots"]
         ]
 
     def get_video(self):
         is_nsfw = self.get_if_nsfw()
         video_webm = [
-            self.remove_query(i["webm"]["max"]).replace("http", "https")
+            self._remove_query(i["webm"]["max"]).replace("http", "https")
             for i in self.data[str(self.id)]["data"]["movies"]
         ]
         video_mp4 = [
-            self.remove_query(i["mp4"]["max"]).replace("http", "https")
+            self._remove_query(i["mp4"]["max"]).replace("http", "https")
             for i in self.data[str(self.id)]["data"]["movies"]
         ]
         return [
@@ -215,50 +208,52 @@ class Steam(BasePlugin):
         ]
 
     def get_links(self):
-        def remove_query_string(x: str):
-            return parse_qs(urlparse(x).query)["u"][0] if "linkfilter" in x else x
+        def remove_query_string(url: str):
+            return parse_qs(urlparse(url).query)["u"][0] if "linkfilter" in url else url
 
-        temp1 = self.soup.body.find(
-            "div",
-            attrs={"class": "game_area_description"},
+        description_div = self._soup.body.find("div", class_="game_area_description")
+        padding_div = self._soup.body.find("div", style="padding-top: 14px;")
+        anchor_tags = padding_div.find_all("a")
+
+        # 提取链接并移除查询字符串
+        tooltips = [
+            remove_query_string(a["data-tooltip-text"])
+            for a in anchor_tags
+            if "data-tooltip-text" in a.attrs
+        ]
+
+        website_url: str | None = self.json["data"]["website"]
+        if website_url:
+            website_url = website_url.replace(r"\/", "\\")
+
+        links = [
+            remove_query_string(a.attrs["href"])
+            for a in description_div.select("a[href]")
+        ]
+        unique_links = list(
+            set(links + tooltips + [website_url] if website_url else [])
         )
-        temp3 = self.soup.body.find("div", attrs={"style": "padding-top: 14px;"})
-        temp2 = temp3.find_all("a")
-        temp4 = [
-            remove_query_string(i["data-tooltip-text"])
-            for i in temp2
-            if "data-tooltip-text" in i.attrs
-        ]
-        temp5: str | None = self.json["data"]["website"]
-        if temp5:
-            temp5 = temp5.replace(r"\/", "\\")
-        temp = temp1.select("a[href]")
-        ret = []
-        for i in temp:
-            ret.append(remove_query_string(i.attrs["href"]))
 
-        data = [
-            {"url": i, "processed": False}
-            for i in list(set(ret + temp4 + [temp5] if temp5 else []))
-        ]
         processed_data = []
-        for i in data:
-            for p in fgi_dict:
-                if re.match(p["match"], i["url"]):
+        for url in unique_links:
+            for pattern in fgi_dict:
+                if re.match(pattern["match"], url):
                     processed_data.append(
                         {
-                            "name": p["prefix"],
-                            "uri": re.sub(p["match"], p["replace"], i["url"]),
+                            "name": pattern["prefix"],
+                            "uri": re.sub(pattern["match"], pattern["replace"], url),
                         }
                     )
-                    i["processed"] = True
-        for i in data:
-            if not i["processed"]:
-                processed_data.append({"name": ".website", "uri": i["url"]})
+                    break
+            else:
+                processed_data.append({"name": ".website", "uri": url})
+
         processed_data.append({"name": ".steam", "uri": f"steam:{self.id}"})
         return processed_data
 
     def get_thumbnail(self):
-        return self.remove_query(
-            self.soup.body.find("img", {"class": "game_header_image_full"}).attrs["src"]
+        return self._remove_query(
+            self._soup.body.find("img", {"class": "game_header_image_full"}).attrs[
+                "src"
+            ]
         )

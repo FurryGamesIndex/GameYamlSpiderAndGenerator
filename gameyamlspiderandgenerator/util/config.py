@@ -2,7 +2,6 @@ from fgi_yaml_formattor import fgi
 from .fgi import default_config
 from ..exception import ReadOrWriteConfigFailed
 from dataclasses import dataclass, field
-from deprecated import deprecated
 
 
 @dataclass(kw_only=True)
@@ -37,10 +36,6 @@ class Config:
                 self.__dict__.update(fgi.load(fp))
         except Exception as e:
             raise ReadOrWriteConfigFailed from e
-
-    @deprecated(version="2.0.2b")
-    def update(self, data: dict):
-        self.load(data)
 
 
 config = Config(**default_config)

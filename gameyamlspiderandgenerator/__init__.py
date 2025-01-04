@@ -14,7 +14,7 @@ logger.remove()
 logger.add(sys.stdout, level="WARNING")
 
 
-def verify(url: str) -> Callable[..., BasePlugin] | None:
+def verify(url: str) -> Callable[..., type[BasePlugin]] | None:
     if not pkg.plugin:
         raise PluginNotLoadedError
     verify_list = [

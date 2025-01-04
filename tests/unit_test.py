@@ -4,7 +4,10 @@ import unittest
 from pathlib import Path
 
 from gameyamlspiderandgenerator.util.config import config
+from loguru import logger
 
+logger.remove()
+logger.add(sys.stdout, level="DEBUG")
 config.load(Path(__file__).parent / "test_config.yaml")
 print(config)
 print("*" * 10)
@@ -24,6 +27,9 @@ class CliUnitTest(unittest.TestCase):
                 "-m",
                 "gameyamlspiderandgenerator",
                 "https://store.steampowered.com/app/1470120/Atopes/",
+                "-f",
+                "tests/test_config.yaml",
+                "--debug",
             ]
         )
         self.assertEqual(result.returncode, 0)
@@ -35,6 +41,9 @@ class CliUnitTest(unittest.TestCase):
                 "-m",
                 "gameyamlspiderandgenerator",
                 "https://fymm-game.itch.io/ddp",
+                "-f",
+                "tests/test_config.yaml",
+                "--debug",
             ]
         )
         self.assertEqual(result.returncode, 0)

@@ -5,6 +5,11 @@ from gameyamlspiderandgenerator import produce_yaml
 from gameyamlspiderandgenerator.util.config import config
 from gameyamlspiderandgenerator.util.fgi_yaml import get_valid_filename
 from gameyamlspiderandgenerator.util.plugin_manager import pkg
+from loguru import logger
+import sys
+
+logger.remove()
+logger.add(sys.stdout, level="DEBUG")
 
 
 def get_time(f):
