@@ -112,7 +112,7 @@ class BasePlugin(abc.ABC):
         """
 
     @abc.abstractmethod
-    def get_tags(self) -> list[dict]:
+    def get_tags(self) -> list[str]:
         """
         Get the game tags
 
@@ -173,3 +173,7 @@ class BasePlugin(abc.ABC):
         Returns:
             YAML
         """
+
+    @abc.abstractmethod
+    def get_type_tags(self) -> list[dict]:
+        pass

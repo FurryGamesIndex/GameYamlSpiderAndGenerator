@@ -145,7 +145,6 @@ class Steam(BasePlugin):
             ret.extend(value for ii in self.tag if i in ii)
         return list(set(ret))
 
-    @property
     def get_tags(self):
         return self.tag
 

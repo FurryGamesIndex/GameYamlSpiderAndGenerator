@@ -17,7 +17,8 @@ class Gcores(BasePlugin):
             f"https://www.gcores.com/gapi/v1/games/{self.id}?include="
             "tags%2Cuser%2Cgame-stores%2Cgame-links%2Cinvolvements.entity.user%2Cactive-entry-vote-activities%2Cactive-entry-vote-activities.vote-activity-options%2Cactive-entry-vote-activity-records%2Cactive-entry-vote-activity-records.vote-activity-option&fields[users]=nickname%2Cthumb&fields[involvements]=position%2Ctitle%2Crank%2Centity&fields[celebrities]=user&fields[organizations]=name&fields[tags]=name%2Ctag-type&meta[tags]=%2C&meta[users]=%2C&meta[celebrities]=%2C&meta[organizations]=%2C"
         )
-        print(self.get_authors())
+        self.tags = self.get_tags()
+        logger.warning(self.tags)
 
     def get_name(self) -> str:
         return self.parser(".data.attributes.title")
@@ -37,8 +38,8 @@ class Gcores(BasePlugin):
             "文案": "screenwriter",
             "美术": "artist",
             "动画": "animation",
-            "制作": "developer",
-            "开发": "developer",
+            "制作": "producer",
+            "开发": "producer",
             "音乐": "musician",
             "音效": "musician",
             "场景": "scenographer",
@@ -104,31 +105,56 @@ class Gcores(BasePlugin):
         ret.append(
             {
                 "name": self.parser('.data.attributes."booom-group-title"'),
-                "role": "producer",
+                "role": ["producer"],
             }
         )
         return ret
 
-    def get_tags(self) -> list[dict]:
-        pass
+    def get_tags(self) -> list[str]:
+        return self.parser(
+            '.included.[] | select(.type == "tags").attributes.name', method="all"
+        )
 
     def get_misc_tags(self) -> list[dict]:
-        pass
+        return []
 
     def get_platforms(self) -> list[str]:
-        pass
+        repl = {
+            "Windows": "windows",
+        }
+        return [repl[i.strip()] for i in self.tags if i in repl.keys()]
 
     def get_langs(self) -> list[str]:
-        pass
+        return ["zh"]
 
     def get_links(self) -> list[dict]:
-        pass
+        downlink = self.parser('.data.attributes."download-link"')
+        if downlink:
+            return [{"name": ".demo-version", "uri": downlink}]
 
     def get_screenshots(self) -> list[str]:
-        pass
+        link: list[str] = self.parser(".data.attributes.screenshots")
+        return ["https://image.gcores.com/" + _ for _ in link]
 
     def to_yaml(self) -> YamlData:
-        pass
+        ret = {
+            "name": self.get_name(),
+            "brief-description": self.get_brief_desc(),
+            "description": self.get_desc(),
+            "description-format": "markdown",
+            "authors": self.get_authors(),
+            "tags": {
+                "type": [],
+                "lang": self.get_langs(),
+                "platform": self.get_platforms(),
+                "publish": [".website"],
+                "misc": self.get_misc_tags(),
+            },
+            "links": self.get_links(),
+            "thumbnail": self.get_thumbnail(),
+            "screenshots": self.get_screenshots(),
+        }
+        return YamlData(self._load_hook(ret))
 
     def parser(self, jq: str, json: dict | str = None, method: str = "first"):
         try:
@@ -138,3 +164,6 @@ class Gcores(BasePlugin):
         except Exception as e:
             logger.warning(f"Parse /{jq}/ failed!({e!r})")
             logger.debug(json)
+
+    def get_type_tags(self) -> list[dict]:
+        pass
