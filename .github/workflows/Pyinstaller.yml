@@ -40,15 +40,6 @@ jobs:
             echo "skip_build=false" >> $env:GITHUB_ENV
           }
 
-      - name: Cache PDM dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/pdm
-            ~/.cache/pip
-          key: windows-pdm-${{ matrix.python-version }}-${{ hashFiles('pdm.lock', 'pyproject.toml') }}
-        if: env.skip_build != 'true'
-
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -67,22 +58,22 @@ jobs:
 
       - name: Build Binary with PyInstaller
         run: |
-           $env:PYTHONPATH = ".\.venv\Lib\site-packages"; pyinstaller --name GameYamlSpider `
-           --add-data "gameyamlspiderandgenerator\plugin:gameyamlspiderandgenerator\plugin" `
-           --add-data "./.venv/lib/site-packages/language_data/data:language_data\data" `
-           --add-data ./.venv/lib/site-packages/ruamel/yaml/string/__plug_in__.py:ruamel/yaml/string `
-           --hidden-import gameyamlspiderandgenerator.plugin.gcores `
-           --hidden-import gameyamlspiderandgenerator.plugin.itchio `
-           --hidden-import gameyamlspiderandgenerator.plugin.steam `
-           --hidden-import yamlgenerator_hook_search `
-           --hidden-import language_data `
-           --hidden-import ruamel.yaml.string `
-           --hidden-import yamlgenerator_hook_validate `
-           pkg.py
+          $env:PYTHONPATH = ".\.venv\Lib\site-packages"; pyinstaller --name GameYamlSpider `
+          --add-data "gameyamlspiderandgenerator\plugin:gameyamlspiderandgenerator\plugin" `
+          --add-data "./.venv/lib/site-packages/language_data/data:language_data\data" `
+          --add-data ./.venv/lib/site-packages/ruamel/yaml/string/__plug_in__.py:ruamel/yaml/string `
+          --hidden-import gameyamlspiderandgenerator.plugin.gcores `
+          --hidden-import gameyamlspiderandgenerator.plugin.itchio `
+          --hidden-import gameyamlspiderandgenerator.plugin.steam `
+          --hidden-import yamlgenerator_hook_search `
+          --hidden-import language_data `
+          --hidden-import ruamel.yaml.string `
+          --hidden-import yamlgenerator_hook_validate `
+          pkg.py
         env:
           PATH: ${{ github.workspace }}/.pdm/bin:${{ env.PATH }}
         if: env.skip_build != 'true'
-        
+
       - name: Package with Zipfile
         run: python -m zipfile -c dist\GameYamlSpider.zip dist\GameYamlSpider
         if: env.skip_build != 'true'
@@ -109,6 +100,8 @@ jobs:
           release_name: Release v${{ env.version }}
           draft: false
           prerelease: ${{ env.pre_release }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Release Assets
         if: env.pre_release == 'false'
