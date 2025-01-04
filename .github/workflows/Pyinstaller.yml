@@ -11,20 +11,22 @@ on:
 permissions:
   contents: write
   actions: write
-
 jobs:
   build:
     runs-on: windows-latest
-
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
       - name: Get Version from pyproject.toml
+        id: get-version
         run: |
           $version = (Get-Content pyproject.toml | Select-String -Pattern '^version = "(.*)"' | ForEach-Object { $_.Matches.Groups[1].Value })
           echo "version=$version" >> $env:GITHUB_ENV
+          echo "::set-output name=version::$version"
 
       - name: Get Last Commit Version
         run: |
@@ -85,13 +87,16 @@ jobs:
       - name: Set Is Pre-release
         id: prerelease-check
         run: |
-          if [[ "${{ env.version }}" =~ (a|b|dev|rc)$ ]]; then
+          version="${{ needs.build.outputs.version }}"
+          echo "version=$version" >> $GITHUB_ENV
+          if [[ "$version" =~ (a|b|dev|rc)$ ]]; then
             echo "This is a pre-release version. Skipping GitHub release."
             echo "pre_release=true" >> $GITHUB_ENV
           else
             echo "This is a stable release."
             echo "pre_release=false" >> $GITHUB_ENV
           fi
+
       - name: Create Release
         if: env.pre_release == 'false'
         uses: actions/create-release@v1
