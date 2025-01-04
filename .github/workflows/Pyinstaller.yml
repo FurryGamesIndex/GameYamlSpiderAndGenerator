@@ -105,10 +105,6 @@ jobs:
 
       - name: Upload Release Assets
         if: env.pre_release == 'false'
-        uses: actions/upload-artifact@v4
+        uses: softprops/action-gh-release@v1
         with:
-          repo: ${{ github.repository }}
-          release_id: ${{ steps.create-release.outputs.id }}
-          asset_path: dist/GameYamlSpider.zip
-          asset_name: windows-binary-${{ env.version }}.zip
-          asset_content_type: application/zip
+          files: dist/GameYamlSpider.zip
