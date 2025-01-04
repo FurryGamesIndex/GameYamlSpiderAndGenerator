@@ -171,7 +171,7 @@ class ItchIO(BasePlugin):
             "description-format": "markdown",
             "authors": self.get_authors(),
             "tags": {
-                "type": self.get_type_tag(),
+                "type": self.get_type_tags(),
                 "lang": self.get_langs(),
                 "platform": self.get_platforms(),
                 "publish": [".itchio"],
@@ -183,7 +183,7 @@ class ItchIO(BasePlugin):
         }
         return YamlData(self._load_hook(ret))
 
-    def get_type_tag(self):
+    def get_type_tags(self):
         repl = {
             "Visual Novel": "visual-novel",
             "Real time strategy": "real-time-strategy",

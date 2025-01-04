@@ -61,7 +61,7 @@ class Steam(BasePlugin):
             "description-format": "markdown",
             "authors": self.get_authors(),
             "tags": {
-                "type": self.get_type_tag(),
+                "type": self.get_type_tags(),
                 "lang": self.get_langs(),
                 "platform": self.get_platforms(),
                 "publish": ["steam"],
@@ -117,7 +117,7 @@ class Steam(BasePlugin):
         repl = {"windows": "windows", "mac": "macos", "linux": "linux"}
         return [repl[i] for i in temp if temp[i]]
 
-    def get_type_tag(self):
+    def get_type_tags(self):
         repl = {
             "Adventure": "adventure",
             "Action": "action",
