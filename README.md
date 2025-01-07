@@ -14,7 +14,7 @@ Rest in peace, nullqwertyuiop.
 
 ```sh
 pip install gameyamlspiderandgenerator
-pip install yamlgenerator-hook-openai # install extra hook
+pip install gameyamlspiderandgenerator[openai] # install extra hook
 python3
 ```
 
@@ -33,8 +33,8 @@ proxy: { }
 git_proxy: null
 hook_configs:
   search:
-    google-play: a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90
-    apple: a714b00383f0662a61b2e382d55c685f17015617aa7048972da58a756fb75e90
+    google-play: # api key from https://serpapi.com/ 
+    apple:  # api key from https://serpapi.com/ 
 
 ```
 
