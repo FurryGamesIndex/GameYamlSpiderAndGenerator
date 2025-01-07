@@ -8,8 +8,8 @@ all = [
 
 [project]
 name = "gameyamlspiderandgenerator"
-version = "2.1.0"
-description = "A useful tool for generating Furrygameindex yaml files"
+version = "2.1.1"
+description = "A useful tool for generating FurryGameIndex yaml files"
 readme = "README.md"
 authors = [
     {name = "kaesinol"},

@@ -1,7 +1,8 @@
 import time
 from pathlib import Path
 
-from gameyamlspiderandgenerator import produce_yaml
+from gameyamlspiderandgenerator.plugin.gcores import Gcores
+from gameyamlspiderandgenerator.plugin.steam import Steam
 from gameyamlspiderandgenerator.util.config import config
 from gameyamlspiderandgenerator.util.fgi_yaml import get_valid_filename
 from gameyamlspiderandgenerator.util.plugin_manager import pkg
@@ -29,7 +30,7 @@ pkg.init()
 
 @get_time
 def test1():
-    yml = produce_yaml("https://finji.itch.io/longest-night")
+    yml = Gcores("https://www.gcores.com/games/133528").to_yaml()
     print(yml)
     with open(get_valid_filename(yml.raw_dict["name"]) + ".zip", "wb") as f:
         f.write(bytes(yml))
@@ -37,7 +38,9 @@ def test1():
 
 @get_time
 def test2():
-    yml = produce_yaml("https://store.steampowered.com/app/1710540/Fall_of_Porcupine/")
+    yml = Steam(
+        "https://store.steampowered.com/app/1710540/Fall_of_Porcupine/"
+    ).to_yaml()
     print(yml)
     with open(get_valid_filename(yml.raw_dict["name"]) + ".zip", "wb") as f:
         f.write(bytes(yml))

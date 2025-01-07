@@ -40,7 +40,7 @@ class CliUnitTest(unittest.TestCase):
                 sys.executable,
                 "-m",
                 "gameyamlspiderandgenerator",
-                "https://fymm-game.itch.io/ddp",
+                "https://www.gcores.com/games/133528",
                 "-f",
                 "tests/test_config.yaml",
                 "--debug",

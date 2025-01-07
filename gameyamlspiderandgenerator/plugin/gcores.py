@@ -18,6 +18,7 @@ class Gcores(BasePlugin):
             "tags%2Cuser%2Cgame-stores%2Cgame-links%2Cinvolvements.entity.user%2Cactive-entry-vote-activities%2Cactive-entry-vote-activities.vote-activity-options%2Cactive-entry-vote-activity-records%2Cactive-entry-vote-activity-records.vote-activity-option&fields[users]=nickname%2Cthumb&fields[involvements]=position%2Ctitle%2Crank%2Centity&fields[celebrities]=user&fields[organizations]=name&fields[tags]=name%2Ctag-type&meta[tags]=%2C&meta[users]=%2C&meta[celebrities]=%2C&meta[organizations]=%2C"
         )
         self.tags = self.get_tags()
+        self.link = link
         logger.warning(self.tags)
 
     def get_name(self) -> str:
@@ -61,10 +62,10 @@ class Gcores(BasePlugin):
                 _ret = {_position_dict[_] for _ in _position_dict if _ in role}
             if isinstance(role, str) and not _ret:
                 logger.warning(f"Can't find {role}")
-                return ["developer"]
+                return ["producer"]
             elif isinstance(role, list) and len(role) != len(_ret):
                 logger.warning(f"Can't find {role}")
-                return ["developer"]
+                return ["producer"]
             else:
                 return list(_ret)
 
@@ -130,7 +131,10 @@ class Gcores(BasePlugin):
     def get_links(self) -> list[dict]:
         downlink = self.parser('.data.attributes."download-link"')
         if downlink:
-            return [{"name": ".demo-version", "uri": downlink}]
+            return [
+                {"name": ".demo-version", "uri": downlink},
+                {"name": ".website", "uri": self.link},
+            ]
 
     def get_screenshots(self) -> list[str]:
         link: list[str] = self.parser(".data.attributes.screenshots")
@@ -144,10 +148,10 @@ class Gcores(BasePlugin):
             "description-format": "markdown",
             "authors": self.get_authors(),
             "tags": {
-                "type": [],
+                "type": self.get_type_tags(),
                 "lang": self.get_langs(),
                 "platform": self.get_platforms(),
-                "publish": [".website"],
+                "publish": ["website"],
                 "misc": self.get_misc_tags(),
             },
             "links": self.get_links(),
@@ -166,4 +170,4 @@ class Gcores(BasePlugin):
             logger.debug(json)
 
     def get_type_tags(self) -> list[dict]:
-        pass
+        return []
