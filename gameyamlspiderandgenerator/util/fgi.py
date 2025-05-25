@@ -1,6 +1,6 @@
 fgi_dict = [
     {
-        "match": r"^https://www.youtube.com/(?!watch\?v=)(?!channel/)(@?.+)",
+        "match": "^https://www\.youtube\.com/(?!watch\?v=)(?!channel/)(@?[^/]+)/?$",
         "prefix": ".youtube",
         "replace": "youtube:@\\g<1>",
     },
@@ -11,6 +11,11 @@ fgi_dict = [
     },
     {
         "match": "^https://twitter.com/([A-Za-z0-9_]+).*",
+        "prefix": ".twitter",
+        "replace": "twitter:\\g<1>",
+    },
+    {
+        "match": "^https://x.com/([A-Za-z0-9_]+).*",
         "prefix": ".twitter",
         "replace": "twitter:\\g<1>",
     },
