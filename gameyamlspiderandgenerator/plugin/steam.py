@@ -212,7 +212,7 @@ class Steam(BasePlugin):
             return parse_qs(urlparse(url).query)["u"][0] if "linkfilter" in url else url
 
         description_div = self._soup.body.find("div", class_="game_area_description")
-        padding_div = self._soup.body.find("div", style="padding-top: 14px;")
+        padding_div = self._soup.body.find("div", id="appDetailsUnderlinedLinks")
         anchor_tags = padding_div.find_all("a")
 
         # 提取链接并移除查询字符串

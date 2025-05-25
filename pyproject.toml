@@ -1,6 +1,6 @@
 [project]
 name = "gameyamlspiderandgenerator"
-version = "2.1.1"
+version = "2.1.2rc"
 description = "A useful tool for generating FurryGameIndex yaml files"
 readme = "README.md"
 authors = [
