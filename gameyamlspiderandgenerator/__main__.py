@@ -111,9 +111,11 @@ elif "." in args.output:
         with open(args.output, "w") as f:
             f.write(str(yml))
     else:
-        logger.error(f"unsupported file format: {args.output[args.output.rfind('.'):]}")
+        logger.error(
+            f"unsupported file format: {args.output[args.output.rfind('.') :]}"
+        )
         exit(1)
 
 else:
-    logger.error(f"unsupported file format: {args.output[args.output.rfind('.'):]}")
+    logger.error(f"unsupported file format: {args.output[args.output.rfind('.') :]}")
     exit(1)

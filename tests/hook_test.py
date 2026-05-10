@@ -1,14 +1,13 @@
+import sys
 import unittest
+from importlib.metadata import version
 from pathlib import Path
 
-
-from gameyamlspiderandgenerator.util.fgi import template_dict
-from gameyamlspiderandgenerator.util.plugin_manager import pkg
+from loguru import logger
 
 from gameyamlspiderandgenerator.util.config import config
-from importlib.metadata import version
-from loguru import logger
-import sys
+from gameyamlspiderandgenerator.util.fgi import template_dict
+from gameyamlspiderandgenerator.util.plugin_manager import pkg
 
 config.load(Path(__file__).parent / "test_config.yaml")
 pkg.init()

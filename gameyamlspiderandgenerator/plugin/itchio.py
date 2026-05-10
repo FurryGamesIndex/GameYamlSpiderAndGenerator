@@ -131,7 +131,7 @@ class ItchIO(BasePlugin):
         link = [
             i.attrs["href"]
             for i in self.soup.select_one(
-                "div.left_col.column > " "div.formatted_description.user_formatted"
+                "div.left_col.column > div.formatted_description.user_formatted"
             ).select("a[href]")
         ]
         data = [{"url": i, "processed": False} for i in list(set(link))]

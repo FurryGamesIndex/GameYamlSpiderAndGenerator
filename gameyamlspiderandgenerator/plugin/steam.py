@@ -5,6 +5,7 @@ from urllib.parse import parse_qs, urlparse
 from bs4 import BeautifulSoup
 from html2text import html2text
 from langcodes import Language, find
+from loguru import logger
 
 from .. import BasePlugin, YamlData
 from ..util.fgi import fgi_dict
@@ -180,33 +181,8 @@ class Steam(BasePlugin):
 
     def get_video(self):
         is_nsfw = self.get_if_nsfw()
-        video_webm = [
-            self._remove_query(i["webm"]["max"]).replace("http", "https")
-            for i in self.data[str(self.id)]["data"]["movies"]
-        ]
-        video_mp4 = [
-            self._remove_query(i["mp4"]["max"]).replace("http", "https")
-            for i in self.data[str(self.id)]["data"]["movies"]
-        ]
-        return [
-            {
-                "video": [
-                    {
-                        "mime": "video/webm",
-                        "sensitive": is_nsfw,
-                        "uri": video_webm[i],
-                    },
-                    {"mime": "video/mp4", "sensitive": is_nsfw, "uri": video_mp4[i]},
-                ]
-                if is_nsfw
-                else [
-                    {"mime": "video/webm", "uri": video_webm[i]},
-                    {"mime": "video/mp4", "uri": video_mp4[i]},
-                ],
-            }
-            for i in range(len(video_webm))
-        ]
-
+        logger.warning(self.data[str(self.id)]["data"]["movies"])
+        return []
     def get_links(self):
         def remove_query_string(url: str):
             return parse_qs(urlparse(url).query)["u"][0] if "linkfilter" in url else url
