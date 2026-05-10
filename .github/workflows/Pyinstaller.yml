@@ -45,17 +45,17 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.11
+          python-version: 3.14
         if: env.skip_build != 'true'
 
-      - name: Install PDM
-        run: pip install pdm
+      - name: Install uv
+        run: pip install uv
         if: env.skip_build != 'true'
 
       - name: Install Dependencies
         run: |
-          pdm install
-          pip install pyinstaller
+          uv sync
+          uv pip install pyinstaller
         if: env.skip_build != 'true'
 
       - name: Build Binary with PyInstaller
@@ -71,8 +71,6 @@ jobs:
           --hidden-import ruamel.yaml.string `
           --hidden-import yamlgenerator_hook_validate `
           pkg.py
-        env:
-          PATH: ${{ github.workspace }}/.pdm/bin:${{ env.PATH }}
         if: env.skip_build != 'true'
 
       - name: Package with Zipfile

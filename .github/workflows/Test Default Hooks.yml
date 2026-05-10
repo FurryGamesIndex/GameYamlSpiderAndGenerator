@@ -20,20 +20,25 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Setup PDM
-        uses: pdm-project/setup-pdm@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.11
-          cache: true
-      - name: Check Cache
-        id: cache-check
+          python-version: 3.14
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Setup uv cache
         uses: actions/cache@v4
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/pdm.lock') }}
+          path: |
+            ~/.cache/uv
+            .venv
+          key: ${{ runner.os }}-uv-${{ hashFiles('uv.lock') }}
+
       - name: Install dependencies
-        if: steps.cache-check.outputs.cache-hit != 'true'
-        run: pdm install
+        run: uv sync --dev
+
       - name: Test with unittest
-        run: |
-          pdm run python -m unittest tests.hook_test
+        run: uv run python -m unittest tests.hook_test
