@@ -63,7 +63,6 @@ jobs:
           $env:PYTHONPATH = ".\.venv\Lib\site-packages"; pyinstaller --name GameYamlSpider `
           --add-data "gameyamlspiderandgenerator\plugin:gameyamlspiderandgenerator\plugin" `
           --add-data "./.venv/lib/site-packages/language_data/data:language_data\data" `
-          --add-data ./.venv/lib/site-packages/ruamel/yaml/string/__plug_in__.py:ruamel/yaml/string `
           --hidden-import gameyamlspiderandgenerator.plugin.gcores `
           --hidden-import gameyamlspiderandgenerator.plugin.itchio `
           --hidden-import gameyamlspiderandgenerator.plugin.steam `

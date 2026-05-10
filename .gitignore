@@ -2,8 +2,7 @@
 .idea
 __pycache__
 dist
-tests/Atopes.zip
-tests/Springblades.zip
+*.zip
 /managed_context/
 /gameyamlspiderandgenerator.egg-info/
 /test_suite_analysis/

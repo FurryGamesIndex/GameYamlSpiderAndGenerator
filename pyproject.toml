@@ -1,6 +1,6 @@
 [project]
 name = "gameyamlspiderandgenerator"
-version = "2.1.2"
+version = "2.1.3"
 description = "A useful tool for generating FurryGameIndex yaml files"
 readme = "README.md"
 authors = [
@@ -27,7 +27,7 @@ dependencies = [
     "yamlgenerator-hook-search>=1.0.1,<2.0",
     "yamlgenerator-hook-validate>=1.0.0a1,<2.0",
     "curl-cffi>=0.7.3",
-    "jq>=1.8.0",
+    "python-jsonpath>=2.0.2",
 ]
 
 urls = { "Homepage" = "https://github.com/FurryGamesIndex/GameYamlSpiderAndGenerator/" }
@@ -35,11 +35,11 @@ urls = { "Homepage" = "https://github.com/FurryGamesIndex/GameYamlSpiderAndGener
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Operating System :: OS Independent",
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows",
@@ -75,3 +75,8 @@ lint = [
 all = [
     "yamlgenerator-hook-openai"
 ]
+[tool.ty.environment]
+python = "./.venv"
+root = ['src']
+[tool.ty.rules]
+invalid-assignment = "ignore"
